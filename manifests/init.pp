@@ -9,3 +9,14 @@ class { 'redis':
   version        => '2.8.13',
   redis_password => 'test',
 }
+
+
+class { 'python':
+  version    => 'system',
+  pip        => true,
+  dev        => true,
+  virtualenv => true,
+  gunicorn   => false,
+}
+
+class { 'graphite': }

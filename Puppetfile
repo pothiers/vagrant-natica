@@ -5,3 +5,6 @@ mod 'camptocamp/augeas'
 mod 'stahnma/epel'
 
 mod 'thomasvandoren/redis'
+
+mod 'stankevich/python'
+mod 'gdsoperations/graphite'
