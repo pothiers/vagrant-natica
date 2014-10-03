@@ -11,12 +11,46 @@ class { 'redis':
 }
 
 
+#! class { 'graphite': }
+
+
+yumrepo { 'ius':
+  descr      => 'ius - stable',
+  baseurl    => 'http://dl.iuscommunity.org/pub/ius/stable/CentOS/6/x86_64/',
+  enabled    => 1,
+  gpgcheck   => 0,
+  priority   => 1,
+  mirrorlist => absent,
+} -> Package<| provider == 'yum' |>
+
+
+#!class { 'python':    
+#!  version    => '3.4.1',
+#!  pip        => true,
+#!  dev        => true,
+#!  virtualenv => true,
+#!  gunicorn   => false,
+#!}
+
 class { 'python':
-  version    => 'system',
-  pip        => true,
+  version    => '34u',
+  pip        => false,
   dev        => true,
   virtualenv => true,
-  gunicorn   => false,
 }
 
-class { 'graphite': }
+
+
+package { 'python34u-pip': } ->
+file { '/usr/bin/pip':
+  ensure => 'link',
+  target => '/usr/bin/pip3.4',
+} ->
+
+
+package { 'graphviz-devel': } ->
+
+
+
+
+python::requirements { '/vagrant/requirements.txt': }

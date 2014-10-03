@@ -14,3 +14,11 @@ tmp
 modules
 .librarian
 Puppetfile.lock
+
+#####################
+# Backup files
+#
+*~
+\#*\#
+.\#*
+OBSOLETE/

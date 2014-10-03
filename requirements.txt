@@ -1,0 +1,43 @@
+#### Initial ordered list (from dq PYTHON_ENV)
+####
+## decorator==3.4.0
+## freetype-py==0.4.2
+## graphviz==0.4
+## hiredis==0.1.4
+## ipython==2.2.0
+## lockfile==0.9.1
+## matplotlib==1.4.0
+## networkx==1.9
+## nose==1.3.4
+## numpy==1.8.1
+## pyfits==3.3
+## pygraphviz==1.3.dev
+## pyparsing==2.0.2
+## python-daemon==1.5.5
+## python-dateutil==2.2
+## redis==2.10.1
+## simpy==3.0.5
+## six==1.7.3
+
+
+# For DQ, DCI2
+decorator==3.4.0
+freetype-py==0.4.2
+#! ipython==2.2.0
+lockfile==0.9.1
+nose==1.3.4
+#pyfits==3.3
+pyparsing==2.0.2
+#! python-daemon==1.5.5
+#! python-dateutil==2.2
+six==1.7.3
+
+graphviz==0.4
+hiredis==0.1.4
+redis==2.10.1
+networkx==1.9
+#! numpy==1.8.1
+#! matplotlib==1.4.0
+#!pygraphviz==1.3.dev
+pygraphviz==1.3rc1
+simpy==3.0.5
