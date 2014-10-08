@@ -70,6 +70,11 @@ file { '/etc/irods/service_account.config':
     content => "IRODS_SERVICE_ACCOUNT_NAME=irods\nIRODS_SERVICE_GROUP_NAME=irods",
     }
 
+# Clear any existing rules and make sure that only rules defined in
+# Puppet exist on the machine.
+resources { "firewall":
+  purge => true
+}
 
 ##############################################################################
 ### Still to go
