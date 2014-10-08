@@ -48,13 +48,11 @@ class { 'redis':
 
 $dbuser = 'pg-irods'
 $dbpass = 'noao-sdm'
-class { 'postgresql::server': 
-  } 
-
+class { 'postgresql::server': } 
 postgresql::server::db { 'icat-db':
     user     => $dbuser,
     password => postgresql_password($dbuser,$dbpass),
-  }
+  } 
 
 package { ['postgresql-odbc',
            'unixODBC', 
@@ -75,6 +73,46 @@ file { '/etc/irods/service_account.config':
 resources { "firewall":
   purge => true
 }
+
+Firewall {
+  before  => Class['irods_fw::post'],
+  require => Class['irods_fw::pre'],
+}
+
+class { ['irods_fw::pre', 'irods_fw::post']: }
+
+class { 'firewall': }
+
+class irods_fw::pre {
+  Firewall {
+    require => undef,
+  }
+
+  # Default firewall rules
+  firewall { '000 accept all icmp':
+    proto   => 'icmp',
+    action  => 'accept',
+  }->
+  firewall { '001 accept all to lo interface':
+    proto   => 'all',
+    iniface => 'lo',
+    action  => 'accept',
+  }->
+  firewall { '002 accept related established rules':
+    proto   => 'all',
+    state => ['RELATED', 'ESTABLISHED'],
+    action  => 'accept',
+  }
+}
+
+class irods_fw::post {
+  Firewall {
+    require => undef,
+  }
+
+  # Default firewall rules
+}
+
 
 ##############################################################################
 ### Still to go
