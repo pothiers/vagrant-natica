@@ -102,7 +102,30 @@ class irods_fw::pre {
     proto   => 'all',
     state => ['RELATED', 'ESTABLISHED'],
     action  => 'accept',
-  }
+  }->
+
+ # IRODS
+ firewall { '100 allow irods':
+    chain   => 'INPUT',
+    state   => ['NEW'],
+    dport   => '1247',
+    proto   => 'tcp',
+    action  => 'accept',
+    }->
+ firewall { '101 allow irods':
+    chain   => 'INPUT',
+    state   => ['NEW'],
+    dport   => '20000-20199',
+    proto   => 'tcp',
+    action  => 'accept',
+    }->
+ firewall { '102 allow irods':
+    chain   => 'INPUT',
+    state   => ['NEW'],
+    dport   => '20000-20199',
+    proto   => 'udp',
+    action  => 'accept',
+    }
 }
 
 class irods_fw::post {
@@ -111,6 +134,7 @@ class irods_fw::post {
   }
 
   # Default firewall rules
+  # (none)
 }
 
 
@@ -121,13 +145,6 @@ class irods_fw::post {
 #! sudo sed -ibak s/-E//  /etc/xinetd.d/auth 
 #! sudo /sbin/chkconfig --level=3 auth on
 #! sudo /etc/init.d/xinetd restart
-##6.  Open your firewall, if necessary, to let in iRODS ::
-##      Add the following to your /etc/sysconfig/iptables:
-##       -A INPUT -m state --state NEW -m tcp -p tcp --dport 1247 -j ACCEPT
-##       -A INPUT -m state --state NEW -m tcp -p tcp --dport 20000:20199 -j ACCEPT
-##       -A INPUT -m state --state NEW -m udp -p udp --dport 20000:20199 -j ACCEPT
-##      Restart the firewall:
-#! sudo service iptables restart
 #!
 #!wget ftp://ftp.renci.org/pub/irods/releases/4.0.3/irods-database-plugin-postgres-1.3-centos6.rpm
 #!wget ftp://ftp.renci.org/pub/irods/releases/4.0.3/irods-icat-4.0.3-64bit-centos6.rpm
