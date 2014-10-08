@@ -40,30 +40,41 @@ class { 'redis':
 #!     source => 'ftp://ftp.renci.org/pub/irods/releases/4.0.3/irods-database-plugin-postgres-1.3-centos6.rpm',
 #! }
 
+
+#sudo service postgresql initdb
+#sudo service postgresql start
+#sudo -u postgres createuser --no-createdb --no-createrole --no-superuser  pg-irods
+#sudo -u postgres createdb  icat-db "icat catalog"
+
 $dbuser = 'pg-irods'
 $dbpass = 'noao-sdm'
 class { 'postgresql::server': 
   } 
 
-postgresql::server::db { 'irodsserver':
+postgresql::server::db { 'icat-db':
     user     => $dbuser,
     password => postgresql_password($dbuser,$dbpass),
   }
 
-package { [#! 'postgresql-server', 
-           #! 'postgresql-odbc',
+package { ['postgresql-odbc',
            'unixODBC', 
            #! 'authd', 
            #! 'fuse-libs', 
            #! 'openssl098e',
           ]: } 
 
+file { '/etc/irods':
+    ensure => directory,
+    } ->
+file { '/etc/irods/service_account.config':
+    content => "IRODS_SERVICE_ACCOUNT_NAME=irods\nIRODS_SERVICE_GROUP_NAME=irods",
+    }
+
+
 ##############################################################################
 ### Still to go
 ###
 
-#! sudo service postgresql initdb
-#! sudo service postgresql start
 #! sudo sed -ibak s/-E//  /etc/xinetd.d/auth 
 #! sudo /sbin/chkconfig --level=3 auth on
 #! sudo /etc/init.d/xinetd restart
@@ -74,20 +85,11 @@ package { [#! 'postgresql-server',
 ##       -A INPUT -m state --state NEW -m udp -p udp --dport 20000:20199 -j ACCEPT
 ##      Restart the firewall:
 #! sudo service iptables restart
-
+#!
 #!wget ftp://ftp.renci.org/pub/irods/releases/4.0.3/irods-database-plugin-postgres-1.3-centos6.rpm
 #!wget ftp://ftp.renci.org/pub/irods/releases/4.0.3/irods-icat-4.0.3-64bit-centos6.rpm
 #!
 #!sudo rpm -i irods-database-plugin-postgres-1.3-centos6.rpm
-#!echo 'noao-sdm' | sudo passwd postgres --stdin
-#!sudo -u postgres createuser --no-createdb --no-createrole --no-superuser  pg-irods 
-#!sudo -u postgres createdb  icat-db "icat catalog"
-#!
-#!cat >/etc/irods/service_account.config <<DONE
-#!IRODS_SERVICE_ACCOUNT_NAME=irods 
-#!IRODS_SERVICE_GROUP_NAME=irods 
-#!DONE
-#!
 #!sudo rpm -i irods-icat-4.0.3-64bit-centos6.rpm
 
 ###
