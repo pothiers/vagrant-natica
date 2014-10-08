@@ -1,6 +1,7 @@
 forge 'https://forgeapi.puppetlabs.com'
 
 mod 'puppetlabs/stdlib'
+mod 'puppetlabs/postgresql'
 mod 'camptocamp/augeas'
 mod 'stahnma/epel'
 

@@ -1,7 +1,14 @@
+# after: vagrant ssh
+# puppet apply --modulepath=/vagrant/modules /vagrant/manifests/init.pp --noop --graph
+# sudo ls /var/lib/puppet/state/graphs/
+
+# include postgresql
 include augeas
 # epel is not needed by the puppet redis module but it's nice to have it
 # already configured in the box
 include epel
+# include concat
+
 
 Class['epel'] -> Package<||>{ provider => 'yum' }
 
@@ -13,6 +20,78 @@ class { 'redis':
 
 #! class { 'graphite': }
 
+#ftp://ftp.renci.org/pub/irods/releases/4.0.3/irods-icat-4.0.3-64bit-centos6.rpm
+#ftp://ftp.renci.org/pub/irods/releases/4.0.3/irods-database-plugin-postgres-1.3-centos6.rpm
+#sudo rpm -i irods-icat-4.0.3-64bit-centos6.rpm irods-database-plugin-postgres-1.3-centos6.rpm
+
+
+#!yumrepo { 'renco':
+#!  baseurl    => 'ftp://ftp.renci.org/pub/irods/releases/4.0.3/',
+#!  #!baseurl    => 'ftp://ftp.renci.org/pub/irods/releases/',
+#!  enabled    => 1,
+#!  gpgcheck   => 0,
+#!  priority   => 1,
+#!  mirrorlist => absent,
+#!} -> Package<| provider == 'yum' |>
+#!
+#!package { 'irods-icat': } 
+
+#! package { 'irods-database-plugin-postgres': 
+#!     source => 'ftp://ftp.renci.org/pub/irods/releases/4.0.3/irods-database-plugin-postgres-1.3-centos6.rpm',
+#! }
+
+$dbuser = 'pg-irods'
+$dbpass = 'noao-sdm'
+class { 'postgresql::server': 
+  } 
+
+postgresql::server::db { 'irodsserver':
+    user     => $dbuser,
+    password => postgresql_password($dbuser,$dbpass),
+  }
+
+package { [#! 'postgresql-server', 
+           #! 'postgresql-odbc',
+           'unixODBC', 
+           #! 'authd', 
+           #! 'fuse-libs', 
+           #! 'openssl098e',
+          ]: } 
+
+##############################################################################
+### Still to go
+###
+
+#! sudo service postgresql initdb
+#! sudo service postgresql start
+#! sudo sed -ibak s/-E//  /etc/xinetd.d/auth 
+#! sudo /sbin/chkconfig --level=3 auth on
+#! sudo /etc/init.d/xinetd restart
+##6.  Open your firewall, if necessary, to let in iRODS ::
+##      Add the following to your /etc/sysconfig/iptables:
+##       -A INPUT -m state --state NEW -m tcp -p tcp --dport 1247 -j ACCEPT
+##       -A INPUT -m state --state NEW -m tcp -p tcp --dport 20000:20199 -j ACCEPT
+##       -A INPUT -m state --state NEW -m udp -p udp --dport 20000:20199 -j ACCEPT
+##      Restart the firewall:
+#! sudo service iptables restart
+
+#!wget ftp://ftp.renci.org/pub/irods/releases/4.0.3/irods-database-plugin-postgres-1.3-centos6.rpm
+#!wget ftp://ftp.renci.org/pub/irods/releases/4.0.3/irods-icat-4.0.3-64bit-centos6.rpm
+#!
+#!sudo rpm -i irods-database-plugin-postgres-1.3-centos6.rpm
+#!echo 'noao-sdm' | sudo passwd postgres --stdin
+#!sudo -u postgres createuser --no-createdb --no-createrole --no-superuser  pg-irods 
+#!sudo -u postgres createdb  icat-db "icat catalog"
+#!
+#!cat >/etc/irods/service_account.config <<DONE
+#!IRODS_SERVICE_ACCOUNT_NAME=irods 
+#!IRODS_SERVICE_GROUP_NAME=irods 
+#!DONE
+#!
+#!sudo rpm -i irods-icat-4.0.3-64bit-centos6.rpm
+
+###
+##############################################################################
 
 yumrepo { 'ius':
   descr      => 'ius - stable',
@@ -23,23 +102,12 @@ yumrepo { 'ius':
   mirrorlist => absent,
 } -> Package<| provider == 'yum' |>
 
-
-#!class { 'python':    
-#!  version    => '3.4.1',
-#!  pip        => true,
-#!  dev        => true,
-#!  virtualenv => true,
-#!  gunicorn   => false,
-#!}
-
 class { 'python':
   version    => '34u',
   pip        => false,
   dev        => true,
   virtualenv => true,
 }
-
-
 
 package { 'python34u-pip': } ->
 file { '/usr/bin/pip':
@@ -49,8 +117,9 @@ file { '/usr/bin/pip':
 
 
 package { 'graphviz-devel': } ->
-
-
-
-
 python::requirements { '/vagrant/requirements.txt': }
+
+python::pip {'daflsim': 
+    pkgname => 'daflsim',
+    url => 'https://github.com/pothiers/daflsim/archive/master.zip',
+    }

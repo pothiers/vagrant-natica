@@ -22,3 +22,5 @@ Puppetfile.lock
 \#*\#
 .\#*
 OBSOLETE/
+
+graphs/
