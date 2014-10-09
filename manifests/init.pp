@@ -2,49 +2,18 @@
 # sudo puppet apply --modulepath=/vagrant/modules /vagrant/manifests/init.pp --noop --graph
 # sudo ls /var/lib/puppet/state/graphs/
 
-# include postgresql
 include augeas
+
 # epel is not needed by the puppet redis module but it's nice to have it
 # already configured in the box
 include epel
 # include concat
 
 
-Class['epel'] -> Package<||>{ provider => 'yum' }
-
 class { 'redis':
   version        => '2.8.13',
   redis_password => 'test',
 }
-
-
-#! class { 'graphite': }
-
-#ftp://ftp.renci.org/pub/irods/releases/4.0.3/irods-icat-4.0.3-64bit-centos6.rpm
-#ftp://ftp.renci.org/pub/irods/releases/4.0.3/irods-database-plugin-postgres-1.3-centos6.rpm
-#sudo rpm -i irods-icat-4.0.3-64bit-centos6.rpm irods-database-plugin-postgres-1.3-centos6.rpm
-
-
-#!yumrepo { 'renco':
-#!  baseurl    => 'ftp://ftp.renci.org/pub/irods/releases/4.0.3/',
-#!  #!baseurl    => 'ftp://ftp.renci.org/pub/irods/releases/',
-#!  enabled    => 1,
-#!  gpgcheck   => 0,
-#!  priority   => 1,
-#!  mirrorlist => absent,
-#!} -> Package<| provider == 'yum' |>
-#!
-#!package { 'irods-icat': } 
-
-#! package { 'irods-database-plugin-postgres': 
-#!     source => 'ftp://ftp.renci.org/pub/irods/releases/4.0.3/irods-database-plugin-postgres-1.3-centos6.rpm',
-#! }
-
-
-#sudo service postgresql initdb
-#sudo service postgresql start
-#sudo -u postgres createuser --no-createdb --no-createrole --no-superuser  pg-irods
-#sudo -u postgres createdb  icat-db "icat catalog"
 
 $dbuser = 'pg-irods'
 $dbpass = 'noao-sdm'
@@ -54,12 +23,6 @@ postgresql::server::db { 'icat-db':
     password => postgresql_password($dbuser,$dbpass),
   } 
 
-package { ['postgresql-odbc',
-           'unixODBC', 
-           #! 'authd', 
-           'fuse-libs', 
-           'openssl098e',
-          ]: } 
 
 file { '/etc/irods':
     ensure => directory,
@@ -87,22 +50,6 @@ class irods_fw::pre {
   Firewall {
     require => undef,
   }
-
-  # Default firewall rules
-  firewall { '000 accept all icmp':
-    proto   => 'icmp',
-    action  => 'accept',
-  }->
-  firewall { '001 accept all to lo interface':
-    proto   => 'all',
-    iniface => 'lo',
-    action  => 'accept',
-  }->
-  firewall { '002 accept related established rules':
-    proto   => 'all',
-    state => ['RELATED', 'ESTABLISHED'],
-    action  => 'accept',
-  }->
 
  # IRODS
  firewall { '100 allow irods':
@@ -141,6 +88,10 @@ class irods_fw::post {
 #wget ftp://ftp.renci.org/pub/irods/releases/4.0.3/irods-database-plugin-postgres-1.3-centos6.rpm
 #sudo rpm -i irods-database-plugin-postgres-1.3-centos6.rpm
 
+# There has to be a better way!!!
+$irods_depends = ['postgresql-odbc', 'unixODBC',  'authd', 
+                  'fuse-libs',   'openssl098e',  ]
+package { $irods_depends : } ->
 wget::fetch { 'get irods-icat':
     source => 'ftp://ftp.renci.org/pub/irods/releases/4.0.3/irods-icat-4.0.3-64bit-centos6.rpm',
     destination => '/tmp/irods-icat-4.0.3-64bit-centos6.rpm',
@@ -149,18 +100,15 @@ package { 'irods-icat':
     ensure => installed,
     provider => rpm,
     source => '/tmp/irods-icat-4.0.3-64bit-centos6.rpm',
-  }
-
+  } ->
 wget::fetch { 'get irods pg plugin':
     source => 'ftp://ftp.renci.org/pub/irods/releases/4.0.3/irods-database-plugin-postgres-1.3-centos6.rpm',
     destination => '/tmp/irods-database-plugin-postgres-1.3-centos6.rpm',
-    } 
-#!package { 'irods-database-plugin-postgres':
-#!    source => '/tmp/irods-database-plugin-postgres-1.3-centos6.rpm',
-#!    provider => 'rpm',
-#!  }
-
-
+    } ->
+package { 'irods-database-plugin-postgres':
+    source => '/tmp/irods-database-plugin-postgres-1.3-centos6.rpm',
+    provider => rpm,
+  }
 
 
 ##############################################################################
