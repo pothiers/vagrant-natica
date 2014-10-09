@@ -15,6 +15,10 @@ class { 'redis':
   redis_password => 'test',
 }
 
+user { 'irods':  ensure => 'present', }
+user { 'rods':  ensure => 'present', }
+
+
 $dbuser = 'pg-irods'
 $dbpass = 'noao-sdm'
 class { 'postgresql::server': } 
@@ -23,13 +27,18 @@ postgresql::server::db { 'icat-db':
     password => postgresql_password($dbuser,$dbpass),
   } 
 
+    
 
 file { '/etc/irods':
     ensure => directory,
     } ->
 file { '/etc/irods/service_account.config':
     content => "IRODS_SERVICE_ACCOUNT_NAME=irods\nIRODS_SERVICE_GROUP_NAME=irods",
-    }
+    } 
+#!file { '/etc/irods/irods.config' :
+#!    source => 'puppet:///modules/irods/setupirodsconfig.txt',
+#!  }
+
 
 # Clear any existing rules and make sure that only rules defined in
 # Puppet exist on the machine.
@@ -88,27 +97,47 @@ class irods_fw::post {
 #wget ftp://ftp.renci.org/pub/irods/releases/4.0.3/irods-database-plugin-postgres-1.3-centos6.rpm
 #sudo rpm -i irods-database-plugin-postgres-1.3-centos6.rpm
 
-# There has to be a better way!!!
+define irods_package($pname = $title) {
+    $rpmname = "$pname-4.0.3-64bit-centos6.rpm"
+    wget::fetch { "fetch $pname":
+      source      => "ftp://ftp.renci.org/pub/irods/releases/4.0.3/$rpmname",
+      destination => '/tmp/$rpmname',
+    } ->
+    package { "install $pname":
+      source   => "/tmp/$rpmname",
+      provider => rpm,
+    }
+  }
+
+
 $irods_depends = ['postgresql-odbc', 'unixODBC',  'authd', 
                   'fuse-libs',   'openssl098e',  ]
 package { $irods_depends : } ->
-wget::fetch { 'get irods-icat':
-    source => 'ftp://ftp.renci.org/pub/irods/releases/4.0.3/irods-icat-4.0.3-64bit-centos6.rpm',
-    destination => '/tmp/irods-icat-4.0.3-64bit-centos6.rpm',
-    } ->
 package { 'irods-icat':
-    ensure => installed,
-    provider => rpm,
-    source => '/tmp/irods-icat-4.0.3-64bit-centos6.rpm',
+  provider => 'rpm',
+  source   =>
+'ftp://ftp.renci.org/pub/irods/releases/4.0.3/irods-icat-4.0.3-64bit-centos6.rpm',
+  } -> 
+package { 'irods-runtime':
+  provider => 'rpm',
+  source   =>
+'ftp://ftp.renci.org/pub/irods/releases/4.0.3/irods-runtime-4.0.3-64bit-centos6.rpm',
+  } -> 
+package { 'irods-icommands':
+  provider => 'rpm',
+  source   =>
+'ftp://ftp.renci.org/pub/irods/releases/4.0.3/irods-icommands-4.0.3-64bit-centos6.rpm',
   } ->
-wget::fetch { 'get irods pg plugin':
-    source => 'ftp://ftp.renci.org/pub/irods/releases/4.0.3/irods-database-plugin-postgres-1.3-centos6.rpm',
-    destination => '/tmp/irods-database-plugin-postgres-1.3-centos6.rpm',
-    } ->
 package { 'irods-database-plugin-postgres':
-    source => '/tmp/irods-database-plugin-postgres-1.3-centos6.rpm',
-    provider => rpm,
-  }
+  provider => 'rpm',
+  source   =>
+'ftp://ftp.renci.org/pub/irods/releases/4.0.3/irods-database-plugin-postgres-1.3-centos6.rpm',
+  } 
+
+#!irods_package { 'irods-icat': } ->
+#!irods_package { 'irods-database-plugin-postgres': } ->
+#!irods_package { 'irods-runtime': } ->
+#!irods_package { 'irods-icommands': } 
 
 
 ##############################################################################
