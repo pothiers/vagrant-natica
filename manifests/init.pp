@@ -1,5 +1,5 @@
 # after: vagrant ssh
-# puppet apply --modulepath=/vagrant/modules /vagrant/manifests/init.pp --noop --graph
+# sudo puppet apply --modulepath=/vagrant/modules /vagrant/manifests/init.pp --noop --graph
 # sudo ls /var/lib/puppet/state/graphs/
 
 # include postgresql
@@ -57,8 +57,8 @@ postgresql::server::db { 'icat-db':
 package { ['postgresql-odbc',
            'unixODBC', 
            #! 'authd', 
-           #! 'fuse-libs', 
-           #! 'openssl098e',
+           'fuse-libs', 
+           'openssl098e',
           ]: } 
 
 file { '/etc/irods':
@@ -132,25 +132,44 @@ class irods_fw::post {
   Firewall {
     require => undef,
   }
-
   # Default firewall rules
   # (none)
 }
 
+#wget ftp://ftp.renci.org/pub/irods/releases/4.0.3/irods-icat-4.0.3-64bit-centos6.rpm
+#sudo rpm -i irods-icat-4.0.3-64bit-centos6.rpm
+#wget ftp://ftp.renci.org/pub/irods/releases/4.0.3/irods-database-plugin-postgres-1.3-centos6.rpm
+#sudo rpm -i irods-database-plugin-postgres-1.3-centos6.rpm
+
+wget::fetch { 'get irods-icat':
+    source => 'ftp://ftp.renci.org/pub/irods/releases/4.0.3/irods-icat-4.0.3-64bit-centos6.rpm',
+    destination => '/tmp/irods-icat-4.0.3-64bit-centos6.rpm',
+    } ->
+package { 'irods-icat':
+    ensure => installed,
+    provider => rpm,
+    source => '/tmp/irods-icat-4.0.3-64bit-centos6.rpm',
+  }
+
+wget::fetch { 'get irods pg plugin':
+    source => 'ftp://ftp.renci.org/pub/irods/releases/4.0.3/irods-database-plugin-postgres-1.3-centos6.rpm',
+    destination => '/tmp/irods-database-plugin-postgres-1.3-centos6.rpm',
+    } 
+#!package { 'irods-database-plugin-postgres':
+#!    source => '/tmp/irods-database-plugin-postgres-1.3-centos6.rpm',
+#!    provider => 'rpm',
+#!  }
+
+
+
 
 ##############################################################################
-### Still to go
+### Still tto go
 ###
 
 #! sudo sed -ibak s/-E//  /etc/xinetd.d/auth 
 #! sudo /sbin/chkconfig --level=3 auth on
 #! sudo /etc/init.d/xinetd restart
-#!
-#!wget ftp://ftp.renci.org/pub/irods/releases/4.0.3/irods-database-plugin-postgres-1.3-centos6.rpm
-#!wget ftp://ftp.renci.org/pub/irods/releases/4.0.3/irods-icat-4.0.3-64bit-centos6.rpm
-#!
-#!sudo rpm -i irods-database-plugin-postgres-1.3-centos6.rpm
-#!sudo rpm -i irods-icat-4.0.3-64bit-centos6.rpm
 
 ###
 ##############################################################################
