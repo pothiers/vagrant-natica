@@ -11,7 +11,6 @@ spec/fixtures/modules/
 .vagrant
 .tmp
 tmp
-modules
 .librarian
 Puppetfile.lock
 

@@ -1,0 +1,16 @@
+tempZone
+1247
+20000
+20199
+/var/lib/irods/iRODS/Vault
+TEMP_LOCAL_ZONE_SID
+temp_32_byte_key_for_agent__conn
+rods
+
+yes
+0.0.0.0
+5432
+ICAT
+irods
+irods-sdm
+yes

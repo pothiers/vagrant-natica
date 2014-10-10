@@ -1,0 +1,31 @@
+1.0.1 2014-01-03
+- Correct CHANGELOG date for 1.0.0
+- Correct README to say that we support upgrades.
+
+1.0.0 2014-01-03
+- Install (nearly) everything to a Python virtualenv. This will cleanly
+  upgrade existing installations, but you may wish to tidy up some old
+  packages/directories yourself.
+- Pull in `stankevich/python` module.
+- Optional support for carbon-aggregator. See class docs.
+- Allow version to be specified. Currently defaults to `0.9.12`.
+- Make `rake test` call `puppet-syntax`.
+
+0.2.4 2013-12-17
+ - Republish of 0.2.3 because Puppetforge won't delete a bad uploaded version
+
+0.2.3 2013-12-17
+ - Run carbon-cache with --debug (so it logs to STDOUT again)
+
+0.2.2 2013-11-28
+ - Don't run carbon-cache with --debug option
+
+0.2.1 2013-11-26
+ - Fix deprecation warnings by using @-prefixed variables in templates
+ - Fix Modulefile format to enable forge to properly understand dependencies
+
+0.2.0 2013-09-02
+ - Add the ability to pass through the source or content of the carbon.conf config file.
+
+0.1.0 2013-08-08
+ - Initial commit introduction a puppet module for graphite
