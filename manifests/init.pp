@@ -1,6 +1,6 @@
 # after: vagrant ssh
 # sudo puppet apply --modulepath=/vagrant/modules /vagrant/manifests/init.pp --noop --graph
-# sudo ls /var/lib/puppet/state/graphs/
+# sudo cp -r /var/lib/puppet/state/graphs/ /vagrant/
 
 include augeas
 
@@ -17,36 +17,6 @@ class { 'redis':
 
 $dbuser = 'irods' # must match IRODS_SERVICE_ACCOUNT_NAME per manual.rst!
 $dbpass = 'irods-sdm'
-
-#!user { 'irods':  
-#!  ensure => 'present', 
-#!    home => '/var/lib/irods/iRODS', # circular dependencies!!!
-#!    managehome => false,
-#!  } ->
-#!file { '/var/lib/irods':
-#!    ensure => directory,
-#!    owner   => 'irods',
-#!    mode    => 'u+wX',
-#!    recurse => true,
-#!    } ->
-#!user { 'rods':  
-#!  ensure => 'present', 
-#!  password => 'rods',
-#!  } ->
-#!file { '/etc/irods':
-#!    ensure => directory,
-#!    owner  => 'irods',
-#!    recurse => true,
-#!    }
-#!file { '/etc/irods/service_account.config':
-#!   content => "IRODS_SERVICE_ACCOUNT_NAME=irods\nIRODS_SERVICE_GROUP_NAME=irods\n",
-#!  } ->
-#!file { '/etc/irods/irods.config' :
-#!    source => '/vagrant/modules/irods/setupirodsconfig.txt',
-#!    owner  => 'irods',
-#!    mode   => 'u+w',
-#!  } ->
-
 
 ################### 
 ### Firewall setup
@@ -104,10 +74,6 @@ package { 'irods-icat':
   provider => 'rpm',
   source   => "$irodsbase/irods-icat-4.0.3-64bit-centos6.rpm",
   } -> 
-#!package { 'irods-resource':
-#!  provider => 'rpm',
-#!  source   => "$irodsbase/irods-resource-4.0.3-64bit-centos6.rpm",
-#!  } -> 
 package { 'irods-runtime':
   provider => 'rpm',
   source   => "$irodsbase/irods-runtime-4.0.3-64bit-centos6.rpm",
@@ -119,17 +85,19 @@ package { 'irods-icommands':
 package { 'irods-database-plugin-postgres':
   provider => 'rpm',
   source   => "$irodsbase/irods-database-plugin-postgres-1.3-centos6.rpm",
-  } #->
+  } ->
 class { 'postgresql::server': } ->
 postgresql::server::db { 'ICAT':
     user     => $dbuser,
     password => $dbpass,
-  } ->
-exec { '/var/lib/irods/packaging/setup_irods.sh < /vagrant/modules/irods/setup_irods.input' :  # !!!
+  } 
+
+$irods_setup_in = '/vagrant/modules/irods/setup_irods.input'
+Package [ 'irods-icat' ] ->
+Postgresql::Server::Db['ICAT'] ->
+exec { "/var/lib/irods/packaging/setup_irods.sh < $irods_setup_in" :  
     creates => '/tmp/irods/setup_irods_configuration.flag',
     }
-#!    logoutput => true,
-#!    loglevel => 'debug',
 
 
 
