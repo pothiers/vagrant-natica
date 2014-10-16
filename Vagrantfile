@@ -2,6 +2,10 @@
 # vi: set ft=ruby :
 
 Vagrant.configure("2") do |config|
+
+  config.vm.provision "shell",
+    inline: "yum upgrade -y puppet"
+
   if Vagrant.has_plugin?("vagrant-cachier")
     config.cache.auto_detect = true
     config.cache.scope       = :box
@@ -30,4 +34,6 @@ Vagrant.configure("2") do |config|
 # '--parser future',
     ]
   end
+
+
 end
