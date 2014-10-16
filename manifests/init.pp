@@ -97,7 +97,13 @@ Package [ 'irods-icat' ] ->
 Postgresql::Server::Db['ICAT'] ->
 exec { "/var/lib/irods/packaging/setup_irods.sh < $irods_setup_in" :  
     creates => '/tmp/irods/setup_irods_configuration.flag',
-    }
+    } ->
+exec { '/sbin/service irods status' :
+  logoutput => true,
+  } -> 
+exec { '/bin/su - irods -c ils' :
+  logoutput => true,
+  } 
 
 
 
@@ -125,5 +131,5 @@ package { 'graphviz-devel': } ->
 python::requirements { '/vagrant/requirements.txt': } ->
 python::pip {'daflsim': 
     pkgname => 'daflsim',
-    url => 'https://github.com/pothiers/daflsim/archive/master.zip',
+    url     => 'https://github.com/pothiers/daflsim/archive/master.zip',
     }
