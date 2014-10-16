@@ -1,3 +1,5 @@
+irods
+irods
 tempZone
 1247
 20000
@@ -6,9 +8,9 @@ tempZone
 TEMP_LOCAL_ZONE_SID
 temp_32_byte_key_for_agent__conn
 rods
-
+temppasswd
 yes
-0.0.0.0
+localhost
 5432
 ICAT
 irods

@@ -15,52 +15,38 @@ class { 'redis':
   redis_password => 'test',
 }
 
-user { 'irods':  
-  ensure => 'present', 
-    home => '/var/lib/irods/iRODS', # circular dependencies!!!
-    managehome => false,
-  } ->
-file { '/var/lib/irods':
-    ensure => directory,
-    owner   => 'irods',
-    mode    => 'u+wX',
-    recurse => true,
-    } 
-
-user { 'rods':  
-  ensure => 'present', 
-  password => 'rods',
-  }
-
-
 $dbuser = 'irods' # must match IRODS_SERVICE_ACCOUNT_NAME per manual.rst!
 $dbpass = 'irods-sdm'
-class { 'postgresql::server': } 
-postgresql::server::db { 'ICAT':
-    user     => $dbuser,
-    password => $dbpass,
-  } 
-    
 
-file { '/etc/irods':
-    ensure => directory,
-    owner  => 'irods',
-    recurse => true,
-    } ->
-file { '/etc/irods/service_account.config':
-   content => "IRODS_SERVICE_ACCOUNT_NAME=irods\nIRODS_SERVICE_GROUP_NAME=irods\n",
-  } ->
-file { '/etc/irods/irods.config' :
-    source => '/vagrant/modules/irods/setupirodsconfig.txt',
-    owner  => 'irods',
-    mode   => 'u+w',
-  } ->
-#exec { '/var/lib/irods/packaging/setup_irods.sh' :  
-notify { 'run setup_irods_puppet.sh' : } ->
-exec { '/vagrant/modules/irods/setup_irods_puppet.sh' :  # !!!
-    creates => '/tmp/irods/setup_irods_configuration.flag',
-    logoutput => true,
-    }
+#!user { 'irods':  
+#!  ensure => 'present', 
+#!    home => '/var/lib/irods/iRODS', # circular dependencies!!!
+#!    managehome => false,
+#!  } ->
+#!file { '/var/lib/irods':
+#!    ensure => directory,
+#!    owner   => 'irods',
+#!    mode    => 'u+wX',
+#!    recurse => true,
+#!    } ->
+#!user { 'rods':  
+#!  ensure => 'present', 
+#!  password => 'rods',
+#!  } ->
+#!file { '/etc/irods':
+#!    ensure => directory,
+#!    owner  => 'irods',
+#!    recurse => true,
+#!    }
+#!file { '/etc/irods/service_account.config':
+#!   content => "IRODS_SERVICE_ACCOUNT_NAME=irods\nIRODS_SERVICE_GROUP_NAME=irods\n",
+#!  } ->
+#!file { '/etc/irods/irods.config' :
+#!    source => '/vagrant/modules/irods/setupirodsconfig.txt',
+#!    owner  => 'irods',
+#!    mode   => 'u+w',
+#!  } ->
+
 
 ################### 
 ### Firewall setup
@@ -69,21 +55,16 @@ exec { '/vagrant/modules/irods/setup_irods_puppet.sh' :  # !!!
 resources { "firewall":
   purge => true
 }
-
 Firewall {
   before  => Class['irods_fw::post'],
   require => Class['irods_fw::pre'],
 }
-
 class { ['irods_fw::pre', 'irods_fw::post']: }
-
 class { 'firewall': }
-
 class irods_fw::pre {
   Firewall {
     require => undef,
   }
-
  # IRODS
  firewall { '100 allow irods':
     chain   => 'INPUT',
@@ -107,7 +88,6 @@ class irods_fw::pre {
     action  => 'accept',
     }
 }
-
 class irods_fw::post {
   Firewall {
     require => undef,
@@ -139,18 +119,19 @@ package { 'irods-icommands':
 package { 'irods-database-plugin-postgres':
   provider => 'rpm',
   source   => "$irodsbase/irods-database-plugin-postgres-1.3-centos6.rpm",
-  } 
+  } #->
+class { 'postgresql::server': } ->
+postgresql::server::db { 'ICAT':
+    user     => $dbuser,
+    password => $dbpass,
+  } ->
+exec { '/var/lib/irods/packaging/setup_irods.sh < /vagrant/modules/irods/setup_irods.input' :  # !!!
+    creates => '/tmp/irods/setup_irods_configuration.flag',
+    }
+#!    logoutput => true,
+#!    loglevel => 'debug',
 
 
-
-##############################################################################
-### Still tto go
-###
-#! sudo sed -ibak s/-E//  /etc/xinetd.d/auth 
-#! sudo /sbin/chkconfig --level=3 auth on
-#! sudo /etc/init.d/xinetd restart
-###
-##############################################################################
 
 yumrepo { 'ius':
   descr      => 'ius - stable',
@@ -166,18 +147,14 @@ class { 'python':
   pip        => false,
   dev        => true,
   virtualenv => true,
-}
-
+} ->
 package { 'python34u-pip': } ->
 file { '/usr/bin/pip':
   ensure => 'link',
   target => '/usr/bin/pip3.4',
 } ->
-
-
 package { 'graphviz-devel': } ->
-python::requirements { '/vagrant/requirements.txt': }
-
+python::requirements { '/vagrant/requirements.txt': } ->
 python::pip {'daflsim': 
     pkgname => 'daflsim',
     url => 'https://github.com/pothiers/daflsim/archive/master.zip',
