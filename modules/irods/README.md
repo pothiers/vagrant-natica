@@ -15,28 +15,31 @@
 
 ## Overview
 
-A one-maybe-two sentence summary of what the module does/what problem it solves.
-This is your 30 second elevator pitch for your module. Consider including
-OS/Puppet version it works with.
+Install and configure irods. see: https://github.com/irods/irods
+Works with CentOS 6.5, maybe others.  Uses Puppet 3.7.1
 
 ## Module Description
 
-If applicable, this section should have a brief description of the technology
-the module integrates with and what that integration enables. This section
-should answer the questions: "What does this module *do*?" and "Why would I use
-it?"
+Installs and configures iRODS from RPMs.
+Integrates with Postgresql. After a new VM is created and this module
+successfull used, you can run iCommands as "irods" user.
+e.g. '/bin/su - irods -c ils'
 
-If your module has a range of functionality (installation, configuration,
-management, etc.) this is the time to mention it.
+
 
 ## Setup
 
 ### What irods affects
 
-* A list of files, packages, services, or operations that the module will alter,
-  impact, or execute on the system it's installed on.
-* This is a great place to stick any warnings.
-* Can be in list or paragraph form.
+* Loads packages irods needs plus postgres:
+* Setups up and starts the postgres DB for use with irods
+* Modifies firewall settings to allow irods connections (TCP, UDP)
+* Starts the iRODS server
+
+__WARNING: Blindly feeds answers to *setup_irods.sh* prompts.__
+The *setup_irods.sh* script comes from the irods RPMs. If the precise
+order or count of prompts is issues changes at all, this will break!
+  
 
 ### Setup Requirements **OPTIONAL**
 
@@ -45,16 +48,22 @@ etc.), mention it here.
 
 ### Beginning with irods
 
-The very basic steps needed for a user to get the module up and running.
+```puppet
+class { 'irods':
+  setup_input_file =>  '/vagrant/modules/irods/setup_irods.input',
+}
+```
 
-If your most recent release breaks compatibility or requires particular steps
-for upgrading, you may wish to include an additional section here: Upgrading
-(For an example, see http://forge.puppetlabs.com/puppetlabs/firewall).
 
 ## Usage
 
-Put the classes, types, and resources for customizing, configuring, and doing
-the fancy stuff with your module here.
+```puppet
+class { 'irods':
+  setup_input_file =>  '/vagrant/modules/irods/setup_irods.input',
+  dbuser           => 'irods',
+  dbpass           => 'irods-temppasswd',
+}
+```
 
 ## Reference
 
@@ -63,17 +72,32 @@ This section should include all of the under-the-hood workings of your module so
 people know what the module is touching on their system but don't need to mess
 with things. (We are working on automating this section!)
 
+* Classes
+  * firewall
+  * irods_fw::pre
+  * irods_fw::post
+  * postgresql::server::db
+* Resources
+  * firewall
+* Packages
+  * Dependencies
+    * postgresql-odbc
+    * unixODBC
+    * authd
+    * fuse-libs
+    * openssl098e
+  * iRODS (4.0.3)
+    * irods-icat
+    * irods-runtime
+    * irods-icommands
+    * irods-database-plugin-postgres
+  * postgresql
+* Exec
+  * of setup_irods.sh from irods packages
+
+
 ## Limitations
 
-This is where you list OS compatibility, version compatibility, etc.
+* Gets iRODS RPMs directly from ftp://ftp.renci.org/pub/irods/releases/4.0.3
 
-## Development
 
-Since your module is awesome, other users will want to play with it. Let them
-know what the ground rules for contributing are.
-
-## Release Notes/Contributors/Etc **Optional**
-
-If you aren't using changelog, put your release notes here (though you should
-consider using changelog). You may also add any additional sections you feel are
-necessary or important to include here. Please use the `## ` header.

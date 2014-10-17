@@ -1,45 +1,33 @@
 # == Class: irods
 #
-# This class will install and configure irods
+# This class will install and configure irods.
 # see: https://github.com/irods/irods
 #
 # === Parameters
 #
 # Document parameters here.
 #
-# [*sample_parameter*]
-#   Explanation of what this parameter affects and what it defaults to.
-#   e.g. "Specify one or more upstream ntp servers as an array."
-#
-# === Variables
-#
-# Here you should define a list of variables that this module would require.
-#
-# [*sample_variable*]
-#   Explanation of how this variable affects the funtion of this class and if
-#   it has a default. e.g. "The parameter enc_ntp_servers must be set by the
-#   External Node Classifier as a comma separated list of hostnames." (Note,
-#   global variables should be avoided in favor of class parameters as
-#   of Puppet 2.6.)
+# [*dbuser*]
+#   Postgresql database usename for irods.
+#   default='irods'
+# [*dbpass*]
+#   Postgresql database password for irods.
+#   default='irods-sdm'
 #
 # === Examples
 #
 #  class { 'irods':
-#    servers => [ 'pool.ntp.org', 'ntp.local.company.com' ],
+#    setup_input_file =>  '/vagrant/modules/irods/setup_irods.input',
 #  }
 #
 # === Authors
 #
-# Author Name <author@domain.com>
-#
-# === Copyright
-#
-# Copyright 2014 Your name here, unless otherwise noted.
+# S.Pothier <pothier@email.noao.edu>
 #
 class irods (
   $setup_input_file = 'setup_irods.input',
   $dbuser = 'irods', # must match IRODS_SERVICE_ACCOUNT_NAME per manual.rst!
-  $dbpass = 'irods-sdm',
+  $dbpass = 'irods-temppasswd',
   ) {
   
   ################### 
@@ -66,7 +54,7 @@ class irods (
       dport   => '1247',
       proto   => 'tcp',
       action  => 'accept',
-    } 
+    }
     firewall { '101 allow irods':
       chain   => 'INPUT',
       state   => ['NEW'],
@@ -92,23 +80,23 @@ class irods (
   
   $irods_depends = ['postgresql-odbc', 'unixODBC',  'authd', 
                     'fuse-libs',   'openssl098e',  ]
-  $irodsbase = "ftp://ftp.renci.org/pub/irods/releases/4.0.3"
+  $irodsbase = 'ftp://ftp.renci.org/pub/irods/releases/4.0.3'
   package { $irods_depends : } ->
   package { 'irods-icat':
     provider => 'rpm',
-    source   => "$irodsbase/irods-icat-4.0.3-64bit-centos6.rpm",
+    source   => "${irodsbase}/irods-icat-4.0.3-64bit-centos6.rpm",
     } -> 
   package { 'irods-runtime':
     provider => 'rpm',
-    source   => "$irodsbase/irods-runtime-4.0.3-64bit-centos6.rpm",
+    source   => "${irodsbase}/irods-runtime-4.0.3-64bit-centos6.rpm",
     } -> 
   package { 'irods-icommands':
     provider => 'rpm',
-    source   => "$irodsbase/irods-icommands-4.0.3-64bit-centos6.rpm",
+    source   => "${irodsbase}/irods-icommands-4.0.3-64bit-centos6.rpm",
     } ->
   package { 'irods-database-plugin-postgres':
     provider => 'rpm',
-    source   => "$irodsbase/irods-database-plugin-postgres-1.3-centos6.rpm",
+    source   => "${irodsbase}/irods-database-plugin-postgres-1.3-centos6.rpm",
     } ->
   class { 'postgresql::server': } ->
   postgresql::server::db { 'ICAT':
@@ -128,7 +116,7 @@ class irods (
       exec { '/bin/su - irods -c ils' :
         logoutput => true,
       } ->
-      notify { 'success' : 
+      notify { 'success' :
         message  => "iRODS is up and running!",
         }
   }
