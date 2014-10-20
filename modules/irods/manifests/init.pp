@@ -79,7 +79,7 @@ class irods (
   }
   
   $irods_depends = ['postgresql-odbc', 'unixODBC',  'authd', 
-                    'fuse-libs',   'openssl098e',  ]
+                    'fuse-libs',   'openssl098e']
   $irodsbase = 'ftp://ftp.renci.org/pub/irods/releases/4.0.3'
   package { $irods_depends : } ->
   package { 'irods-icat':

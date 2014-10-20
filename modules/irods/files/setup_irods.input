@@ -14,5 +14,5 @@ localhost
 5432
 ICAT
 irods
-irods-sdm
+irods-temppasswd
 yes

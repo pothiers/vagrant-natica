@@ -16,100 +16,8 @@ class { 'redis':
   redis_password => 'test',
 }
 
-#!$dbuser = 'irods' # must match IRODS_SERVICE_ACCOUNT_NAME per manual.rst!
-#!$dbpass = 'irods-sdm'
-#!
-#!################### 
-#!### Firewall setup
-#!# Clear any existing rules and make sure that only rules defined in
-#!# Puppet exist on the machine.
-#!resources { "firewall":
-#!  purge => true
-#!}
-#!Firewall {
-#!  before  => Class['irods_fw::post'],
-#!  require => Class['irods_fw::pre'],
-#!}
-#!class { ['irods_fw::pre', 'irods_fw::post']: }
-#!class { 'firewall': }
-#!class irods_fw::pre {
-#!  Firewall {
-#!    require => undef,
-#!  }
-#! # IRODS
-#! firewall { '100 allow irods':
-#!    chain   => 'INPUT',
-#!    state   => ['NEW'],
-#!    dport   => '1247',
-#!    proto   => 'tcp',
-#!    action  => 'accept',
-#!    }->
-#! firewall { '101 allow irods':
-#!    chain   => 'INPUT',
-#!    state   => ['NEW'],
-#!    dport   => '20000-20199',
-#!    proto   => 'tcp',
-#!    action  => 'accept',
-#!    }->
-#! firewall { '102 allow irods':
-#!    chain   => 'INPUT',
-#!    state   => ['NEW'],
-#!    dport   => '20000-20199',
-#!    proto   => 'udp',
-#!    action  => 'accept',
-#!    }
-#!}
-#!class irods_fw::post {
-#!  Firewall {
-#!    require => undef,
-#!  }
-#!  # Default firewall rules
-#!  # (none)
-#!}
-#!
-#!$irods_depends = ['postgresql-odbc', 'unixODBC',  'authd', 
-#!                  'fuse-libs',   'openssl098e',  ]
-#!$irodsbase = "ftp://ftp.renci.org/pub/irods/releases/4.0.3"
-#!package { $irods_depends : } ->
-#!package { 'irods-icat':
-#!  provider => 'rpm',
-#!  source   => "$irodsbase/irods-icat-4.0.3-64bit-centos6.rpm",
-#!  } -> 
-#!package { 'irods-runtime':
-#!  provider => 'rpm',
-#!  source   => "$irodsbase/irods-runtime-4.0.3-64bit-centos6.rpm",
-#!  } -> 
-#!package { 'irods-icommands':
-#!  provider => 'rpm',
-#!  source   => "$irodsbase/irods-icommands-4.0.3-64bit-centos6.rpm",
-#!  } ->
-#!package { 'irods-database-plugin-postgres':
-#!  provider => 'rpm',
-#!  source   => "$irodsbase/irods-database-plugin-postgres-1.3-centos6.rpm",
-#!  } ->
-#!class { 'postgresql::server': } ->
-#!postgresql::server::db { 'ICAT':
-#!    user     => $dbuser,
-#!    password => $dbpass,
-#!  } 
-#!
-#!$irods_setup_in = '/vagrant/modules/irods/setup_irods.input'
-#!Package [ 'irods-icat' ] ~>
-#!Postgresql::Server::Db['ICAT'] ~>
-#!exec { "/var/lib/irods/packaging/setup_irods.sh < $irods_setup_in" :  
-#!    creates => '/tmp/irods/setup_irods_configuration.flag',
-#!    } ->
-#!# Just for "testing"
-#!exec { '/sbin/service irods status' :
-#!  logoutput => true,
-#!  } -> 
-#!exec { '/bin/su - irods -c ils' :
-#!  logoutput => true,
-#!  } 
-
-
 class { 'irods':
-  setup_input_file =>  '/vagrant/modules/irods/setup_irods.input',
+  setup_input_file =>  '/vagrant/modules/irods/files/setup_irods.input',
 }
 
 yumrepo { 'ius':
@@ -134,7 +42,17 @@ file { '/usr/bin/pip':
 } ->
 package { 'graphviz-devel': } ->
 python::requirements { '/vagrant/requirements.txt': } ->
-python::pip {'daflsim': 
-    pkgname => 'daflsim',
-    url     => 'https://github.com/pothiers/daflsim/archive/master.zip',
-    }
+
+# Get from github now. But its in PyPI for when things stabalize!!!
+python::pip {'daflsim':
+  pkgname => 'daflsim',
+  url     => 'https://github.com/pothiers/daflsim/archive/master.zip',
+}
+
+# Orig is "pre-alpha".  Better to avoid it now. Orig is also python 2.7,
+# this branch upgraded to universal -- maybe.
+#
+#!python::pip {'irodsclient':
+#!  url => 'https://github.com/pothiers/python-irodsclient/archive/master.zip',
+#!}
+
