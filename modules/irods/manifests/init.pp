@@ -102,7 +102,7 @@ class irods (
   postgresql::server::db { 'ICAT':
     user     => $dbuser,
     password => $dbpass,
-  } 
+  }
   
   Package [ 'irods-icat' ] ~>
   Postgresql::Server::Db['ICAT'] ~>

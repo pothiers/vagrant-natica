@@ -10,6 +10,11 @@ include epel
 
 package { 'emacs' : }
 
+user { 'testuser' :
+  ensure     => present,
+  managehome => true,
+  password   => sha1('testuser'),
+  }
 
 class { 'redis':
   version        => '2.8.13',
