@@ -1,0 +1,40 @@
+###########################################################
+#
+# The iCommands have been installed into your path.
+# 
+# They require your environment to be configured
+# for communication with an iRODS server.
+#
+# Place the following configuration information into
+# your .irodsEnv file and edit as appropriate:
+#
+#    ~/.irods/.irodsEnv
+#
+###########################################################
+
+# iRODS server host name:
+irodsHost '172.16.1.12'
+# iRODS server port number:
+irodsPort 1247
+# Default storage resource name:
+irodsDefResource 'demoResc'
+# Home directory in iRODS:
+irodsHome '/tempZone/home/rods'
+# Current directory in iRODS:
+irodsCwd '/tempZone/home/rods'
+# Account name:
+irodsUserName 'vagrant'
+# Zone:
+irodsZone 'tempZone'
+# Enable Advanced Client-Server negotiation:
+irodsClientServerNegotiation 'request_server_negotiation'
+# Client-Server connection policy:
+irodsClientServerPolicy 'CS_NEG_REFUSE'
+# Client-Server Encryption Key Size In Bytes:
+irodsEncryptionKeySize '32'
+# Client-Server Encryption Salt Size In Bytes:
+irodsEncryptionSaltSize '8'
+# Client-Server Encryption Number of Hash Rounds:
+irodsEncryptionNumHashRounds '16'
+# Client-Server Encryption Algorithm:
+irodsEncryptionAlgorithm 'AES-256-CBC'

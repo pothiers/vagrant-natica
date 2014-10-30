@@ -10,7 +10,7 @@ include augeas
 # already configured in the box
 include epel
 
-package { 'emacs' : }
+package { ['emacs', 'xorg-x11-xauth'] : }
 
 user { 'testuser' :
   ensure     => 'present',

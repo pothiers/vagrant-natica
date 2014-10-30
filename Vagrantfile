@@ -1,6 +1,12 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+# MUST bring up "valley" before "mountain".
+#   vagrant up valley mountain
+#
+# This is because the irods "iinit" command used on clients to set up
+# the connection is run as part of mountain provisioning.
+
 Vagrant.configure("2") do |config|
   #! vagrant plugin install vagrant-cachier
   if Vagrant.has_plugin?("vagrant-cachier")
@@ -13,7 +19,8 @@ Vagrant.configure("2") do |config|
   config.hostmanager.manage_host = false
   config.hostmanager.ignore_private_ip = false
   config.hostmanager.include_offline = true
-
+  config.ssh.forward_agent = true
+  config.ssh.forward_x11 = true
 
   config.vm.provision "shell",
     inline: "yum upgrade -y puppet"

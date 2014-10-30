@@ -1,4 +1,4 @@
-# Intended for mountain top provisioning
+# Intended for provisioning of: mountain top
 
 include augeas
 
@@ -6,19 +6,13 @@ include augeas
 # already configured in the box
 include epel
 
-package { 'emacs' : }
+package { ['emacs', 'xorg-x11-xauth'] : }
 
 user { 'testuser' :
   ensure     => 'present',
   managehome => true,
   password   => '$1$4jJ0.K0P$eyUInImhwKruYp4G/v2Wm1',
-  }
-
-user { 'cache' :
-  ensure     => 'present',
-  managehome => true,
-  password   =>  md5('cache'),
-  }
+}
 
 
 class { 'redis':
@@ -26,7 +20,39 @@ class { 'redis':
   redis_password => 'test',
 }
 
+package { 'telnet': }
 
+$irodsbase = 'ftp://ftp.renci.org/pub/irods/releases/4.0.3'
+package { ['fuse-libs','openssl098e']: } ->
+package { 'irods-icommands':
+  provider => 'rpm',
+  source   => "${irodsbase}/irods-icommands-4.0.3-64bit-centos6.rpm",
+  } 
+
+#!$iinit_input = '/vagrant/valley/modules/irods/files/iinit.input'
+#!exec { "/usr/bin/iinit < ${iinit_input}":
+#!  require => Package['irods-icommands'],
+#!  user    => 'testuser',
+#!}
+file { '/home/testuser/.irods':
+  ensure  => 'directory',
+  owner   => 'testuser',
+  group   => 'testuser',
+  require => User['testuser'],
+  } ->
+file { '/home/testuser/.irods/.irodsA':
+  owner   => 'testuser',
+  group   => 'testuser',
+  source  => '/vagrant/irodsA',
+  } ->
+file { '/home/testuser/.irods/.irodsEnv':
+  owner   => 'testuser',
+  group   => 'testuser',
+  source  => '/vagrant/irodsEnv',
+  } 
+    
+    
+  
 yumrepo { 'ius':
   descr      => 'ius - stable',
   baseurl    => 'http://dl.iuscommunity.org/pub/ius/stable/CentOS/6/x86_64/',
