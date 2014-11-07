@@ -28,7 +28,7 @@ package { 'irods-icommands':
   source   => "${irodsbase}/irods-icommands-4.0.3-64bit-centos6.rpm",
   } 
 
-$vault='/var/lib/irods/iRODS/Vault'
+$vault='/var/lib/irods/iRODS/dciVault'
 file { '/home/testuser/.irods':
   ensure  => 'directory',
   owner   => 'testuser',
