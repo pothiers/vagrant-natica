@@ -13,7 +13,7 @@
 ###########################################################
 
 # iRODS server host name:
-irodsHost '172.16.1.12'
+irodsHost 'valley.test.noao.edu'
 # iRODS server port number:
 irodsPort 1247
 # Default storage resource name:
@@ -23,7 +23,7 @@ irodsHome '/tempZone/home/rods'
 # Current directory in iRODS:
 irodsCwd '/tempZone/home/rods'
 # Account name:
-irodsUserName 'vagrant'
+irodsUserName 'rods'
 # Zone:
 irodsZone 'tempZone'
 # Enable Advanced Client-Server negotiation:

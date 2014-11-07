@@ -26,14 +26,13 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell",
     inline: "yum upgrade -y puppet"
 
-  config.vm.synced_folder "../tada", "/sandbox/tada"
   config.vm.box     = 'centos65'
   config.vm.box_url = 'http://puppet-vagrant-boxes.puppetlabs.com/centos-65-x64-virtualbox-puppet.box'
 
   config.vm.define "mountain" do |mountain|
     mountain.vm.network :private_network, ip: "172.16.1.11"
-    mountain.vm.hostname = "mountain"
-    mountain.hostmanager.aliases =  %w(mountain.test.noao.edu)
+    mountain.vm.hostname = "mountain.test.noao.edu"
+    mountain.hostmanager.aliases =  %w(mountain)
 
     mountain.vm.provision :puppet do |puppet|
       puppet.manifests_path = "mountain/manifests"
@@ -51,8 +50,8 @@ Vagrant.configure("2") do |config|
 
   config.vm.define "valley" do |valley|
     valley.vm.network :private_network, ip: "172.16.1.12"
-    valley.vm.hostname = "valley"
-    valley.hostmanager.aliases =  %w(valley.test.noao.edu iserver)
+    valley.vm.hostname = "valley.test.noao.edu"
+    valley.hostmanager.aliases =  %w(valley iserver)
 
     valley.vm.provision :puppet do |puppet|
       puppet.manifests_path = "valley/manifests"
