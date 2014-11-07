@@ -6,7 +6,7 @@ include augeas
 # already configured in the box
 include epel
 
-package { ['emacs', 'xorg-x11-xauth'] : }
+package { ['emacs', 'xorg-x11-xauth', 'cups'] : }
 
 user { 'testuser' :
   ensure     => 'present',
@@ -29,29 +29,53 @@ package { 'irods-icommands':
   source   => "${irodsbase}/irods-icommands-4.0.3-64bit-centos6.rpm",
   } 
 
+
 #!$iinit_input = '/vagrant/valley/modules/irods/files/iinit.input'
 #!exec { "/usr/bin/iinit < ${iinit_input}":
 #!  require => Package['irods-icommands'],
 #!  user    => 'testuser',
 #!}
+$vault='/var/lib/irods/iRODS/Vault'
 file { '/home/testuser/.irods':
   ensure  => 'directory',
   owner   => 'testuser',
   group   => 'testuser',
   require => User['testuser'],
   } ->
-file { '/home/testuser/.irods/.irodsA':
-  owner   => 'testuser',
-  group   => 'testuser',
-  source  => '/vagrant/irodsA',
-  } ->
-file { '/home/testuser/.irods/.irodsEnv':
-  owner   => 'testuser',
-  group   => 'testuser',
-  source  => '/vagrant/irodsEnv',
-  } 
-    
-    
+#!file { '/home/testuser/.irods/.irodsA':
+#!  owner   => 'testuser',
+#!  group   => 'testuser',
+#!  source  => '/vagrant/irodsA',
+#!  } ->
+#!file { '/home/testuser/.irods/.irodsEnv':
+#!  owner   => 'testuser',
+#!  group   => 'testuser',
+#!  source  => '/vagrant/irodsEnv',
+#!  } 
+
+##  ARG!!! Cannot seem to feed iinit via file so that it is happy. Do manual for now!!!  
+#!exec { 'irod-iinit':
+#!   command => "/usr/bin/iinit < /vagrant/iinit.input",
+#!   require => Package['irods-icommands'],
+#!   user    => 'testuser',
+#!   } ->
+#! exec { 'irod-resource':
+#!   command => "/usr/bin/iadmin mkresc dciResc 'unixfilesystem' valley.test.noao.edu:${vault}",
+#!   require => Package['irods-icommands'],
+#!   user    => 'testuser',
+#!   } 
+  
+
+# !!! The following yields rcConnect error from irods when run during provisioning.
+#     "ERROR: _rcConnect: setRhostInfo error, irodsHost is probably not set correctly status = -302000 USER_RODS_HOST_EMPTY"
+# Yet it works when typed in under testuser. But it prompts for password despite the .irodsA
+# file being in place.
+#
+#!exec { 'irod-resource':
+#!  command => "/usr/bin/iadmin mkresc dciResc 'unixfilesystem' valley.test.noao.edu:${vault}",
+#!  require => Package['irods-icommands'],
+#!  user    => 'testuser',
+#!}
   
 yumrepo { 'ius':
   descr      => 'ius - stable',
@@ -81,4 +105,5 @@ python::pip {'daflsim':
   pkgname => 'daflsim',
   url     => 'https://github.com/pothiers/daflsim/archive/master.zip',
 }
+
 

@@ -1,0 +1,4 @@
+irodsHost valley.test.noao.edu
+irodsPort 1247
+irodsUserName rods
+irodsZone tempZone

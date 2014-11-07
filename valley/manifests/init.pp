@@ -10,7 +10,7 @@ include augeas
 # already configured in the box
 include epel
 
-package { ['emacs', 'xorg-x11-xauth'] : }
+package { ['emacs', 'xorg-x11-xauth', 'cups', 'wireshark-gnome'] : }
 
 user { 'testuser' :
   ensure     => 'present',
@@ -64,4 +64,5 @@ python::pip {'daflsim':
 #!python::pip {'irodsclient':
 #!  url => 'https://github.com/pothiers/python-irodsclient/archive/master.zip',
 #!}
+
 
