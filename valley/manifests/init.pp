@@ -50,17 +50,16 @@ file { '/usr/bin/pip':
   target => '/usr/bin/pip3.4',
 } ->
 package { 'graphviz-devel': } ->
-python::requirements { '/vagrant/requirements.txt': } ->
+python::requirements { '/vagrant/requirements.txt': } 
 
 # Get from github now. But its in PyPI for when things stabalize!!!
-python::pip {'daflsim':
-  pkgname => 'daflsim',
-  url     => 'https://github.com/pothiers/daflsim/archive/master.zip',
-}
+#!python::pip {'daflsim':
+#!  pkgname => 'daflsim',
+#!  url     => 'https://github.com/pothiers/daflsim/archive/master.zip',
+#!}
 
 # Orig is "pre-alpha".  Better to avoid it now. Orig is also python 2.7,
 # this branch upgraded to universal -- maybe.
-#
 #!python::pip {'irodsclient':
 #!  url => 'https://github.com/pothiers/python-irodsclient/archive/master.zip',
 #!}

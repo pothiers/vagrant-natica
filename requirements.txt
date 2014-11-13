@@ -40,7 +40,13 @@ hiredis==0.1.4
 redis==2.10.1
 networkx==1.9
 #! numpy==1.8.1
-#! matplotlib==1.4.0
+#! matplotlib==1.4.0b
 #!pygraphviz==1.3.dev
 pygraphviz==1.3rc1
 simpy==3.0.5
+
+# pip install will not install pre-release using default (no version) specifier
+#! dataq>=0.0.dev0
+
+# Use current version from github
+#! -e git+git@github.com:pothiers/data-queue.git#egg=dataq
