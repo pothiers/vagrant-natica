@@ -44,6 +44,7 @@ Vagrant.configure("2") do |config|
        '--report',
        '--show_diff',
        '--pluginsync',
+       "--hiera_config /vagrant/hiera.yaml"
       ]
     end
 

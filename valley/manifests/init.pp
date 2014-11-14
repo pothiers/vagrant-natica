@@ -4,6 +4,13 @@
 # sudo puppet apply --modulepath=/vagrant/modules /vagrant/manifests/init.pp --noop --graph
 # sudo cp -r /var/lib/puppet/state/graphs/ /vagrant/
 
+if versioncmp($::puppetversion,'3.6.1') >= 0 {
+  $allow_virtual_packages = hiera('allow_virtual_packages',false)
+  Package {
+    allow_virtual => $allow_virtual_packages,
+  }
+}
+
 include augeas
 
 # epel is not needed by the puppet redis module but it's nice to have it

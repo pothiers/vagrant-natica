@@ -85,11 +85,11 @@ exec { 'dataq':
   require => Package['python34u-pip']
   } ->
 file {  '/var/run/dataq':
-  endure => 'directory',
+  ensure => 'directory',
   mode   => '0777',
   } ->
 file {  '/var/log/dataq':
-  endure => 'directory',
+  ensure => 'directory',
   mode   => '0777',
 }
 
@@ -106,12 +106,19 @@ exec { 'dqsvcpop':
 $astroprinter='astro'
 $mountaincache='/var/tada/mountain_cache'
 service { 'cups':
-  ensure => 'running',
-  enable => true,
+  ensure  => 'running',
+  enable  => true,
+  require => Package['cups'],
   } ->
 file {  '/usr/lib/cups/backend/astropost':
   source => '/sandbox/tada/astro/astropost',
   mode   => '0700',
+  } ->
+file {  '/usr/lib/cups/lib':
+  ensure => directory,
+  } ->
+file {  '/usr/lib/cups/lib/astro':
+  ensure => directory,
   } ->
 file {  '/usr/lib/cups/lib/astro/pushfile.sh':
   source => '/sandbox/tada/astro/pushfile.sh',
@@ -121,7 +128,7 @@ file { $mountaincache:
   mode   => '0777',
   } ->
 exec { 'add-astro-printer':
-  command => "lpadmin -p ${astroprinter} -v astropost:${mountaincache} -E",
+  command => "/usr/sbin/lpadmin -p ${astroprinter} -v astropost:${mountaincache} -E",
   }
 
 
