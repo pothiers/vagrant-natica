@@ -84,6 +84,14 @@ exec { 'dataq':
   #!  require => Python::requirements['/vagrant/requirements.txt']
   require => Package['python34u-pip']
   } ->
+file {  '/etc/dataq':
+  ensure => 'directory',
+  mode   => '0644',
+  } ->
+file {  '/etc/dataq/dq.conf':
+  source => '/sandbox/data-queue/data/dq_config.json',
+  mode   => '0744',
+  } ->
 file {  '/var/run/dataq':
   ensure => 'directory',
   mode   => '0777',

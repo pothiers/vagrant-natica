@@ -27,7 +27,7 @@ user { 'testuser' :
 
 class { 'redis':
   version        => '2.8.13',
-  redis_password => 'test',
+  redis_max_memory  => '1gb',
 }
 
 class { 'irods':
@@ -58,6 +58,33 @@ file { '/usr/bin/pip':
 } ->
 package { 'graphviz-devel': } ->
 python::requirements { '/vagrant/requirements.txt': } 
+
+exec { 'dataq':
+  command => '/usr/bin/python3 /sandbox/data-queue/setup.py install',
+  #!  require => Python::requirements['/vagrant/requirements.txt']
+  require => Package['python34u-pip']
+  } ->
+file {  '/etc/dataq':
+  ensure => 'directory',
+  mode   => '0644',
+  } ->
+file {  '/var/run/dataq':
+  ensure => 'directory',
+  mode   => '0777',
+  } ->
+file {  '/var/log/dataq':
+  ensure => 'directory',
+  mode   => '0777',
+}
+
+exec { 'dqsvcpush':
+  command => '/usr/bin/dqsvcpush > /var/log/dataq/push.log 2>&1 &',
+  require => File['/var/run/dataq'],
+}
+exec { 'dqsvcpop':
+  command => '/usr/bin/dqsvcpop > /var/log/dataq/pop.log 2>&1 &',
+  require => File['/var/run/dataq'],
+}
 
 # Get from github now. But its in PyPI for when things stabalize!!!
 #!python::pip {'daflsim':
