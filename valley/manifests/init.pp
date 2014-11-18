@@ -68,6 +68,10 @@ file {  '/etc/dataq':
   ensure => 'directory',
   mode   => '0644',
   } ->
+file {  '/etc/dataq/dq.conf':
+  source => '/sandbox/data-queue/data/dq_config.json',
+  mode   => '0744',
+  } ->
 file {  '/var/run/dataq':
   ensure => 'directory',
   mode   => '0777',
@@ -76,6 +80,21 @@ file {  '/var/log/dataq':
   ensure => 'directory',
   mode   => '0777',
 }
+
+file {  '/var/tada':
+  ensure => 'directory',
+  mode   => '0777',
+}
+file {  '/var/tada/non-archive':
+  ensure => 'directory',
+  mode   => '0777',
+}
+file {  '/var/tada/archive':
+  ensure => 'directory',
+  mode   => '0777',
+}
+
+
 
 exec { 'dqsvcpush':
   command => '/usr/bin/dqsvcpush > /var/log/dataq/push.log 2>&1 &',

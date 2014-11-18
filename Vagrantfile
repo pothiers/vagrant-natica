@@ -1,6 +1,10 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+## TODO:
+##   Re-factor.  modules for tada, dq
+##
+
 # MUST bring up "valley" before "mountain".
 #   vagrant up valley mountain
 #

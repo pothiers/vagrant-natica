@@ -121,6 +121,8 @@ service { 'cups':
 file {  '/usr/lib/cups/backend/astropost':
   source => '/sandbox/tada/astro/astropost',
   mode   => '0700',
+  owner  => 'root',
+  group  => 'root',
   } ->
 file {  '/usr/lib/cups/lib':
   ensure => directory,
@@ -132,7 +134,12 @@ file {  '/usr/lib/cups/lib/astro/pushfile.sh':
   source => '/sandbox/tada/astro/pushfile.sh',
   mode   => '0555',
   } ->
+file { '/var/tada':
+  ensure => 'directory',
+  mode   => '0777',
+  } ->
 file { $mountaincache:
+  ensure => 'directory',
   mode   => '0777',
   } ->
 exec { 'add-astro-printer':
