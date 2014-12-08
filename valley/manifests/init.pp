@@ -64,19 +64,19 @@ exec { 'dataq':
   #!  require => Python::requirements['/vagrant/requirements.txt']
   require => Package['python34u-pip']
   } ->
-file {  '/etc/dataq':
+file {  '/etc/tada':
   ensure => 'directory',
   mode   => '0644',
   } ->
-file {  '/etc/dataq/dq.conf':
+file {  '/etc/tada/dq.conf':
   source => '/sandbox/data-queue/data/dq_config.json',
   mode   => '0744',
   } ->
-file {  '/var/run/dataq':
+file {  '/var/run/tada':
   ensure => 'directory',
   mode   => '0777',
   } ->
-file {  '/var/log/dataq':
+file {  '/var/log/tada':
   ensure => 'directory',
   mode   => '0777',
 }
@@ -97,12 +97,12 @@ file {  '/var/tada/archive':
 
 
 exec { 'dqsvcpush':
-  command => '/usr/bin/dqsvcpush > /var/log/dataq/push.log 2>&1 &',
-  require => File['/var/run/dataq'],
+  command => '/usr/bin/dqsvcpush > /var/log/tada/push.log 2>&1 &',
+  require => File['/var/run/tada'],
 }
 exec { 'dqsvcpop':
-  command => '/usr/bin/dqsvcpop > /var/log/dataq/pop.log 2>&1 &',
-  require => File['/var/run/dataq'],
+  command => '/usr/bin/dqsvcpop > /var/log/tada/pop.log 2>&1 &',
+  require => File['/var/run/tada'],
 }
 
 # Get from github now. But its in PyPI for when things stabalize!!!
