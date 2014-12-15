@@ -58,3 +58,6 @@ wheel==0.24.0
 
 # Use current version from github
 #! -e git+git@github.com:pothiers/data-queue.git#egg=dataq
+#! -e git+git@github.com:pothiers/tada.git#egg=tada
+git+https://github.com/pothiers/data-queue.git#egg=dataq
+git+https://github.com/pothiers/tada.git#egg=tada

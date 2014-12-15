@@ -1,5 +1,12 @@
 # Intended for provisioning of: mountain top
 
+if versioncmp($::puppetversion,'3.6.1') >= 0 {
+  $allow_virtual_packages = hiera('allow_virtual_packages',false)
+  Package {
+    allow_virtual => $allow_virtual_packages,
+  }
+}
+
 include augeas
 
 # epel is not needed by the puppet redis module but it's nice to have it
@@ -12,6 +19,13 @@ user { 'testuser' :
   ensure     => 'present',
   managehome => true,
   password   => '$1$4jJ0.K0P$eyUInImhwKruYp4G/v2Wm1',
+}
+
+user { 'tadauser' :
+  ensure     => 'present',
+  managehome => true,
+  # tada"Password"
+  password   => '$1$Pk1b6yel$tPE2h9vxYE248CoGKfhR41',
 }
 
 class { 'redis':
@@ -29,29 +43,30 @@ package { 'irods-icommands':
   } 
 
 $vault='/var/lib/irods/iRODS/dciVault'
-file { '/home/testuser/.irods':
+file { '/home/tadauser/.irods':
   ensure  => 'directory',
-  owner   => 'testuser',
-  group   => 'testuser',
-  require => User['testuser'],
+  owner   => 'tadauser',
+  group   => 'tadauser',
+  require => User['tadauser'],
   } ->
-file { '/home/testuser/.irods/.irodsEnv':
-  owner   => 'testuser',
-  group   => 'testuser',
+file { '/home/tadauser/.irods/.irodsEnv':
+  owner   => 'tadauser',
+  group   => 'tadauser',
   source  => '/vagrant/mountain/files/irodsEnv',
   } ->
 exec { 'irod-iinit':
-  environment => ['HOME=/home/testuser'],
+  environment => ['HOME=/home/tadauser'],
   command     => '/usr/bin/iinit temppasswd',
   require     => Package['irods-icommands'],
-  user        => 'testuser',
-  } ->
-exec { 'irod-resource':
-  environment => ['HOME=/home/testuser'],
-  command     => "/usr/bin/iadmin mkresc dciResc 'unixfilesystem' valley.test.noao.edu:${vault}",
-  require     => Package['irods-icommands'],
-  user        => 'testuser',
-  } 
+  user        => 'tadauser',
+}
+#!->
+#!exec { 'irod-resource':
+#!  environment => ['HOME=/home/tadauser'],
+#!  command     => "/usr/bin/iadmin mkresc dciResc 'unixfilesystem' valley.test.noao.edu:${vault}",
+#!  require     => Package['irods-icommands'],
+#!  user        => 'tadauser',
+#!  } 
 
 yumrepo { 'ius':
   descr      => 'ius - stable',

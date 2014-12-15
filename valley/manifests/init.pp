@@ -25,6 +25,13 @@ user { 'testuser' :
   password   => '$1$4jJ0.K0P$eyUInImhwKruYp4G/v2Wm1',
   }
 
+user { 'tadauser' :
+  ensure     => 'present',
+  managehome => true,
+  # tada"Password"
+  password   => '$1$Pk1b6yel$tPE2h9vxYE248CoGKfhR41',
+}
+
 class { 'redis':
   version        => '2.8.13',
   redis_max_memory  => '1gb',
@@ -35,6 +42,38 @@ class { 'irods':
   #!!! How?
   setup_input_file =>  '/vagrant/valley/modules/irods/files/setup_irods.input',
 }
+
+#!package { 'irods-icommands':
+#!  provider => 'rpm',
+#!  source   => "${irodsbase}/irods-icommands-4.0.3-64bit-centos6.rpm",
+#!  require  => Package['fuse-libs','openssl098e'],
+#!  } 
+
+
+$vault='/var/lib/irods/iRODS/dciVault'
+file { '/home/tadauser/.irods':
+  ensure  => 'directory',
+  owner   => 'tadauser',
+  group   => 'tadauser',
+  require => User['tadauser'],
+  } ->
+file { '/home/tadauser/.irods/.irodsEnv':
+  owner   => 'tadauser',
+  group   => 'tadauser',
+  source  => '/vagrant/mountain/files/irodsEnv',
+  } ->
+exec { 'irod-iinit':
+  environment => ['HOME=/home/tadauser'],
+  command     => '/usr/bin/iinit temppasswd',
+  require     => [Package['irods-icommands'], Class['irods']],
+  user        => 'tadauser',
+  } ->
+exec { 'irod-resource':
+  environment => ['HOME=/home/tadauser'],
+  command     => "/usr/bin/iadmin mkresc dciResc 'unixfilesystem' valley.test.noao.edu:${vault}",
+  require     => Package['irods-icommands'],
+  user        => 'tadauser',
+  } 
 
 yumrepo { 'ius':
   descr      => 'ius - stable',
