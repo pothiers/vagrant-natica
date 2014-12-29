@@ -50,7 +50,7 @@ class { 'irods':
 #!  } 
 
 
-$vault='/var/lib/irods/iRODS/dciVault'
+$vault='/var/lib/irods/iRODS/tadaVault'
 file { '/home/tadauser/.irods':
   ensure  => 'directory',
   owner   => 'tadauser',
@@ -70,10 +70,16 @@ exec { 'irod-iinit':
   } ->
 exec { 'irod-resource':
   environment => ['HOME=/home/tadauser'],
-  command     => "/usr/bin/iadmin mkresc dciResc 'unixfilesystem' valley.test.noao.edu:${vault}",
+  command     => "/usr/bin/iadmin mkresc tadaResc 'unixfilesystem' valley.test.noao.edu:${vault}",
   require     => Package['irods-icommands'],
   user        => 'tadauser',
-  } 
+  } ->
+exec { 'irod-resource':
+  environment => ['HOME=/home/tadauser'],
+  command     => "/usr/bin/iadmin mkzone noao-tuc-z1 remote",
+  require     => Package['irods-icommands'],
+  user        => 'tadauser',
+  } ->
 
 yumrepo { 'ius':
   descr      => 'ius - stable',

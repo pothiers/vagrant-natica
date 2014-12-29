@@ -8,7 +8,7 @@
 # MUST bring up "valley" before "mountain".
 #   vagrant up valley mountain
 #
-# This is because the irods "iinit" command used on clients to set up
+# This is because the irods "iinit" command used on cUlients to set up
 # the connection is run as part of mountain provisioning.
 
 Vagrant.configure("2") do |config|
