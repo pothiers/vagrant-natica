@@ -31,7 +31,7 @@ Vagrant.configure("2") do |config|
     inline: "yum upgrade -y puppet"
 
   config.vm.synced_folder "..", "/sandbox"
-  config.vm.synced_folder "../../data", "/data"
+  config.vm.synced_folder "../data", "/data"
   config.vm.box     = 'centos65'
   config.vm.box_url = 'http://puppet-vagrant-boxes.puppetlabs.com/centos-65-x64-virtualbox-puppet.box'
 
