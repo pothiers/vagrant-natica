@@ -4,10 +4,12 @@ echo -e "\n###################################################################"
 echo "Expect full provisioning to take about: 0:30"
 echo "Starting: " `date`
 
-time vagrant up valley mountain '
+time vagrant up valley mountain 
 
 #! vagrant ssh valley -- -Y 
 #! vagrant ssh mountain -- -Y
 
 #! ssh tadauser@valley.test.noao.edu
 
+
+echo "Done: " `date`

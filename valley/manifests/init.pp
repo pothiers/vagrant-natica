@@ -74,12 +74,12 @@ exec { 'irod-resource':
   require     => Package['irods-icommands'],
   user        => 'tadauser',
   } ->
-exec { 'irod-resource':
-  environment => ['HOME=/home/tadauser'],
-  command     => "/usr/bin/iadmin mkzone noao-tuc-z1 remote",
-  require     => Package['irods-icommands'],
-  user        => 'tadauser',
-  } ->
+#!exec { 'irod-resource':
+#!  environment => ['HOME=/home/tadauser'],
+#!  command     => "/usr/bin/iadmin mkzone noao-tuc-z1 remote",
+#!  require     => Package['irods-icommands'],
+#!  user        => 'tadauser',
+#!  } ->
 
 yumrepo { 'ius':
   descr      => 'ius - stable',

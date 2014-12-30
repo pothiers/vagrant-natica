@@ -33,7 +33,8 @@ Vagrant.configure("2") do |config|
   config.vm.synced_folder "..", "/sandbox"
   config.vm.synced_folder "../data", "/data"
   config.vm.box     = 'centos65'
-  config.vm.box_url = 'http://puppet-vagrant-boxes.puppetlabs.com/centos-65-x64-virtualbox-puppet.box'
+  #!config.vm.box_url = 'http://puppet-vagrant-boxes.puppetlabs.com/centos-65-x64-virtualbox-puppet.box'
+  config.vm.box_url = 'http://puppet-vagrant-boxes.puppetlabs.com/centos-65-i386-virtualbox-puppet.box'
 
   config.vm.define "mountain" do |mountain|
     mountain.vm.network :private_network, ip: "172.16.1.11"
