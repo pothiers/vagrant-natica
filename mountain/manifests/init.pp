@@ -29,7 +29,8 @@ user { 'tadauser' :
 }
 
 class { 'redis':
-  version           => '2.8.13',
+  #!version           => '2.8.13',
+  version           => '2.8.19',
   redis_max_memory  => '1gb',
 }
 
