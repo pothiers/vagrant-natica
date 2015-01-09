@@ -17,7 +17,17 @@ include augeas
 # already configured in the box
 include epel
 
-package { ['emacs', 'xorg-x11-xauth', 'cups', 'wireshark-gnome'] : }
+package { ['emacs', 'xorg-x11-xauth', 'cups',
+           #! 'wireshark-gnome',
+           'openssl-devel', 'expat-devel', 'perl-CPAN'] : } 
+#!class {'cpan':
+#!  manage_package => false,
+#!  #!installdirs => 'vendor',
+#!  #!installdirs => 'perl',
+#!  #!manage_config => 'false',
+#!}
+
+
 
 user { 'testuser' :
   ensure     => 'present',
@@ -41,7 +51,7 @@ class { 'redis':
 class { 'irods':
   #!!! Want this to be relative ('../modules/irods/files/setup_irods.input')
   #!!! How?
-  setup_input_file =>  '/vagrant/valley/modules/irods/files/setup_irods.input',
+  setup_input_file => '/vagrant/valley/modules/irods/files/setup_irods.input',
 }
 
 #!package { 'irods-icommands':
@@ -163,4 +173,21 @@ exec { 'dqsvcpop':
 #!  url => 'https://github.com/pothiers/python-irodsclient/archive/master.zip',
 #!}
 
+
+
+
+#!cpan { "App::cpanminus":
+#!  ensure  => present,
+#!  require => Class['::cpan'],
+#!  } ->
+exec { 'cpan':
+  #!command => '/usr/bin/cpan -fi App::cpanminus',
+  command => '/usr/bin/cpan App::cpanminus',
+  require => Package['perl-CPAN'],
+  timeout => 0,  # no timeout
+  } ->
+exec { 'cpanm':
+  command => '/usr/local/bin/cpanm SOAP::Lite XML::XPath --force',
+  timeout => 0, # no timeout
+}
 
