@@ -12,14 +12,14 @@ if versioncmp($::puppetversion,'3.6.1') >= 0 {
 }
 
 include augeas
-
+#
 # epel is not needed by the puppet redis module but it's nice to have it
 # already configured in the box
 include epel
 
 package { ['emacs', 'xorg-x11-xauth', 'cups',
            #! 'wireshark-gnome',
-           'openssl-devel', 'expat-devel', 'perl-CPAN'] : } 
+           'openssl-devel', 'expat-devel', 'perl-CPAN', 'libxml2-devel'] : } 
 #!class {'cpan':
 #!  manage_package => false,
 #!  #!installdirs => 'vendor',
@@ -87,7 +87,7 @@ exec { 'irod-resource':
   } ->
 #!exec { 'irod-resource':
 #!  environment => ['HOME=/home/tadauser'],
-#!  command     => "/usr/bin/iadmin mkzone noao-tuc-z1 remote",
+#iadmin!  command     => "/usr/bin/iadmin mkzone noao-tuc-z1 remote",
 #!  require     => Package['irods-icommands'],
 #!  user        => 'tadauser',
 #!  } ->
@@ -161,6 +161,24 @@ exec { 'dqsvcpop':
   require => File['/var/run/tada'],
 }
 
+
+# ASTRO
+$astroprinter='astro'
+service { 'cups':
+  ensure  => 'running',
+  enable  => true,
+  require => Package['cups'],
+  } ->
+file { '/etc/cups/client.conf':
+  source  => '/vagrant/client.conf',
+}
+#!->
+#!exec { 'add-astro-printer':
+#!  command => "/usr/sbin/lpadmin -p ${astroprinter} -v astropost:${mountaincache} -E",
+#!  }
+
+
+
 # Get from github now. But its in PyPI for when things stabalize!!!
 #!python::pip {'daflsim':
 #!  pkgname => 'daflsim',
@@ -191,3 +209,6 @@ exec { 'cpanm':
   timeout => 0, # no timeout
 }
 
+
+
+# see "Installing Additional Clients" in https://wiki.irods.org/index.php/Installation
