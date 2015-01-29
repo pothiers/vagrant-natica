@@ -150,6 +150,9 @@ file {  '/usr/lib/cups/lib/astro/pushfile.sh':
   source => '/sandbox/tada/astro/pushfile.sh',
   mode   => '0555',
   } ->
+file { '/etc/cups/cupsd.conf':
+  source => '/vagrant/mountain/files/new-cupsd.conf'
+  } ->
 file { '/var/tada':
   ensure => 'directory',
   mode   => '0777',
