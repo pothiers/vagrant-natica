@@ -36,38 +36,45 @@ class { 'redis':
 
 package { 'telnet': }
 
-$irodsbase = 'ftp://ftp.renci.org/pub/irods/releases/4.0.3'
-package { ['fuse-libs','openssl098e']: } ->
-package { 'irods-icommands':
-  provider => 'rpm',
-  source   => "${irodsbase}/irods-icommands-4.0.3-64bit-centos6.rpm",
-  } 
-
-$vault='/var/lib/irods/iRODS/dciVault'
-file { '/home/tadauser/.irods':
-  ensure  => 'directory',
-  owner   => 'tadauser',
-  group   => 'tadauser',
-  require => User['tadauser'],
-  } ->
-file { '/home/tadauser/.irods/.irodsEnv':
-  owner   => 'tadauser',
-  group   => 'tadauser',
-  source  => '/vagrant/mountain/files/irodsEnv',
-  } ->
-exec { 'irod-iinit':
-  environment => ['HOME=/home/tadauser'],
-  command     => '/usr/bin/iinit temppasswd',
-  require     => Package['irods-icommands'],
-  user        => 'tadauser',
-}
+########################################################################
+# iRODS has too many time consuming obstacles. Very hard to figure out #
+# what goes wrong because error codes are often useless and            #
+# documentation is out of date. THEREFORE, remove use of it from TADA. #
+########################################################################
+###
+#! $irodsbase = 'ftp://ftp.renci.org/pub/irods/releases/4.0.3'
+#! package { ['fuse-libs','openssl098e']: } ->
+#! package { 'irods-icommands':
+#!   provider => 'rpm',
+#!   source   => "${irodsbase}/irods-icommands-4.0.3-64bit-centos6.rpm",
+#!   } 
+#! $vault='/var/lib/irods/iRODS/dciVault'
+#! file { '/home/tadauser/.irods':
+#!   ensure  => 'directory',
+#!   owner   => 'tadauser',
+#!   group   => 'tadauser',
+#!   require => User['tadauser'],
+#!   } ->
+#! file { '/home/tadauser/.irods/.irodsEnv':
+#!   owner   => 'tadauser',
+#!   group   => 'tadauser',
+#!   source  => '/vagrant/mountain/files/irodsEnv',
+#!   } ->
+#! exec { 'irod-iinit':
+#!   environment => ['HOME=/home/tadauser'],
+#!   command     => '/usr/bin/iinit temppasswd',
+#!   require     => Package['irods-icommands'],
+#!   user        => 'tadauser',
+#! }
 #!->
-#!exec { 'irod-resource':
-#!  environment => ['HOME=/home/tadauser'],
-#!  command     => "/usr/bin/iadmin mkresc dciResc 'unixfilesystem' valley.test.noao.edu:${vault}",
-#!  require     => Package['irods-icommands'],
-#!  user        => 'tadauser',
-#!  } 
+#!#exec { 'irod-resource':
+#!#  environment => ['HOME=/home/tadauser'],
+#!#  command     => "/usr/bin/iadmin mkresc dciResc 'unixfilesystem' valley.test.noao.edu:${vault}",
+#!#  require     => Package['irods-icommands'],
+#!#  user        => 'tadauser',
+#!#  }
+###
+#######################################################################
 
 yumrepo { 'ius':
   descr      => 'ius - stable',
@@ -104,8 +111,8 @@ file {  '/etc/tada':
   ensure => 'directory',
   mode   => '0644',
   } ->
-file {  '/etc/tada/dq.conf':
-  source => '/sandbox/data-queue/data/dq_config.json',
+file {  '/etc/tada/tada.conf':
+  source => '/sandbox/tada/conf/tada_config.json',
   mode   => '0744',
   } ->
 file {  '/var/run/tada':

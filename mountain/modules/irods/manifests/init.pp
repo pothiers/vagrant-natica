@@ -22,7 +22,7 @@
 #
 # === Authors
 #
-# S.Pothier <pothier@email.noao.edu>
+# S.Pothier 
 #
 class irods (
   $setup_input_file = 'setup_irods.input',
