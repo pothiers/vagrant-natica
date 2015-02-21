@@ -201,9 +201,22 @@ service { 'cups':
 ########################################################################
 # iRODS has too many time consuming obstacles. Very hard to figure out #
 # what goes wrong because error codes are often useless and            #
-# documentation is out of date. THEREFORE, remove use of it from TADA. #
+# documentation is out of date. THEREFORE, remove use of it from TADA  #
+# proper. IRODS 3.3.1 is used by Archive Ingest, so we the icommands   #
+# for that (which are incomopatible with icommands for 4.0.3)          #
 ########################################################################
 ###
+file { '/usr/local/share/applications/irods-3.3.1.tgz':
+  ensure => present,
+  source => '/vagrant/valley/files/irods-3.3.1.tgz',
+  notify => Exec['unpack irods'],
+} 
+exec { 'unpack irods':
+  command     => '/bin/tar -xf /usr/local/share/applications/irods-3.3.1.tgz',
+  cwd         => '/usr/local/share/applications',
+  refreshonly => true,
+}
+
 #$irodsbase = 'ftp://ftp.renci.org/pub/irods/releases/4.0.3'
 #package { ['fuse-libs','openssl098e']: } ->
 #package { 'irods-icommands':
