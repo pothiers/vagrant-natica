@@ -1,15 +1,10 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-## TODO:
-##   Re-factor.  modules for tada, dq
-##
-
 # MUST bring up "valley" before "mountain".
 #   vagrant up valley mountain
-#
-# This is because the irods "iinit" command used on clients to set up
-# the connection is run as part of mountain provisioning.
+# OBSOLETE: This is because the irods "iinit" command used on clients
+# OBSOLETE: to set up the connection is run as part of mountain provisioning.
 
 Vagrant.configure("2") do |config|
   #! Do this before using: vagrant plugin install vagrant-cachier
@@ -33,8 +28,8 @@ Vagrant.configure("2") do |config|
   config.vm.synced_folder "..", "/sandbox"
   config.vm.synced_folder "../data", "/data"
   config.vm.box     = 'centos65'
-  #!config.vm.box_url = 'http://puppet-vagrant-boxes.puppetlabs.com/centos-65-x64-virtualbox-puppet.box'
-  config.vm.box_url = 'http://puppet-vagrant-boxes.puppetlabs.com/centos-65-i386-virtualbox-puppet.box'
+  config.vm.box_url = 'http://puppet-vagrant-boxes.puppetlabs.com/centos-65-x64-virtualbox-puppet.box'
+  #!config.vm.box_url = 'http://puppet-vagrant-boxes.puppetlabs.com/centos-65-i386-virtualbox-puppet.box'
 
   config.vm.define "mountain" do |mountain|
     mountain.vm.network :private_network, ip: "172.16.1.11"
@@ -50,10 +45,10 @@ Vagrant.configure("2") do |config|
        '--report',
        '--show_diff',
        '--pluginsync',
-       "--hiera_config /vagrant/hiera.yaml"
+       '--hiera_config /vagrant/hiera.yaml',
+       '--debug', #+++
       ]
     end
-
   end
 
   config.vm.define "valley" do |valley|
@@ -70,11 +65,10 @@ Vagrant.configure("2") do |config|
        '--report',
        '--show_diff',
        '--pluginsync',
-  # '--debug',
-  # '--parser future',
+       '--hiera_config /vagrant/hiera.yaml',
+       '--debug', #+++
       ]
     end
-
   end
 
 end

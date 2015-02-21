@@ -60,9 +60,9 @@ file {  '/etc/rsyncd.conf':
 }
 
 
-package { ['emacs', 'xorg-x11-xauth', 'cups', 'xinetd',
-           #!  'wireshark-gnome',
-           'openssl-devel', 'expat-devel', 'perl-CPAN', 'libxml2-devel'] : } 
+#! package { [ 'emacs', 'xorg-x11-xauth', 'wireshark-gnome', 'openssl-devel', 'expat-devel', 'perl-CPAN', 'libxml2-devel'] : }  # DBG
+package { ['cups', 'xinetd'] : } 
+
 #!class {'cpan':
 #!  manage_package => false,
 #!  #!installdirs => 'vendor',
@@ -72,18 +72,20 @@ package { ['emacs', 'xorg-x11-xauth', 'cups', 'xinetd',
 
 
 
+user { 'tada' :
+  ensure     => 'present',
+  comment    => 'For running TADA related services and actions',
+  managehome => true, 
+  password   => '$1$Pk1b6yel$tPE2h9vxYE248CoGKfhR41',  # tada"Password"
+  system     => true,  
+}
+
 user { 'testuser' :
   ensure     => 'present',
   managehome => true,
   password   => '$1$4jJ0.K0P$eyUInImhwKruYp4G/v2Wm1',
   }
 
-user { 'tadauser' :
-  ensure     => 'present',
-  managehome => true,
-  # tada"Password"
-  password   => '$1$Pk1b6yel$tPE2h9vxYE248CoGKfhR41',
-}
 
 class { 'redis':
   #!version           => '2.8.13',
@@ -181,19 +183,56 @@ service { 'cups':
 
 
 
-#!cpan { "App::cpanminus":
-#!  ensure  => present,
-#!  require => Class['::cpan'],
+#!exec { 'cpan':
+#!  #!command => '/usr/bin/cpan -fi App::cpanminus',
+#!  command => '/usr/bin/cpan App::cpanminus',
+#!  require => Package['perl-CPAN'],
+#!  timeout => 0,  # no timeout
 #!  } ->
-exec { 'cpan':
-  #!command => '/usr/bin/cpan -fi App::cpanminus',
-  command => '/usr/bin/cpan App::cpanminus',
-  require => Package['perl-CPAN'],
-  timeout => 0,  # no timeout
-  } ->
-exec { 'cpanm':
-  command => '/usr/local/bin/cpanm SOAP::Lite XML::XPath --force',
-  timeout => 0, # no timeout
-}
+#!exec { 'cpanm':
+#!  command => '/usr/local/bin/cpanm SOAP::Lite XML::XPath --force',
+#!  timeout => 0, # no timeout
+#!}
 
+
+
+
+
+########################################################################
+# iRODS has too many time consuming obstacles. Very hard to figure out #
+# what goes wrong because error codes are often useless and            #
+# documentation is out of date. THEREFORE, remove use of it from TADA. #
+########################################################################
+###
+#$irodsbase = 'ftp://ftp.renci.org/pub/irods/releases/4.0.3'
+#package { ['fuse-libs','openssl098e']: } ->
+#package { 'irods-icommands':
+#  provider => 'rpm',
+#  source   => "${irodsbase}/irods-icommands-4.0.3-64bit-centos6.rpm",
+#} 
+#$vault='/var/lib/irods/iRODS/dciVault'
+#file { '/home/tada/.irods':
+#  ensure  => 'directory',
+#  owner   => 'tada',
+#  require => User['tada'],
+#  } ->
+#file { '/home/tada/.irods/.irodsEnv':
+#  owner   => 'tada',
+#  source  => '/vagrant/mountain/files/irodsEnv',
+#  } ->
+#exec { 'irod-iinit':
+#  environment => ['HOME=/home/tada'],
+#  command     => '/usr/bin/iinit temppasswd',
+#  require     => Package['irods-icommands'],
+#  user        => 'tada',
+#}
+#!->
+#!#exec { 'irod-resource':
+#!#  environment => ['HOME=/home/tadauser'],
+#!#  command     => "/usr/bin/iadmin mkresc dciResc 'unixfilesystem' valley.test.noao.edu:${vault}",
+#!#  require     => Package['irods-icommands'],
+#!#  user        => 'tadauser',
+#!#  }
+###
+#######################################################################
 
