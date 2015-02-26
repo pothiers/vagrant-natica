@@ -6,7 +6,7 @@
   - "%{::environment}"
   - defaults
 :yaml:
-  :datadir: /home/pothiers/sandbox/puppet-tada/hieradata
+  :datadir: /vagrant/hieradata
 
 
 

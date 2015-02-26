@@ -1,33 +1,24 @@
-# Intended for provisioning of: mountain top
+# Intended for provisioning of: mountain
 
 
-# Following is attempt to get around warning:
-#
-#   "Warning: The package
-#   type's allow_virtual parameter will be changing its default value
-#   from false to true in a future release. If you do not want to
-#   allow virtual packages, please explicitly set allow_virtual to
-#   false.
+# Following is attempt to get around the warning:
+#   "Warning: The package type's allow_virtual parameter will be
+#   changing its default value from false to true in a future
+#   release. If you do not want to allow virtual packages, please
+#   explicitly set allow_virtual to false.
 #      (at /usr/lib/ruby/site_ruby/1.8/puppet/type/package.rb:430:in `default')"
-#
 # But it doesn't work!!! (at least when this is run from vagrant)  Sigh.
 Package {
   allow_virtual => false,
 }
 
-include augeas
 
-##############################
-# Just getting hiera going.  Remove when integrated!!!
-#! $message = hiera('message')
-#! notify { $message: }
-#
-##############################
 
 # epel is not needed by the puppet redis module but it's nice to have it
 # already configured in the box
 # (epel:: Extra Repository for Enterprise Linux)
 include epel
+include augeas
 
 yumrepo { 'ius':
   descr      => 'ius - stable',
@@ -72,18 +63,18 @@ file { '/usr/bin/pip':
   ensure => 'link',
   target => '/usr/bin/pip3.4',
 } 
-#!package { 'graphviz-devel': }  #!!! remove?
+python::requirements { '/vagrant/requirements.txt': } 
 Class['python'] -> Package['python34u-pip'] -> File['/usr/bin/pip']
-#!-> Package['graphviz-devel']   #!!! remove?
+  -> Python::Requirements['/vagrant/requirements.txt']
 
+#! $confdir='/sandbox/tada/conf'
+$confdir='/sandbox/demo/conf'
 
 ##############################################################################
 ### Configure TADA  (move to config.pp!!!)
 ###
 file {  '/etc/tada':
   ensure => 'directory',
-  #!owner  => 'tada',
-  #!mode   => '0644',
 }
 file {  [ '/var/run/tada', '/var/log/tada']:
   ensure => 'directory',
@@ -91,12 +82,11 @@ file {  [ '/var/run/tada', '/var/log/tada']:
   mode   => '0744',
 }
 file {  '/etc/tada/tada.conf':
-  #! source => '/sandbox/tada/conf/tada_config.json',
-  source => '/sandbox/demo/conf/tada_config.json',
+  source => "${confdir}/tada_config.json",
   #!mode   => '0744',
 }
 file { '/etc/tada/pop.yaml':
-  source => '/sandbox/demo/conf/tada-logging.yaml',
+  source => "${confdir}/tada-logging.yaml",
   #!mode   => '0744',
   }
 ###  
@@ -115,9 +105,6 @@ class { 'redis':
 #!  #!  require => Python::requirements['/vagrant/requirements.txt']
 #!  require => Package['python34u-pip']
 #!}
-python::requirements { '/vagrant/requirements.txt':
-  require => Package['python34u-pip'],
-  } 
 #!python::pip {'dataq':
 #!  require       => Python::Requirements['/vagrant/requirements.txt'],
 #!  pkgname       => 'dataq',
@@ -147,8 +134,10 @@ python::requirements { '/vagrant/requirements.txt':
 # Would be nice to SUBSCRIBE to the dependencies, and restart services
 # upon any change to dependency. Gotta make dqsvc be restartable
 # service (in the puppet sense) for that to work!!!
+$qname = hiera('queuename')
+$dqlevel = hiera('dq_loglevel')
 exec { 'dqsvcpush':
-  command     => '/usr/bin/dqsvcpush --loglevel DEBUG --queue transfer > /var/log/tada/dqpush.log 2>&1 &',
+  command     => "/usr/bin/dqsvcpush --loglevel ${dqlevel} --queue ${qname} > /var/log/tada/dqpush.log 2>&1 &",
   user        => 'tada',
   refreshonly => true,
   creates     => '/var/run/tada/dqsvcpush.pid',
@@ -159,7 +148,7 @@ exec { 'dqsvcpush':
                   ],
 }
 exec { 'dqsvcpop':
-  command     => '/usr/bin/dqsvcpop --loglevel DEBUG --queue transfer  > /var/log/tada/dqpop.log 2>&1 &',
+  command     => "/usr/bin/dqsvcpop --loglevel ${dqlevel} --queue ${qname} > /var/log/tada/dqpop.log 2>&1 &",
   user        => 'tada',
   creates     => '/var/run/tada/dqsvcpop.pid',
   refreshonly => true,
@@ -220,7 +209,7 @@ file { ['/var/tada', $mountaincache] :
   }
   
 file { '/etc/tada/rsync.pwd':
-  source => '/sandbox/demo/conf/rsync.pwd',
+  source => "${confdir}/rsync.pwd",
   mode   => '0400',
   owner  => 'tada',
   } 

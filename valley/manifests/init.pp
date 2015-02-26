@@ -4,58 +4,28 @@
 # sudo puppet apply --modulepath=/vagrant/modules /vagrant/manifests/init.pp --noop --graph
 # sudo cp -r /var/lib/puppet/state/graphs/ /vagrant/
 
-#! if versioncmp($::puppetversion,'3.6.1') >= 0 {
-#!  $allow_virtual_packages = hiera('allow_virtual_packages',false)
-  $allow_virtual_packages = false
-  Package {
-    allow_virtual => $allow_virtual_packages,
-  }
-#! }
 
-include augeas
-#
-# epel is not needed by the puppet redis module but it's nice to have it
-# already configured in the box
 include epel
+include augeas
 
-#!include rsync::server
-#!class { 'rsync::server':
-#!  motd_file => '/etc/rsync-motd',
-#!}
+#! $confdir='/sandbox/tada/conf'
+$confdir='/sandbox/demo/conf'
 
-
-#!service { 'xinetd':
-#!  ensure  => 'running',
-#!  enable  => true,
-#!  require => [Package['xinetd'], File[ '/etc/rsyncd.conf']],
-#!  } 
-
-#!class { 'rsync': package_ensure => 'latest' }
 $mirror='/var/tada/mountain-mirror'
 $secrets='/etc/rsyncd.scr'
-#!rsync::server::module{ 'repo':
-#!  path            => $mirror,
-#!  require         => File[$mirror, $secrets],
-#!  read_only       => no,
-#!  list            => yes,
-#!  comment         => 'For transfer from Mountain to Valley',
-#!  hosts_allow     => ['172.16.1.11',],
-#!  auth_users      => ['vagrant', 'tada'],
-#!  secrets_file    => $secrets,
-#!  max_connections => 5,
-#!}
+
 
 file {  $mirror:
   ensure => 'directory',
   mode   => '0777',
   } 
 file {  $secrets:
-  source => '/sandbox/demo/conf/rsyncd.scr',
+  source => "${confdir}/rsyncd.scr",
   mode   => '0400',
 }
 
 file {  '/etc/rsyncd.conf':
-  source => '/sandbox/demo/conf/rsyncd.conf',
+  source => "${confdir}/rsyncd.conf",
   mode   => '0400',
 }
 
@@ -69,8 +39,6 @@ package { ['cups', 'xinetd'] : }
 #!  #!installdirs => 'perl',
 #!  #!manage_config => 'false',
 #!}
-
-
 
 user { 'tada' :
   ensure     => 'present',
@@ -86,9 +54,7 @@ user { 'testuser' :
   password   => '$1$4jJ0.K0P$eyUInImhwKruYp4G/v2Wm1',
   }
 
-
 class { 'redis':
-  #!version           => '2.8.13',
   version           => '2.8.19',
   redis_max_memory  => '1gb',
 }
@@ -103,71 +69,28 @@ yumrepo { 'ius':
   mirrorlist => absent,
 } -> Package<| provider == 'yum' |>
 
+##############################################################################
+# Setup for installing python packages
+#
 class { 'python':
   version    => '34u',
   pip        => false,
   dev        => true,
   virtualenv => true,
-} ->
-package { 'python34u-pip': } ->
+} 
+package { 'python34u-pip': } 
 file { '/usr/bin/pip':
   ensure => 'link',
   target => '/usr/bin/pip3.4',
-} ->
-package { 'graphviz-devel': } ->
+} 
 python::requirements { '/vagrant/requirements.txt': } 
-
-exec { 'dataq':
-  command => '/usr/bin/python3 /sandbox/data-queue/setup.py install',
-  #!  require => Python::requirements['/vagrant/requirements.txt']
-  require => Package['python34u-pip']
-  } ->
-file {  '/etc/tada':
-  ensure => 'directory',
-  mode   => '0644',
-  } ->
-file {  '/etc/tada/tada.conf':
-  source => '/sandbox/tada/conf/tada_config.json',
-  mode   => '0744',
-  } ->
-file {  '/var/run/tada':
-  ensure => 'directory',
-  mode   => '0777',
-  } ->
-file {  '/var/log/tada':
-  ensure => 'directory',
-  mode   => '0777',
-}
-
-file {  '/var/tada':
-  ensure => 'directory',
-  mode   => '0777',
-}
-file {  '/var/tada/non-archive':
-  ensure => 'directory',
-  mode   => '0777',
-}
-file {  '/var/tada/archive':
-  ensure => 'directory',
-  mode   => '0777',
-}
-
-
-
-exec { 'dqsvcpush':
-  command => '/usr/bin/dqsvcpush > /var/log/tada/push.log 2>&1 &',
-  require => File['/var/run/tada'],
-}
-exec { 'dqsvcpop':
-  command => '/usr/bin/dqsvcpop > /var/log/tada/pop.log 2>&1 &',
-  require => File['/var/run/tada'],
-}
+Class['python'] -> Package['python34u-pip'] -> File['/usr/bin/pip']
+-> Python::Requirements['/vagrant/requirements.txt']
 
 
 # ASTRO
-$astroprinter='astro'
 file { '/etc/cups/client.conf':
-  source  => '/sandbox/demo/conf/client.conf',
+  source  => "${confdir}/client.conf",
 } ->
 service { 'cups':
   ensure  => 'running',
@@ -175,11 +98,104 @@ service { 'cups':
   require => Package['cups'],
   } 
 
-# Get from github now. But its in PyPI for when things stabalize!!!
-#!python::pip {'daflsim':
-#!  pkgname => 'daflsim',
-#!  url     => 'https://github.com/pothiers/daflsim/archive/master.zip',
+
+##############################################################################
+### Configure TADA  (move to config.pp!!!)
+###
+#!file {  '/etc/tada':
+#!  ensure => 'directory',
 #!}
+file { [ '/var/run/tada', '/var/log/tada', '/etc/tada',
+         '/var/tada', '/var/tada/archive', '/var/tada/non-archive']:
+  ensure => 'directory',
+  owner  => 'tada',
+  mode   => '0744',
+}
+
+file {  '/etc/tada/tada.conf':
+  source => "${confdir}/tada_config.json",
+  #! mode   => '0744',
+}
+file { '/etc/tada/pop.yaml':
+  source => "${confdir}/tada-logging.yaml",
+  #! mode   => '0744',
+  }
+
+###  
+##############################################################################
+
+  
+#!file {  '/etc/tada':
+#!  ensure => 'directory',
+#!  mode   => '0644',
+#!  } ->
+#!file {  '/etc/tada/tada.conf':
+#!  source => '/sandbox/tada/conf/tada_config.json',
+#!  mode   => '0744',
+#!  } ->
+#!file {  '/var/run/tada':
+#!  ensure => 'directory',
+#!  mode   => '0777',
+#!  } ->
+#!file {  '/var/log/tada':
+#!  ensure => 'directory',
+#!  mode   => '0777',
+#!}
+#!file {  '/var/tada':
+#!  ensure => 'directory',
+#!  mode   => '0777',
+#!}
+
+#!!exec { 'dataq':
+#!!  command => '/usr/bin/python3 /sandbox/data-queue/setup.py install',
+#!!  #!  require => Python::requirements['/vagrant/requirements.txt']
+#!!  require => Package['python34u-pip']
+#!!  } 
+
+
+
+
+##########################################
+# TADA services.
+# Would be nice to SUBSCRIBE to the dependencies, and restart services
+# upon any change to dependency. Gotta make dqsvc be restartable
+# service (in the puppet sense) for that to work!!!
+
+#!exec { 'dqsvcpush':
+#!  command => '/usr/bin/dqsvcpush > /var/log/tada/push.log 2>&1 &',
+#!  require => File['/var/run/tada'],
+#!}
+#!exec { 'dqsvcpop':
+#!  command => '/usr/bin/dqsvcpop > /var/log/tada/pop.log 2>&1 &',
+#!  require => File['/var/run/tada'],
+#!}
+
+$qname = hiera('queuename')
+$dqlevel = hiera('dq_loglevel')
+exec { 'dqsvcpush':
+  command     => "/usr/bin/dqsvcpush --loglevel ${dqlevel} --queue ${qname} > /var/log/tada/dqpush.log 2>&1 &",
+  user        => 'tada',
+  refreshonly => true,
+  creates     => '/var/run/tada/dqsvcpush.pid',
+  require     => [File['/var/run/tada'], Class['redis']],
+  subscribe   => [File['/etc/tada/tada.conf'],
+                  Python::Requirements[ '/vagrant/requirements.txt'],
+                  #!Python::Pip['dataq'],
+                  ],
+}
+exec { 'dqsvcpop':
+  command     => "/usr/bin/dqsvcpop --loglevel ${dqlevel} --queue ${qname} > /var/log/tada/dqpop.log 2>&1 &",
+  user        => 'tada',
+  creates     => '/var/run/tada/dqsvcpop.pid',
+  refreshonly => true,
+  require     => [File['/var/run/tada'], Class['redis']],
+  subscribe   => [File['/etc/tada/tada.conf'],
+                  Python::Requirements[ '/vagrant/requirements.txt'],
+                  #!Python::Pip['dataq'],
+                  ],
+}
+###  
+##############################################################################
 
 
 

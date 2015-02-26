@@ -1,2 +1,2 @@
 ---
-message: "value from defaults2"
+dq_loglevel: 'DEBUG'
