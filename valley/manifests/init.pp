@@ -1,37 +1,45 @@
 # Intended for provisioning of: valley (archive)
 #
 # after: vagrant ssh
-# sudo puppet apply --modulepath=/vagrant/modules /vagrant/manifests/init.pp --noop --graph
+# sudo puppet apply --modulepath=/vagrant/modules /vagrant/manifests/init.pp --noop --graphsub
 # sudo cp -r /var/lib/puppet/state/graphs/ /vagrant/
 
 
 include epel
 include augeas
 
-#! $confdir='/sandbox/tada/conf'
-$confdir='/sandbox/demo/conf'
-
-$mirror='/var/tada/mountain-mirror'
-$secrets='/etc/rsyncd.scr'
-
-
-file {  $mirror:
-  ensure => 'directory',
-  mode   => '0777',
-  } 
-file {  $secrets:
-  source => "${confdir}/rsyncd.scr",
-  mode   => '0400',
-}
-
-file {  '/etc/rsyncd.conf':
-  source => "${confdir}/rsyncd.conf",
-  mode   => '0400',
-}
-
-
 #! package { [ 'emacs', 'xorg-x11-xauth', 'wireshark-gnome', 'openssl-devel', 'expat-devel', 'perl-CPAN', 'libxml2-devel'] : }  # DBG
 package { ['cups', 'xinetd'] : } 
+
+#! $confdir='/sandbox/tada/conf'
+#! $confdir='/sandbox/demo/conf'
+$confdir=hiera('tada_confdir')
+
+
+##############################################################################
+### rsync
+$secrets='/etc/rsyncd.scr'
+file {  $secrets:
+  source => "${confdir}/rsyncd.scr",
+  owner  => 'root',
+  mode   => '0400',
+}
+file {  '/etc/rsyncd.conf':
+  source => "${confdir}/rsyncd.conf",
+  owner  => 'root',
+  mode   => '0400',
+}
+exec { 'rsyncd':
+  command   => "/sbin/chkconfig rsync on",
+  require   => [Service['xinetd'],],
+  subscribe => File['/etc/rsyncd.conf'],
+}
+service { 'xinetd':
+  ensure  => 'running',
+  enable  => true,
+  require => Package['xinetd'],
+  }
+
 
 #!class {'cpan':
 #!  manage_package => false,
@@ -52,8 +60,9 @@ user { 'testuser' :
   ensure     => 'present',
   managehome => true,
   password   => '$1$4jJ0.K0P$eyUInImhwKruYp4G/v2Wm1',
-  }
+}
 
+  
 class { 'redis':
   version           => '2.8.19',
   redis_max_memory  => '1gb',
@@ -88,14 +97,14 @@ Class['python'] -> Package['python34u-pip'] -> File['/usr/bin/pip']
 -> Python::Requirements['/vagrant/requirements.txt']
 
 
-# ASTRO
 file { '/etc/cups/client.conf':
   source  => "${confdir}/client.conf",
-} ->
+} 
 service { 'cups':
   ensure  => 'running',
   enable  => true,
   require => Package['cups'],
+  subscribe => File['/etc/cups/client.conf'],
   } 
 
 
@@ -106,10 +115,11 @@ service { 'cups':
 #!  ensure => 'directory',
 #!}
 file { [ '/var/run/tada', '/var/log/tada', '/etc/tada',
-         '/var/tada', '/var/tada/archive', '/var/tada/non-archive']:
+         '/var/tada', '/var/tada/mountain-mirror', '/var/tada/noarchive']:
   ensure => 'directory',
   owner  => 'tada',
-  mode   => '0744',
+  #!mode   => '0744',
+  mode   => '0777', #!!! tighten up permissions after initial burn in period
 }
 
 file {  '/etc/tada/tada.conf':
@@ -119,7 +129,8 @@ file {  '/etc/tada/tada.conf':
 file { '/etc/tada/pop.yaml':
   source => "${confdir}/tada-logging.yaml",
   #! mode   => '0744',
-  }
+}
+
 
 ###  
 ##############################################################################
@@ -175,23 +186,27 @@ $dqlevel = hiera('dq_loglevel')
 exec { 'dqsvcpush':
   command     => "/usr/bin/dqsvcpush --loglevel ${dqlevel} --queue ${qname} > /var/log/tada/dqpush.log 2>&1 &",
   user        => 'tada',
-  refreshonly => true,
+  environment => ['HOME=/home/tada'],
+  #! refreshonly => true,
   creates     => '/var/run/tada/dqsvcpush.pid',
-  require     => [File['/var/run/tada'], Class['redis']],
-  subscribe   => [File['/etc/tada/tada.conf'],
+  require     => [File['/etc/tada/tada.conf',
+                       '/var/run/tada',
+                       '/home/tada/.irods/.irodsEnv'],
                   Python::Requirements[ '/vagrant/requirements.txt'],
-                  #!Python::Pip['dataq'],
+                  Class['redis'],
                   ],
 }
 exec { 'dqsvcpop':
   command     => "/usr/bin/dqsvcpop --loglevel ${dqlevel} --queue ${qname} > /var/log/tada/dqpop.log 2>&1 &",
   user        => 'tada',
+  environment => ['HOME=/home/tada'],
   creates     => '/var/run/tada/dqsvcpop.pid',
-  refreshonly => true,
-  require     => [File['/var/run/tada'], Class['redis']],
-  subscribe   => [File['/etc/tada/tada.conf'],
+  #! refreshonly => true,
+  require     => [File['/etc/tada/tada.conf',
+                       '/var/run/tada',
+                       '/home/tada/.irods/.irodsEnv'],
                   Python::Requirements[ '/vagrant/requirements.txt'],
-                  #!Python::Pip['dataq'],
+                  Class['redis'],
                   ],
 }
 ###  
@@ -232,6 +247,30 @@ exec { 'unpack irods':
   cwd         => '/usr/local/share/applications',
   refreshonly => true,
 }
+file { '/home/tada/.irods':
+  ensure => 'directory',
+  owner  => 'tada',
+}
+file { '/home/tada/.irods/.irodsEnv':
+  owner  => 'tada',
+  source => '/vagrant/valley/files/irodsEnv'
+  }
+file { '/home/tada/.irods/iinit.in':
+  owner  => 'tada',
+  source => hiera('irodsdata'),
+}
+$icmdpath='/usr/local/share/applications/irods3.3.1/iRODS/clients/icommands/bin'
+exec { 'iinit':
+  #!command     => "${icmdpath}/iinit `cat /home/tada/.irods/iinit.in`",
+  environment => ['irodsEnvFile=/home/tada/.irods/.irodsEnv',
+                 'HOME=/home/tada' ],
+  command     => "${icmdpath}/iinit cacheMonet", #!!!
+  user        => 'tada',
+  creates     => '/home/tada/.irods/.irodsA',
+  require     => [Exec['unpack irods'],
+                  File[ '/home/tada/.irods/.irodsEnv',
+                        '/home/tada/.irods/iinit.in']],
+  }
 
 #$irodsbase = 'ftp://ftp.renci.org/pub/irods/releases/4.0.3'
 #package { ['fuse-libs','openssl098e']: } ->

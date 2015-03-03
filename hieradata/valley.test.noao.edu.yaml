@@ -1,3 +1,4 @@
 ---
-message: 'Valley machine hiera values'
 queuename: 'submit'
+irodsdata: '/sandbox/demo/conf/iinit.in'
+

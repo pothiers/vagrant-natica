@@ -1,4 +1,4 @@
-echo "START: Provision mountain and ssh to it."
+echo "START: Provision valley and ssh to it."
 
-vagrant provision mountain --provision-with puppet
-vagrant ssh mountain
+vagrant provision valley --provision-with puppet
+vagrant ssh valley

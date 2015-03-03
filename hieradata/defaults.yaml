@@ -1,2 +1,3 @@
 ---
 dq_loglevel: 'DEBUG'
+tada_confdir: '/sandbox/demo/conf'

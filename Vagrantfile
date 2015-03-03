@@ -23,13 +23,12 @@ Vagrant.configure("2") do |config|
   config.ssh.forward_x11 = true
 
   config.vm.provision "shell",
-    inline: "yum upgrade -y puppet"
+    inline: "yum upgrade -y puppet" #! Remove for production!!!
 
   config.vm.synced_folder "..", "/sandbox"
   config.vm.synced_folder "../data", "/data"
   config.vm.box     = 'centos65'
   config.vm.box_url = 'http://puppet-vagrant-boxes.puppetlabs.com/centos-65-x64-virtualbox-puppet.box'
-  #!config.vm.box_url = 'http://puppet-vagrant-boxes.puppetlabs.com/centos-65-i386-virtualbox-puppet.box'
 
   config.vm.define "mountain" do |mountain|
     mountain.vm.network :private_network, ip: "172.16.1.11"
@@ -46,7 +45,7 @@ Vagrant.configure("2") do |config|
        '--show_diff',
        '--pluginsync',
        '--hiera_config /vagrant/hiera.yaml',
-       '--debug', #+++
+       '--debug', #+++ #! Remove for production!!!
       ]
     end
   end

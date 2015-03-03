@@ -68,7 +68,7 @@ Class['python'] -> Package['python34u-pip'] -> File['/usr/bin/pip']
   -> Python::Requirements['/vagrant/requirements.txt']
 
 #! $confdir='/sandbox/tada/conf'
-$confdir='/sandbox/demo/conf'
+$confdir=hiera('tada_confdir')
 
 ##############################################################################
 ### Configure TADA  (move to config.pp!!!)
