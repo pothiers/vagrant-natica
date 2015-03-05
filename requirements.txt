@@ -1,5 +1,6 @@
 # For DQ, DCI2
-astropy==0.4.2
+#!astropy==0.4.2
+astropy==1.0
 decorator==3.4.0
 nose==1.3.4
 pkginfo==1.1
