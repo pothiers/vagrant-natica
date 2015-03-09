@@ -1,11 +1,6 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-# MUST bring up "valley" before "mountain".
-#   vagrant up valley mountain
-# OBSOLETE: This is because the irods "iinit" command used on cUlients
-# OBSOLETE: to set up the connection is run as part of mountain provisioning.
-
 Vagrant.configure("2") do |config|
   #! Do this before using: vagrant plugin install vagrant-cachier
   if Vagrant.has_plugin?("vagrant-cachier")
