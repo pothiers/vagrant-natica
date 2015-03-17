@@ -111,9 +111,6 @@ service { 'cups':
 ##############################################################################
 ### Configure TADA  (move to config.pp!!!)
 ###
-#!file {  '/etc/tada':
-#!  ensure => 'directory',
-#!}
 file { [ '/var/run/tada', '/var/log/tada', '/etc/tada',
          '/var/tada', '/var/tada/mountain-mirror', '/var/tada/noarchive']:
   ensure => 'directory',
@@ -130,7 +127,11 @@ file { '/etc/tada/pop.yaml':
   source => "${confdir}/tada-logging.yaml",
   #! mode   => '0744',
 }
-
+file { '/var/log/tada/submit.manifest':
+  ensure => 'file',
+  owner  => 'tada',
+  mode   => '0744',
+}
 
 ###  
 ##############################################################################

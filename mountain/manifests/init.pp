@@ -89,6 +89,12 @@ file { '/etc/tada/pop.yaml':
   source => "${confdir}/tada-logging.yaml",
   #!mode   => '0744',
   }
+file { '/var/log/tada/submit.manifest':
+  ensure => 'file',
+  owner  => 'tada',
+  mode   => '0744',
+}
+
 ###  
 ##############################################################################
 
