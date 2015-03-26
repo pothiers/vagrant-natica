@@ -130,7 +130,7 @@ file { '/etc/tada/pop.yaml':
 file { '/var/log/tada/submit.manifest':
   ensure => 'file',
   owner  => 'tada',
-  mode   => '0744',
+  mode   => '0766',
 }
 
 ###  
