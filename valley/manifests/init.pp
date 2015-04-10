@@ -65,10 +65,15 @@ user { 'testuser' :
   
 class { 'redis':
   version           => '2.8.19',
-  redis_max_memory  => '1gb',
+  redis_max_memory  => '2gb',
 }
 
 
+
+
+##############################################################################
+# Setup for installing python packages
+#
 yumrepo { 'ius':
   descr      => 'ius - stable',
   baseurl    => 'http://dl.iuscommunity.org/pub/ius/stable/CentOS/6/x86_64/',
@@ -78,9 +83,6 @@ yumrepo { 'ius':
   mirrorlist => absent,
 } -> Package<| provider == 'yum' |>
 
-##############################################################################
-# Setup for installing python packages
-#
 class { 'python':
   version    => '34u',
   pip        => false,
@@ -184,19 +186,19 @@ file { '/var/log/tada/submit.manifest':
 
 $qname = hiera('queuename')
 $dqlevel = hiera('dq_loglevel')
-exec { 'dqsvcpush':
-  command     => "/usr/bin/dqsvcpush --loglevel ${dqlevel} --queue ${qname} > /var/log/tada/dqpush.log 2>&1 &",
-  user        => 'tada',
-  environment => ['HOME=/home/tada'],
-  #! refreshonly => true,
-  creates     => '/var/run/tada/dqsvcpush.pid',
-  require     => [File['/etc/tada/tada.conf',
-                       '/var/run/tada',
-                       '/home/tada/.irods/.irodsEnv'],
-                  Python::Requirements[ '/vagrant/requirements.txt'],
-                  Class['redis'],
-                  ],
-}
+#!exec { 'dqsvcpush':
+#!  command     => "/usr/bin/dqsvcpush --loglevel ${dqlevel} --queue ${qname} > /var/log/tada/dqpush.log 2>&1 &",
+#!  user        => 'tada',
+#!  environment => ['HOME=/home/tada'],
+#!  #! refreshonly => true,
+#!  creates     => '/var/run/tada/dqsvcpush.pid',
+#!  require     => [File['/etc/tada/tada.conf',
+#!                       '/var/run/tada',
+#!                       '/home/tada/.irods/.irodsEnv'],
+#!                  Python::Requirements[ '/vagrant/requirements.txt'],
+#!                  Class['redis'],
+#!                  ],
+#!}
 exec { 'dqsvcpop':
   command     => "/usr/bin/dqsvcpop --loglevel ${dqlevel} --queue ${qname} > /var/log/tada/dqpop.log 2>&1 &",
   user        => 'tada',

@@ -142,17 +142,17 @@ class { 'redis':
 # service (in the puppet sense) for that to work!!!
 $qname = hiera('queuename')
 $dqlevel = hiera('dq_loglevel')
-exec { 'dqsvcpush':
-  command     => "/usr/bin/dqsvcpush --loglevel ${dqlevel} --queue ${qname} > /var/log/tada/dqpush.log 2>&1 &",
-  user        => 'tada',
-  refreshonly => true,
-  creates     => '/var/run/tada/dqsvcpush.pid',
-  require     => [File['/var/run/tada'], Class['redis']],
-  subscribe   => [File['/etc/tada/tada.conf'],
-                  Python::Requirements[ '/vagrant/requirements.txt'],
-                  #!Python::Pip['dataq'],
-                  ],
-}
+#!exec { 'dqsvcpush':
+#!  command     => "/usr/bin/dqsvcpush --loglevel ${dqlevel} --queue ${qname} > /var/log/tada/dqpush.log 2>&1 &",
+#!  user        => 'tada',
+#!  refreshonly => true,
+#!  creates     => '/var/run/tada/dqsvcpush.pid',
+#!  require     => [File['/var/run/tada'], Class['redis']],
+#!  subscribe   => [File['/etc/tada/tada.conf'],
+#!                  Python::Requirements[ '/vagrant/requirements.txt'],
+#!                  #!Python::Pip['dataq'],
+#!                  ],
+#!}
 exec { 'dqsvcpop':
   command     => "/usr/bin/dqsvcpop --loglevel ${dqlevel} --queue ${qname} > /var/log/tada/dqpop.log 2>&1 &",
   user        => 'tada',
