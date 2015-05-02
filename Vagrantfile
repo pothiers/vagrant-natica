@@ -32,9 +32,12 @@ Vagrant.configure("2") do |config|
     mountain.hostmanager.aliases =  %w(mountain)
 
     mountain.vm.provision :puppet do |puppet|
-      puppet.manifests_path = "mountain/manifests"
-      puppet.module_path = "mountain/modules"
-      puppet.manifest_file = "init.pp"
+      #!puppet.manifests_path = "mountain/manifests"
+      #!puppet.module_path = "mountain/modules"
+      #!puppet.manifest_file = "init.pp"
+      puppet.manifests_path = "manifests"
+      puppet.module_path = "modules"
+      puppet.manifest_file = "role/tadamountain.pp"
       puppet.options = [
        '--verbose',
        '--report',
@@ -49,7 +52,7 @@ Vagrant.configure("2") do |config|
   config.vm.define "valley" do |valley|
     valley.vm.network :private_network, ip: "172.16.1.12"
     valley.vm.hostname = "valley.test.noao.edu"
-    valley.hostmanager.aliases =  %w(valley iserver)
+    valley.hostmanager.aliases =  %w(valley)
 
     valley.vm.provision :puppet do |puppet|
       puppet.manifests_path = "valley/manifests"
