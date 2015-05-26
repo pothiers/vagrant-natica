@@ -1,10 +1,12 @@
-class sdm::role::tadamountain {
-  $vers=1
+# Role for any TADA Mountain machine
+
+class role::tadamountain () {
+  $vers=2
   notify {"DBG: client loading role::tadamountain STUB-$vers":}
   #!include ::sdm::profile::base
-  include ::sdm::profile::rsync::client
-  include ::sdm::profile::cups::server
-  include ::sdm::profile::tada::common
-  include ::sdm::profile::tada::mountaindirs
-  include ::sdm::profile::tada::astro
+  include ::tada::profile::rsync::client
+  include ::tada::profile::cups::server
+  include ::tada::profile::tada::common
+  include ::tada::profile::tada::mountaindirs
+  include ::tada::profile::tada::astro
 }
