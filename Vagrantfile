@@ -1,6 +1,11 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+valley_disk = './valley_disk.vdi'
+mountain_disk = './mountain_disk.vdi'
+
+
+
 Vagrant.configure("2") do |config|
   #! Do this before using: vagrant plugin install vagrant-cachier
   if Vagrant.has_plugin?("vagrant-cachier")
@@ -17,27 +22,52 @@ Vagrant.configure("2") do |config|
   config.ssh.forward_agent = true
   config.ssh.forward_x11 = true
 
-  config.vm.provision "shell",
-    inline: "yum upgrade -y puppet" #! Remove for production!!!
+  #! config.vm.provision "shell",
+  #!   inline: "yum upgrade -y puppet" #! Remove for production!!!
 
   config.vm.synced_folder "..", "/sandbox"
   config.vm.synced_folder "../data", "/data"
-  config.vm.synced_folder "/home/pothiers/data", "/fitsdata"  
-  config.vm.box     = 'centos65'
-  config.vm.box_url = 'http://puppet-vagrant-boxes.puppetlabs.com/centos-65-x64-virtualbox-puppet.box'
-
+  #config.vm.box     = 'centos65'
+  #config.vm.box_url = 'http://puppet-vagrant-boxes.puppetlabs.com/centos-65-x64-virtualbox-puppet.box'
+  config.vm.box     = 'puppetlabs/centos-6.6-64-puppet'
+  config.vm.box_url = 'https://atlas.hashicorp.com/puppetlabs/boxes/centos-6.6-64-puppet'
+  
+  
   config.vm.define "mountain" do |mountain|
     mountain.vm.network :private_network, ip: "172.16.1.11"
-    mountain.vm.hostname = "mountain.test.noao.edu"
+    mountain.vm.hostname = "mountain.test.noao.edu" 
     mountain.hostmanager.aliases =  %w(mountain)
 
+    # disk to use for mountain-mirror
+    mountain.vm.provider "virtualbox" do | v |
+      v.customize ['createhd', '--filename', mountain_disk, '--size', 200 * 1024]
+      # list all controllers: "VBoxManage  list vms --long"
+      v.customize ['storageattach', :id, '--storagectl', 'IDE Controller',
+                   '--port', 1, '--device', 0, '--type', 'hdd',
+                   '--medium', mountain_disk]
+    end
+    mountain.vm.provision "shell", path: "disk2.sh"
+
+    
     mountain.vm.provision :puppet do |puppet|
+      ###################################
+      ## Use ORIG style (ad-hoc)
+      ##
       puppet.manifests_path = "mountain/manifests"
       puppet.module_path = "mountain/modules"
       puppet.manifest_file = "init.pp"
+      ##
+      ################
+
+      ###################################
+      ## Use SDM style used under Foreman
+      ##
       #!puppet.manifests_path = "manifests"
       #!puppet.module_path = "modules"
       #!puppet.manifest_file = "role/tadamountain.pp"
+      ##
+      ################
+
       puppet.options = [
        '--verbose',
        '--report',
@@ -54,6 +84,16 @@ Vagrant.configure("2") do |config|
     valley.vm.hostname = "valley.test.noao.edu"
     valley.hostmanager.aliases =  %w(valley)
 
+    # disk to use for mountain-mirror
+    valley.vm.provider "virtualbox" do | v |
+      v.customize ['createhd', '--filename', valley_disk, '--size', 200 * 1024]
+      # list all controllers: "VBoxManage  list vms --long"
+      v.customize ['storageattach', :id, '--storagectl', 'IDE Controller',
+                   '--port', 1, '--device', 0, '--type', 'hdd',
+                   '--medium', valley_disk]
+    end
+    valley.vm.provision "shell", path: "disk2.sh"
+      
     valley.vm.provision :puppet do |puppet|
       puppet.manifests_path = "valley/manifests"
       puppet.module_path = "valley/modules"

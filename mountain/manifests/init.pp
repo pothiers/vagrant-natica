@@ -1,25 +1,22 @@
 # Intended for provisioning of: mountain
 
-
-# Following is attempt to get around the warning:
-#   "Warning: The package type's allow_virtual parameter will be
-#   changing its default value from false to true in a future
-#   release. If you do not want to allow virtual packages, please
-#   explicitly set allow_virtual to false.
-#      (at /usr/lib/ruby/site_ruby/1.8/puppet/type/package.rb:430:in `default')"
-# But it doesn't work!!! (at least when this is run from vagrant)  Sigh.
-Package {
-  allow_virtual => false,
-}
-
-
-
 # epel is not needed by the puppet redis module but it's nice to have it
 # already configured in the box
 # (epel:: Extra Repository for Enterprise Linux)
 include epel
 include augeas
 
+#!package { ['emacs', 'xorg-x11-xauth', 'telnet'] : }  # DBG
+package { ['cups', 'git'] : }
+
+#! $confdir='/sandbox/tada/conf'
+$confdir=hiera('tada_confdir')
+$logging_conf=hiera('tada_logging_conf')
+$tada_conf=hiera('tada_conf')
+
+##############################################################################
+# Setup for installing python packages
+#
 yumrepo { 'ius':
   descr      => 'ius - stable',
   baseurl    => 'http://dl.iuscommunity.org/pub/ius/stable/CentOS/6/x86_64/',
@@ -29,29 +26,6 @@ yumrepo { 'ius':
   mirrorlist => absent,
 } -> Package<| provider == 'yum' |>
 
-
-#!package { ['emacs', 'xorg-x11-xauth', 'telnet'] : }  # DBG
-package { ['cups'] : }
-
-user { 'tada' :
-  ensure     => 'present',
-  comment    => 'For running TADA related services and actions',
-  managehome => true, # comment out after debugging
-  password   => '$1$Pk1b6yel$tPE2h9vxYE248CoGKfhR41',  # tada"Password"
-  system     => true,  
-}
-user { 'testuser' :
-  ensure     => 'present',
-  comment    => 'Normal user for for testing TADA',
-  managehome => true,
-  password   => '$1$4jJ0.K0P$eyUInImhwKruYp4G/v2Wm1',
-}
-
-
-
-##############################################################################
-# Setup for installing python packages
-#
 class { 'python':
   version    => '34u',
   pip        => false,
@@ -67,45 +41,57 @@ python::requirements { '/vagrant/requirements.txt': }
 Class['python'] -> Package['python34u-pip'] -> File['/usr/bin/pip']
   -> Python::Requirements['/vagrant/requirements.txt']
 
-#! $confdir='/sandbox/tada/conf'
-$confdir=hiera('tada_confdir')
+##############################################################################
+class { 'redis':
+  version           => '2.8.19',
+  redis_max_memory  => '1gb',
+}
 
 ##############################################################################
 ### Configure TADA  (move to config.pp!!!)
 ###
-file {  '/etc/tada':
-  ensure => 'directory',
+user { 'tada' :
+  ensure     => 'present',
+  comment    => 'For running TADA related services and actions',
+  managehome => true, # comment out after debugging
+  password   => '$1$Pk1b6yel$tPE2h9vxYE248CoGKfhR41',  # tada"Password"
+  system     => true,  
 }
-file {  [ '/var/run/tada', '/var/log/tada']:
+
+file { [ '/var/run/tada', '/var/log/tada', '/etc/tada',
+         '/var/tada', '/var/tada/mountain-mirror', '/var/tada/noarchive']:
   ensure => 'directory',
   owner  => 'tada',
-  mode   => '0744',
-}
-file {  '/etc/tada/tada.conf':
-  source => "${confdir}/tada_config.json",
   #!mode   => '0744',
+  mode   => '0777', #!!! tighten up permissions after initial burn in period
+}
+
+file {  '/etc/tada/tada.conf':
+  source => "${tada_conf}",
+  #! mode   => '0744',
 }
 file { '/etc/tada/pop.yaml':
-  source => "${confdir}/tada-logging.yaml",
-  #!mode   => '0744',
-  }
+  source => "${logging_conf}",
+  #! mode   => '0744',
+}
 file { '/var/log/tada/submit.manifest':
   ensure => 'file',
   owner  => 'tada',
   mode   => '0744',
 }
 
-###  
-##############################################################################
-
-
-##############################################################################
-### Install TADA  (move to install.pp!!!)
-###
-class { 'redis':
-  version           => '2.8.19',
-  redis_max_memory  => '1gb',
+exec { 'dqsvcpop':
+  command     => "/usr/bin/dqsvcpop --loglevel ${dqlevel} --queue ${qname} > /var/log/tada/dqpop.log 2>&1 &",
+  user        => 'tada',
+  creates     => '/var/run/tada/dqsvcpop.pid',
+  refreshonly => true,
+  require     => [File['/var/run/tada'], Class['redis']],
+  subscribe   => [File['/etc/tada/tada.conf'],
+                  Python::Requirements[ '/vagrant/requirements.txt'],
+                  ],
 }
+
+##############################################################################
 #!exec { 'dataq':
 #!  command => '/usr/bin/python3 /sandbox/data-queue/setup.py install',
 #!  #!  require => Python::requirements['/vagrant/requirements.txt']
@@ -153,20 +139,16 @@ $dqlevel = hiera('dq_loglevel')
 #!                  #!Python::Pip['dataq'],
 #!                  ],
 #!}
-exec { 'dqsvcpop':
-  command     => "/usr/bin/dqsvcpop --loglevel ${dqlevel} --queue ${qname} > /var/log/tada/dqpop.log 2>&1 &",
-  user        => 'tada',
-  creates     => '/var/run/tada/dqsvcpop.pid',
-  refreshonly => true,
-  require     => [File['/var/run/tada'], Class['redis']],
-  subscribe   => [File['/etc/tada/tada.conf'],
-                  Python::Requirements[ '/vagrant/requirements.txt'],
-                  #!Python::Pip['dataq'],
-                  ],
-}
 ###  
 ##############################################################################
 
+firewall { '631 allow cups':
+  chain   => 'INPUT',
+  state   => ['NEW'],
+  dport   => '631',
+  proto   => 'tcp',
+  action  => 'accept',
+}
 
 
 ##############################################################################
@@ -208,11 +190,6 @@ exec { 'add-astro-printer':
   subscribe => Service['cups'],
   }
 
-file { ['/var/tada', $mountaincache] :
-  ensure => 'directory',
-  mode   => '0777',
-  owner  => 'tada',
-  }
   
 file { '/etc/tada/rsync.pwd':
   source => "${confdir}/rsync.pwd",
@@ -222,46 +199,4 @@ file { '/etc/tada/rsync.pwd':
 ###  
 ##############################################################################
 
-
-  
-
-########################################################################
-# iRODS has too many time consuming obstacles. Very hard to figure out #
-# what goes wrong because error codes are often useless and            #
-# documentation is out of date. THEREFORE, remove use of it from TADA. #
-########################################################################
-###
-#! $irodsbase = 'ftp://ftp.renci.org/pub/irods/releases/4.0.3'
-#! package { ['fuse-libs','openssl098e']: } ->
-#! package { 'irods-icommands':
-#!   provider => 'rpm',
-#!   source   => "${irodsbase}/irods-icommands-4.0.3-64bit-centos6.rpm",
-#!   } 
-#! $vault='/var/lib/irods/iRODS/dciVault'
-#! file { '/home/tadauser/.irods':
-#!   ensure  => 'directory',
-#!   owner   => 'tadauser',
-#!   group   => 'tadauser',
-#!   require => User['tadauser'],
-#!   } ->
-#! file { '/home/tadauser/.irods/.irodsEnv':
-#!   owner   => 'tadauser',
-#!   group   => 'tadauser',
-#!   source  => '/vagrant/mountain/files/irodsEnv',
-#!   } ->
-#! exec { 'irod-iinit':
-#!   environment => ['HOME=/home/tadauser'],
-#!   command     => '/usr/bin/iinit temppasswd',
-#!   require     => Package['irods-icommands'],
-#!   user        => 'tadauser',
-#! }
-#!->
-#!#exec { 'irod-resource':
-#!#  environment => ['HOME=/home/tadauser'],
-#!#  command     => "/usr/bin/iadmin mkresc dciResc 'unixfilesystem' valley.test.noao.edu:${vault}",
-#!#  require     => Package['irods-icommands'],
-#!#  user        => 'tadauser',
-#!#  }
-###
-#######################################################################
 

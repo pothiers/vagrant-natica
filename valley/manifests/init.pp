@@ -1,75 +1,18 @@
 # Intended for provisioning of: valley (archive)
-#
-# after: vagrant ssh
-# sudo puppet apply --modulepath=/vagrant/modules /vagrant/manifests/init.pp --noop --graphsub
-# sudo cp -r /var/lib/puppet/state/graphs/ /vagrant/
 
-
+# epel is not needed by the puppet redis module but it's nice to have it
+# already configured in the box
+# (epel:: Extra Repository for Enterprise Linux)
 include epel
 include augeas
 
 #! package { [ 'emacs', 'xorg-x11-xauth', 'wireshark-gnome', 'openssl-devel', 'expat-devel', 'perl-CPAN', 'libxml2-devel'] : }  # DBG
-package { ['cups', 'xinetd'] : } 
+package { ['cups', 'xinetd', 'git'] : } 
 
 #! $confdir='/sandbox/tada/conf'
-#! $confdir='/sandbox/demo/conf'
 $confdir=hiera('tada_confdir')
-
-
-##############################################################################
-### rsync
-$secrets='/etc/rsyncd.scr'
-file {  $secrets:
-  source => "${confdir}/rsyncd.scr",
-  owner  => 'root',
-  mode   => '0400',
-}
-file {  '/etc/rsyncd.conf':
-  source => "${confdir}/rsyncd.conf",
-  owner  => 'root',
-  mode   => '0400',
-}
-exec { 'rsyncd':
-  command   => "/sbin/chkconfig rsync on",
-  require   => [Service['xinetd'],],
-  subscribe => File['/etc/rsyncd.conf'],
-}
-service { 'xinetd':
-  ensure  => 'running',
-  enable  => true,
-  require => Package['xinetd'],
-  }
-
-
-#!class {'cpan':
-#!  manage_package => false,
-#!  #!installdirs => 'vendor',
-#!  #!installdirs => 'perl',
-#!  #!manage_config => 'false',
-#!}
-
-user { 'tada' :
-  ensure     => 'present',
-  comment    => 'For running TADA related services and actions',
-  managehome => true, 
-  password   => '$1$Pk1b6yel$tPE2h9vxYE248CoGKfhR41',  # tada"Password"
-  system     => true,  
-}
-
-user { 'testuser' :
-  ensure     => 'present',
-  managehome => true,
-  password   => '$1$4jJ0.K0P$eyUInImhwKruYp4G/v2Wm1',
-}
-
-  
-class { 'redis':
-  version           => '2.8.19',
-  redis_max_memory  => '2gb',
-}
-
-
-
+$logging_conf=hiera('tada_logging_conf')
+$tada_conf=hiera('tada_conf')
 
 ##############################################################################
 # Setup for installing python packages
@@ -98,6 +41,104 @@ python::requirements { '/vagrant/requirements.txt': }
 Class['python'] -> Package['python34u-pip'] -> File['/usr/bin/pip']
 -> Python::Requirements['/vagrant/requirements.txt']
 
+##############################################################################
+class { 'redis':
+  version           => '2.8.19',
+  redis_max_memory  => '2gb',
+}
+
+##############################################################################
+### Configure TADA  (move to config.pp!!!)
+###
+user { 'tada' :
+  ensure     => 'present',
+  comment    => 'For running TADA related services and actions',
+  managehome => true, 
+  password   => '$1$Pk1b6yel$tPE2h9vxYE248CoGKfhR41',  # tada"Password"
+  system     => true,  
+}
+
+file { [ '/var/run/tada', '/var/log/tada', '/etc/tada',
+         '/var/tada', '/var/tada/mountain-mirror', '/var/tada/noarchive']:
+  ensure => 'directory',
+  owner  => 'tada',
+  #!mode   => '0744',
+  mode   => '0777', #!!! tighten up permissions after initial burn in period
+}
+
+file {  '/etc/tada/tada.conf':
+  source => "${tada_conf}",
+  #! mode   => '0744',
+}
+file { '/etc/tada/pop.yaml':
+  source => "${logging_conf}",
+  #! mode   => '0744',
+}
+file { '/var/log/tada/submit.manifest':
+  ensure => 'file',
+  owner  => 'tada',
+  mode   => '0766',
+}
+
+exec { 'dqsvcpop':
+  command     => "/usr/bin/dqsvcpop --loglevel ${dqlevel} --queue ${qname} > /var/log/tada/dqpop.log 2>&1 &",
+  user        => 'tada',
+  creates     => '/var/run/tada/dqsvcpop.pid',
+  refreshonly => true,
+  require     => [File['/var/run/tada'], Class['redis']],
+  subscribe   => [File['/etc/tada/tada.conf'],
+                  Python::Requirements[ '/vagrant/requirements.txt'],
+                  ],
+}
+
+firewall { '000 allow dqsvcpop':
+  chain   => 'INPUT',
+  state   => ['NEW'],
+  dport   => '6379',
+  proto   => 'tcp',
+  action  => 'accept',
+}
+
+
+##############################################################################
+### rsync
+$secrets='/etc/rsyncd.scr'
+file {  $secrets:
+  source => "${confdir}/rsyncd.scr",
+  owner  => 'root',
+  mode   => '0400',
+}
+file {  '/etc/rsyncd.conf':
+  source => "${confdir}/rsyncd.conf",
+  owner  => 'root',
+  mode   => '0400',
+}
+exec { 'rsyncd':
+  command   => "/sbin/chkconfig rsync on",
+  require   => [Service['xinetd'],],
+  subscribe => File['/etc/rsyncd.conf'],
+}
+service { 'xinetd':
+  ensure  => 'running',
+  enable  => true,
+  require => Package['xinetd'],
+  }
+
+firewall { '000 allow rsync':
+  chain   => 'INPUT',
+  state   => ['NEW'],
+  dport   => '873',
+  proto   => 'tcp',
+  action  => 'accept',
+}
+##############################################################################
+#!class {'cpan':
+#!  manage_package => false,
+#!  #!installdirs => 'vendor',
+#!  #!installdirs => 'perl',
+#!  #!manage_config => 'false',
+#!}
+##############################################################################
 
 file { '/etc/cups/client.conf':
   source  => "${confdir}/client.conf",
@@ -110,30 +151,8 @@ service { 'cups':
   } 
 
 
-##############################################################################
-### Configure TADA  (move to config.pp!!!)
-###
-file { [ '/var/run/tada', '/var/log/tada', '/etc/tada',
-         '/var/tada', '/var/tada/mountain-mirror', '/var/tada/noarchive']:
-  ensure => 'directory',
-  owner  => 'tada',
-  #!mode   => '0744',
-  mode   => '0777', #!!! tighten up permissions after initial burn in period
-}
 
-file {  '/etc/tada/tada.conf':
-  source => "${confdir}/tada_config.json",
-  #! mode   => '0744',
-}
-file { '/etc/tada/pop.yaml':
-  source => "${confdir}/tada-logging.yaml",
-  #! mode   => '0744',
-}
-file { '/var/log/tada/submit.manifest':
-  ensure => 'file',
-  owner  => 'tada',
-  mode   => '0766',
-}
+  
 
 ###  
 ##############################################################################
@@ -199,19 +218,6 @@ $dqlevel = hiera('dq_loglevel')
 #!                  Class['redis'],
 #!                  ],
 #!}
-exec { 'dqsvcpop':
-  command     => "/usr/bin/dqsvcpop --loglevel ${dqlevel} --queue ${qname} > /var/log/tada/dqpop.log 2>&1 &",
-  user        => 'tada',
-  environment => ['HOME=/home/tada'],
-  creates     => '/var/run/tada/dqsvcpop.pid',
-  #! refreshonly => true,
-  require     => [File['/etc/tada/tada.conf',
-                       '/var/run/tada',
-                       '/home/tada/.irods/.irodsEnv'],
-                  Python::Requirements[ '/vagrant/requirements.txt'],
-                  Class['redis'],
-                  ],
-}
 
 
 ###  
