@@ -1,4 +1,4 @@
 ---
 queuename: 'submit'
 irodsdata: '/sandbox/demo/conf/iinit.in'
-
+irodstgz: '/vagrant/valley/files/irods-3.3.1.tgz'

@@ -1,6 +1,6 @@
 # Resources common to all tada hosts (valleys, mountains)
 
-class sdm::profile::tada::common () {
+class ::profile::tada::common () {
   $dqlevel="DEBUG"
   $confdir="puppet:///modules/sdm" # => /etc/puppet/modules/sdm
   $tadapyreq="$confdir/tada-requirements.txt"

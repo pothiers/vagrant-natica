@@ -5,7 +5,6 @@ valley_disk = './valley_disk.vdi'
 mountain_disk = './mountain_disk.vdi'
 
 
-
 Vagrant.configure("2") do |config|
   #! Do this before using: vagrant plugin install vagrant-cachier
   if Vagrant.has_plugin?("vagrant-cachier")
@@ -40,7 +39,8 @@ Vagrant.configure("2") do |config|
 
     # disk to use for mountain-mirror
     mountain.vm.provider "virtualbox" do | v |
-      v.customize ['createhd', '--filename', mountain_disk, '--size', 200 * 1024]
+      v.customize ['createhd', '--filename', mountain_disk,
+                   '--size', 200 * 1024]
       # list all controllers: "VBoxManage  list vms --long"
       v.customize ['storageattach', :id, '--storagectl', 'IDE Controller',
                    '--port', 1, '--device', 0, '--type', 'hdd',
@@ -53,18 +53,19 @@ Vagrant.configure("2") do |config|
       ###################################
       ## Use ORIG style (ad-hoc)
       ##
-      puppet.manifests_path = "mountain/manifests"
-      puppet.module_path = "mountain/modules"
-      puppet.manifest_file = "init.pp"
+      #!puppet.manifests_path = "mountain/manifests"
+      #!puppet.module_path = "mountain/modules"
+      #!puppet.manifest_file = "init.pp"
       ##
       ################
 
       ###################################
       ## Use SDM style used under Foreman
       ##
-      #!puppet.manifests_path = "manifests"
-      #!puppet.module_path = "modules"
-      #!puppet.manifest_file = "role/tadamountain.pp"
+      puppet.manifests_path = "manifests"
+      puppet.module_path = "modules"
+      puppet.manifest_file = "site.pp"
+      #puppet.manifest_file = "tadamountaininit.pp" 
       ##
       ################
 
@@ -86,7 +87,9 @@ Vagrant.configure("2") do |config|
 
     # disk to use for mountain-mirror
     valley.vm.provider "virtualbox" do | v |
-      v.customize ['createhd', '--filename', valley_disk, '--size', 200 * 1024]
+      v.customize ['createhd', '--filename', valley_disk,
+                   '--size', 200 * 1024,  # megabytes
+                  ]
       # list all controllers: "VBoxManage  list vms --long"
       v.customize ['storageattach', :id, '--storagectl', 'IDE Controller',
                    '--port', 1, '--device', 0, '--type', 'hdd',
@@ -95,9 +98,13 @@ Vagrant.configure("2") do |config|
     valley.vm.provision "shell", path: "disk2.sh"
       
     valley.vm.provision :puppet do |puppet|
-      puppet.manifests_path = "valley/manifests"
-      puppet.module_path = "valley/modules"
-      puppet.manifest_file = "init.pp"
+      #!puppet.manifests_path = "valley/manifests"
+      #!puppet.module_path = "valley/modules"
+      #!puppet.manifest_file = "init.pp"
+      puppet.manifests_path = "manifests"
+      puppet.module_path = "modules"
+      puppet.manifest_file = "site.pp" 
+
       puppet.options = [
        '--verbose',
        '--report',

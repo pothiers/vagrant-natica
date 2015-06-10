@@ -3,6 +3,7 @@ class sdm::role::tadavalley {
   notify {"DBG: client loading role::tadavalley STUB-$vers}":}
   #!include ::sdm::profile::base
   #!include ::sdm::site::tu
+  
   include ::sdm::profile::rsync::server
   include ::sdm::profile::cups::client
   include ::sdm::profile::tada::common
