@@ -3,9 +3,28 @@ class tada::valley::config (
   $icmdpath     = '/usr/local/share/applications/irods3.3.1/iRODS/clients/icommands/bin',
   $confdir      = hiera('tada_confdir'),
   $logging_conf = hiera('tada_logging_conf'),
+  $irodsdata    = hiera('irodsdata'),
+  $irodsenv     = hiera('irodsenv'),
 
   ) {
-    ##############################################################################
+  
+  file { [ '/var/tada/mountain-mirror', '/var/tada/noarchive']:
+    ensure => 'directory',
+    owner  => 'tada',
+    mode   => '0744',
+    #!mode   => '0777', #!!! tighten up permissions after initial burn in period
+  }
+
+  firewall { '000 allow dqsvcpop':
+    chain   => 'INPUT',
+    state   => ['NEW'],
+    dport   => '6379',
+    proto   => 'tcp',
+    action  => 'accept',
+  }
+  
+
+  ##############################################################################
   ### rsync
   file {  $secrets:
     source => "${confdir}/rsyncd.scr",
@@ -43,22 +62,28 @@ class tada::valley::config (
   }
   file { '/home/tada/.irods/.irodsEnv':
     owner  => 'tada',
-    source => '/vagrant/valley/files/irodsEnv'
+    source => "$irodsenv",
     }
   file { '/home/tada/.irods/iinit.in':
     owner  => 'tada',
-    source => hiera('irodsdata'),
+    source => "$irodsdata",
   }
   exec { 'iinit':
-    #!command     => "${icmdpath}/iinit `cat /home/tada/.irods/iinit.in`",
     environment => ['irodsEnvFile=/home/tada/.irods/.irodsEnv',
                    'HOME=/home/tada' ],
-    command     => "${icmdpath}/iinit cacheMonet", #!!!
+    command     => "${icmdpath}/iinit `cat /home/tada/.irods/iinit.in`",
     user        => 'tada',
     creates     => '/home/tada/.irods/.irodsA',
     require     => [Exec['unpack irods'],
                     File[ '/home/tada/.irods/.irodsEnv',
                           '/home/tada/.irods/iinit.in']],
-    }
+  }
+
+  ###
+  # CUPS (client only)
+  file { '/etc/cups/client.conf':
+    source  => "${confdir}/client.conf",
+  } 
+
 
   }

@@ -1,1 +1,2 @@
-class tada::valley::service { }
+class tada::valley::service {
+}
