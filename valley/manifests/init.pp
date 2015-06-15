@@ -9,8 +9,6 @@ include augeas
 #! package { [ 'emacs', 'xorg-x11-xauth', 'wireshark-gnome', 'openssl-devel', 'expat-devel', 'perl-CPAN', 'libxml2-devel'] : }  # DBG
 package { ['cups', 'xinetd', 'git'] : } 
 
-#! $confdir='/sandbox/tada/conf'
-$confdir=hiera('tada_confdir')
 $logging_conf=hiera('tada_logging_conf')
 $tada_conf=hiera('tada_conf')
 

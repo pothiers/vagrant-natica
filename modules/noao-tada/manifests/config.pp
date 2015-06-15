@@ -3,13 +3,9 @@
 
 
 class tada::config {
-  $confdir=hiera('tada_confdir')
   $logging_conf=hiera('tada_logging_conf')
   $tada_conf=hiera('tada_conf')
 
-  notify {"DBG: config.pp; tada_conf=$tada_conf":}
-  notify {"DBG: config.pp; confdir=$confdir":}
-  
   user { 'tada' :
     ensure     => 'present',
     comment    => 'For running TADA related services and actions',

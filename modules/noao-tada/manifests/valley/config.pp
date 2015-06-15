@@ -1,7 +1,6 @@
 class tada::valley::config (
   $secrets      = '/etc/rsyncd.scr',
   $icmdpath     = '/usr/local/share/applications/irods3.3.1/iRODS/clients/icommands/bin',
-  $confdir      = hiera('tada_confdir'),
   $logging_conf = hiera('tada_logging_conf'),
   $irodsdata    = hiera('irodsdata'),
   $irodsenv     = hiera('irodsenv'),
