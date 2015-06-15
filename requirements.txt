@@ -41,6 +41,8 @@ redis==2.10.1
 # installing pre-releases and development releases.
 #! dataq>=0.0.dev0
 #! tada>=0.0.dev0
+#! dataq>=0.0.0  # final release
+#! tada>=0.0.0
 
 # Use local current version 
 #!-e /sandbox/data-queue
