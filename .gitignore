@@ -2,6 +2,8 @@ pp
 pp2
 tt
 uu
+mountain_disk.vdi
+valley_disk.vdi
 
 .bundle
 Gemfile.lock
