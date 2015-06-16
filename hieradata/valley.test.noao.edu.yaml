@@ -1,5 +1,8 @@
 ---
 queuename: 'submit'
-irodsdata: '/sandbox/demo/conf/iinit.in'
-irodsenv: '/sandbox/demo/conf/irodsEnv.dev'
-irodstgz: '/vagrant/valley/files/irods-3.3.1.tgz'
+irodsdata: '/sandbox/tada-hiera/files/iinit.in'
+irodsenv: '/sandbox/tada-hiera/files/irodsEnv.dev'
+irodstgz: 'puppet:///modules/tada/irods-3.3.1.tgz'
+rsyncdscr: '/sandbox/tada-hiera/files/rsyncd.scr'
+rsyncdconf: '/sandbox/tada-hiera/files/rsyncd.conf'
+cupsclient: '/sandbox/tada-hiera/files/cups-client.conf'
