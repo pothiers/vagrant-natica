@@ -2,6 +2,7 @@ pp
 pp2
 tt
 uu
+*.vdi
 
 .bundle
 Gemfile.lock

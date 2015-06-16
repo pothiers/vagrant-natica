@@ -1,6 +1,5 @@
 ---
 dq_loglevel: 'DEBUG'
-tada_confdir: '/sandbox/demo/conf'
 tada_logging_conf: '/sandbox/demo/conf/tada-logging.yaml'
 tada_conf: '/sandbox/demo/conf/tada_config.dev.json'
 dqlog: '/var/log/tada/dqsvcpop.log'
