@@ -1,0 +1,3 @@
+[submodule "modules/tada"]
+	path = modules/tada
+	url = https://github.com/pothiers/puppet-tada.git
