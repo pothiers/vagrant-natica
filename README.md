@@ -1,7 +1,7 @@
 vagrant-tada
 ============
 
-For new DCI using Puppet, iRODS, Redis, Python
+For new replacement for DCI using Puppet, iRODS, Redis, Python
 
 Intended as VM base under Vagrant for python development that makes
 use of Redis and iRODS.
@@ -12,4 +12,9 @@ Doing "vagrant up" in this directory creates two VMs (mountain, valley). Tada is
 
 can be put on any other machine that has access to mountain. Then the lp can be done from the other machine also.
 
+
+*NOTE: This uses a "git submodule"!*  Initialize local configuration:
+
+       git submodule init
+       git submodule update
 
