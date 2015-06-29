@@ -1,5 +1,5 @@
 ---
 dq_loglevel: 'DEBUG'
-tada_logging_conf: '/sandbox/demo/conf/tada-logging.yaml'
-tada_conf: '/sandbox/demo/conf/tada_config.dev.json'
+tada_logging_conf: 'puppet:///modules/tada-hiera/tada-logging.yaml'
+tada_conf: 'puppet:///modules/tada-hiera/tada_config.dev.json'
 dqlog: '/var/log/tada/dqsvcpop.log'

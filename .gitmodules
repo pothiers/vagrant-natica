@@ -1,3 +1,6 @@
 [submodule "modules/tada"]
 	path = modules/tada
 	url = https://github.com/pothiers/puppet-tada.git
+[submodule "modules/tada-hiera"]
+	path = modules/tada-hiera
+	url = git@bitbucket.org:noao/tada-hiera.git

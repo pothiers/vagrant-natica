@@ -1,7 +1,7 @@
 ---
-queuename: 'transfer'
-rsyncpwd: '/sandbox/demo/conf/rsync.pwd'
+qname: 'transfer'
+rsyncpwd: 'puppet:///modules/tada-hiera/rsync.pwd'
 cupsdconf: 'puppet:///modules/tada/new-cupsd.conf'
-pushfilesh: '/sandbox/tada/astro/pushfile.sh'
-astropost: '/sandbox/tada/astro/astropost'
+pushfilesh: 'puppet:///modules/tada-hiera/pushfile.sh'
+astropost: 'puppet:///modules/tada-hiera/astropost'
 mtncache: '/var/tada/mountain_cache'
