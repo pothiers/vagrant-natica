@@ -11,5 +11,8 @@ python::gunicorn { 'vhost':
   dir         => '/var/www/project1/current',
   bind        => 'unix:/tmp/gunicorn.socket',
   environment => 'prod',
+  appmodule   => 'app:app',
+  osenv       => { 'DBHOST' => 'dbserver.example.com' },
+  timeout     => 30,
   template    => 'python/gunicorn.erb',
 }

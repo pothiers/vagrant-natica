@@ -26,8 +26,6 @@ Vagrant.configure("2") do |config|
 
   config.vm.synced_folder "..", "/sandbox"
   config.vm.synced_folder "../data", "/data"
-  #config.vm.box     = 'centos65'
-  #config.vm.box_url = 'http://puppet-vagrant-boxes.puppetlabs.com/centos-65-x64-virtualbox-puppet.box'
   config.vm.box     = 'puppetlabs/centos-6.6-64-puppet'
   config.vm.box_url = 'https://atlas.hashicorp.com/puppetlabs/boxes/centos-6.6-64-puppet'
   
@@ -37,37 +35,24 @@ Vagrant.configure("2") do |config|
     mountain.vm.hostname = "mountain.test.noao.edu" 
     mountain.hostmanager.aliases =  %w(mountain)
 
+    # COMMENT OUT TO SPEED VM CREATION
     # disk to use for mountain-mirror
-    mountain.vm.provider "virtualbox" do | v |
-      v.customize ['createhd', '--filename', mountain_disk,
-                   '--size', 200 * 1024]
-      # list all controllers: "VBoxManage  list vms --long"
-      v.customize ['storageattach', :id, '--storagectl', 'IDE Controller',
-                   '--port', 1, '--device', 0, '--type', 'hdd',
-                   '--medium', mountain_disk]
-    end
-    mountain.vm.provision "shell", path: "disk2.sh"
+    #!mountain.vm.provider "virtualbox" do | v |
+    #!  v.customize ['createhd', '--filename', mountain_disk,
+    #!               '--size', 200 * 1024]
+    #!  # list all controllers: "VBoxManage  list vms --long"
+    #!  v.customize ['storageattach', :id, '--storagectl', 'IDE Controller',
+    #!               '--port', 1, '--device', 0, '--type', 'hdd',
+    #!               '--medium', mountain_disk]
+    #!end
+    #!mountain.vm.provision "shell", path: "disk2.sh"
 
     
     mountain.vm.provision :puppet do |puppet|
-      ###################################
-      ## Use ORIG style (ad-hoc)
-      ##
-      #!puppet.manifests_path = "mountain/manifests"
-      #!puppet.module_path = "mountain/modules"
-      #!puppet.manifest_file = "init.pp"
-      ##
-      ################
-
-      ###################################
-      ## Use SDM style used under Foreman
-      ##
       puppet.manifests_path = "manifests"
-      puppet.module_path = "modules"
       puppet.manifest_file = "site.pp"
-      #puppet.manifest_file = "tadamountaininit.pp" 
-      ##
-      ################
+      #! puppet.module_path = "modules"
+      puppet.module_path = ["modules", "../puppet-modules"]
 
       puppet.options = [
        '--verbose',
@@ -85,25 +70,24 @@ Vagrant.configure("2") do |config|
     valley.vm.hostname = "valley.test.noao.edu"
     valley.hostmanager.aliases =  %w(valley)
 
+    # COMMENT OUT TO SPEED VM CREATION
     # disk to use for mountain-mirror
-    valley.vm.provider "virtualbox" do | v |
-      v.customize ['createhd', '--filename', valley_disk,
-                   '--size', 200 * 1024,  # megabytes
-                  ]
-      # list all controllers: "VBoxManage  list vms --long"
-      v.customize ['storageattach', :id, '--storagectl', 'IDE Controller',
-                   '--port', 1, '--device', 0, '--type', 'hdd',
-                   '--medium', valley_disk]
-    end
-    valley.vm.provision "shell", path: "disk2.sh"
+    #!valley.vm.provider "virtualbox" do | v |
+    #!  v.customize ['createhd', '--filename', valley_disk,
+    #!               '--size', 200 * 1024,  # megabytes
+    #!              ]
+    #!  # list all controllers: "VBoxManage  list vms --long"
+    #!  v.customize ['storageattach', :id, '--storagectl', 'IDE Controller',
+    #!               '--port', 1, '--device', 0, '--type', 'hdd',
+    #!               '--medium', valley_disk]
+    #!end
+    #!valley.vm.provision "shell", path: "disk2.sh"
       
     valley.vm.provision :puppet do |puppet|
-      #!puppet.manifests_path = "valley/manifests"
-      #!puppet.module_path = "valley/modules"
-      #!puppet.manifest_file = "init.pp"
       puppet.manifests_path = "manifests"
-      puppet.module_path = "modules"
       puppet.manifest_file = "site.pp" 
+      puppet.module_path = ["modules", "../puppet-modules"]
+
 
       puppet.options = [
        '--verbose',

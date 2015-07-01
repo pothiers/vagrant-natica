@@ -35,6 +35,18 @@
 # [*cwd*]
 #  The directory from which to run the "pip install" command. Default: undef
 #
+# [*extra_pip_args*]
+# Extra arguments to pass to pip after the requirements file
+#
+# [*fix_requirements_owner*]
+# Change owner and group of requirements file. Default: true
+#
+# [*log_dir*]
+# String. Log directory.
+#
+# [*timeout*]
+#  The maximum time in seconds the "pip install" command should take. Default: 1800
+#
 # === Examples
 #
 # python::requirements { '/var/www/project1/requirements.txt':
@@ -49,23 +61,35 @@
 # Fotis Gimian
 #
 define python::requirements (
-  $requirements = $name,
-  $virtualenv   = 'system',
-  $owner        = 'root',
-  $group        = 'root',
-  $proxy        = false,
-  $src          = false,
-  $environment  = [],
-  $forceupdate  = false,
-  $cwd          = undef,
+  $requirements           = $name,
+  $virtualenv             = 'system',
+  $owner                  = 'root',
+  $group                  = 'root',
+  $proxy                  = false,
+  $src                    = false,
+  $environment            = [],
+  $forceupdate            = false,
+  $cwd                    = undef,
+  $extra_pip_args         = '',
+  $fix_requirements_owner = true,
+  $log_dir                = '/tmp',
+  $timeout                = 1800,
 ) {
 
   if $virtualenv == 'system' and ($owner != 'root' or $group != 'root') {
     fail('python::pip: root user must be used when virtualenv is system')
   }
 
-  $rootdir = $virtualenv ? {
-    'system' => '/',
+  if $fix_requirements_owner {
+    $owner_real = $owner
+    $group_real = $group
+  } else {
+    $owner_real = undef
+    $group_real = undef
+  }
+
+  $log = $virtualenv ? {
+    'system' => $log_dir,
     default  => $virtualenv,
   }
 
@@ -90,8 +114,8 @@ define python::requirements (
     file { $requirements:
       ensure  => present,
       mode    => '0644',
-      owner   => $owner,
-      group   => $group,
+      owner   => $owner_real,
+      group   => $group_real,
       audit   => content,
       replace => false,
       content => '# Puppet will install and/or update pip packages listed here',
@@ -100,9 +124,9 @@ define python::requirements (
 
   exec { "python_requirements${name}":
     provider    => shell,
-    command     => "${pip_env} --log ${rootdir}/pip.log install ${proxy_flag} ${src_flag} -r ${requirements}",
+    command     => "${pip_env} --log ${log}/pip.log install ${proxy_flag} ${src_flag} -r ${requirements} ${extra_pip_args}",
     refreshonly => !$forceupdate,
-    timeout     => 1800,
+    timeout     => $timeout,
     cwd         => $cwd,
     user        => $owner,
     subscribe   => File[$requirements],
