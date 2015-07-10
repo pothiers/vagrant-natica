@@ -57,6 +57,8 @@ Vagrant.configure("2") do |config|
        '--verbose',
        '--report',
        '--show_diff',
+       '--graph',
+       '--graphdir /vagrant/graphs/mountain',
        '--pluginsync',
        '--hiera_config /vagrant/hiera.yaml',
        #!'--debug', #+++ #! Remove for production!!!
@@ -92,6 +94,8 @@ Vagrant.configure("2") do |config|
        '--verbose',
        '--report',
        '--show_diff',
+       '--graph',
+       '--graphdir /vagrant/graphs/valley',
        '--pluginsync',
        '--hiera_config /vagrant/hiera.yaml',
        #!'--debug', #+++

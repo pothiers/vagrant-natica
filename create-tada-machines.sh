@@ -20,6 +20,9 @@ emins=$(((`date +'%s'` - tic)/60))
 #! vagrant provision mountain --provision-with puppet
 
 echo "Done provisioning: $sdate to " `date` > tt.out
+echo "Try: "                               >> tt.out
+echo "  /opt/tada-cli/scripts/raw_post /data/molest-pair/nhs_2014_n14_299403.fits" >> tt.out
+echo "  vagrant ssh valley -c /sandbox/tada/tests/smoke/smoke.sh" >> tt.out
 
 echo "Done: " `date`
 cat tt.out | mail -s "Try valley! NO CLEAN ($emins)" pothier@email.noao.edu
