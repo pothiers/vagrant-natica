@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# Run on valley
+
+cfgfiles=/sandbox/puppet-modules/tada-hiera/files
+
+sudo cp $cfgfiles/tada_config.prod.json /etc/tada/tada.conf
+sudo chmod ugo+r /etc/tada/tada.conf
+sudo cp $cfgfiles/irodsEnv.prod ~tada/.irods/.irodsEnv
+sudo chown tada ~tada/.irods/.irodsEnv
+
+sudo service dqd restart

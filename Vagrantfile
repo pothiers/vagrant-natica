@@ -35,7 +35,7 @@ Vagrant.configure("2") do |config|
     mountain.vm.hostname = "mountain.test.noao.edu" 
     mountain.hostmanager.aliases =  %w(mountain)
 
-    # COMMENT OUT TO SPEED VM CREATION
+    # COMMENT OUT TO SPEED VM CREATION (if small disk is good enough)
     # disk to use for mountain-mirror
     mountain.vm.provider "virtualbox" do | v |
       v.customize ['createhd', '--filename', mountain_disk,
