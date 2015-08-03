@@ -34,13 +34,22 @@ Puppet::Type.type(:file_line).provide(:ruby) do
 
   def handle_create_with_match()
     regex = resource[:match] ? Regexp.new(resource[:match]) : nil
-    match_count = lines.select { |l| regex.match(l) }.size
+    regex_after = resource[:after] ? Regexp.new(resource[:after]) : nil
+    match_count = count_matches(regex)
+
     if match_count > 1 && resource[:multiple].to_s != 'true'
      raise Puppet::Error, "More than one line in file '#{resource[:path]}' matches pattern '#{resource[:match]}'"
     end
+
     File.open(resource[:path], 'w') do |fh|
       lines.each do |l|
         fh.puts(regex.match(l) ? resource[:line] : l)
+        if (match_count == 0 and regex_after)
+          if regex_after.match(l)
+            fh.puts(resource[:line])
+            match_count += 1 #Increment match_count to indicate that the new line has been inserted.
+          end
+        end
       end
 
       if (match_count == 0)
@@ -51,24 +60,28 @@ Puppet::Type.type(:file_line).provide(:ruby) do
 
   def handle_create_with_after
     regex = Regexp.new(resource[:after])
+    count = count_matches(regex)
 
-    count = lines.count {|l| l.match(regex)}
-
-    case count
-    when 1 # find the line to put our line after
-      File.open(resource[:path], 'w') do |fh|
-        lines.each do |l|
-          fh.puts(l)
-          if regex.match(l) then
-            fh.puts(resource[:line])
-          end
-        end
-      end
-    when 0 # append the line to the end of the file
-      append_line
-    else
+    if count > 1 && resource[:multiple].to_s != 'true'
       raise Puppet::Error, "#{count} lines match pattern '#{resource[:after]}' in file '#{resource[:path]}'.  One or no line must match the pattern."
     end
+
+    File.open(resource[:path], 'w') do |fh|
+      lines.each do |l|
+        fh.puts(l)
+        if regex.match(l) then
+          fh.puts(resource[:line])
+        end
+      end
+    end
+
+    if (count == 0) # append the line to the end of the file
+      append_line
+    end
+  end
+
+  def count_matches(regex)
+    lines.select{|l| l.match(regex)}.size
   end
 
   ##
@@ -76,7 +89,10 @@ Puppet::Type.type(:file_line).provide(:ruby) do
   #
   # @api private
   def append_line
-    File.open(resource[:path], 'a') do |fh|
+    File.open(resource[:path], 'w') do |fh|
+      lines.each do |l|
+        fh.puts(l)
+      end
       fh.puts resource[:line]
     end
   end
