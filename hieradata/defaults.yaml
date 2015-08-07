@@ -1,9 +1,9 @@
 ---
 dq_loglevel: 'DEBUG'
 tada_logging_conf: 'puppet:///modules/tada-hiera/tada-logging.yaml'
-tada_conf: 'puppet:///modules/tada-hiera/tada_config.prod.json'
 __tada_conf: 'puppet:///modules/tada-hiera/tada_config.prod.json'
 __tada_conf: 'puppet:///modules/tada-hiera/tada_config.dev-vagrant.json'
+tada_conf: 'puppet:///modules/tada-hiera/tada_config.dev-vagrant.json'
 dqlog: '/var/log/tada/dqsvcpop.log'
 udp_recv_channel:
   - port : 8649
