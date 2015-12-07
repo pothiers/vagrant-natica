@@ -4,7 +4,6 @@ if versioncmp($::puppetversion,'3.6.1') >= 0 {
 }
 
 node default {
-  notify {"DBG: site.pp; default":}
   class {'tada': }
 }
 
