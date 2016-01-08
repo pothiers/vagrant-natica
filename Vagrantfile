@@ -25,7 +25,9 @@ Vagrant.configure("2") do |config|
   #!   inline: "yum upgrade -y puppet" #! Remove for production!!!
 
   config.vm.synced_folder "..", "/sandbox"
-  config.vm.synced_folder "../data", "/data"
+  config.vm.synced_folder "../../dev-scripts", "/dbin"
+  config.vm.synced_folder "../../logs", "/logs"
+  config.vm.synced_folder "../../data", "/data"
   config.vm.box     = 'puppetlabs/centos-6.6-64-puppet'
   config.vm.box_url = 'https://atlas.hashicorp.com/puppetlabs/boxes/centos-6.6-64-puppet'
   
