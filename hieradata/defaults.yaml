@@ -1,11 +1,19 @@
 ---
+astropost: 'puppet:///modules/tada-hiera/astropost'
 dq_loglevel: 'DEBUG'
-tada_logging_conf: 'puppet:///modules/tada-hiera/tada-logging.yaml'
-watch_logging_conf: 'puppet:///modules/tada-hiera/watch-logging.yaml'
+fpacktgz: 'puppet:///modules/tada/fpack-bin-centos-6.6.tgz'
 __tada_conf: 'puppet:///modules/tada-hiera/tada_config.prod.json'
 __tada_conf: 'puppet:///modules/tada-hiera/tada_config.dev-vagrant.json'
 tada_conf: 'puppet:///modules/tada-hiera/tada_config.dev-vagrant.json'
+tada_logging_conf: 'puppet:///modules/tada-hiera/tada-logging.yaml'
+watch_logging_conf: 'puppet:///modules/tada-hiera/watch-logging.yaml'
 dqlog: '/var/log/tada/dqsvcpop.log'
+irodsdata: 'puppet:///modules/tada-hiera/iinit.in'
+irodsenv: 'puppet:///modules/tada-hiera/irodsEnv.dev'
+irodstgz: 'puppet:///modules/tada/irods-3.3.1.tgz'
+rsyncdconf: 'puppet:///modules/tada-hiera/rsyncd.conf'
+rsyncdscr: 'puppet:///modules/tada-hiera/rsyncd.scr'
+rsyncpwd: 'puppet:///modules/tada-hiera/rsync.pwd'
 udp_recv_channel:
   - port : 8649
     bind : localhost
@@ -20,3 +28,7 @@ udp_send_channel:
     ttl  : 2
 tcp_accept_channel:
   - port : 8649
+cupsdconf: 'puppet:///modules/tada/new-cupsd.conf'
+pushfilesh: 'puppet:///modules/tada-hiera/pushfile.sh'
+astropost: 'puppet:///modules/tada-hiera/astropost'
+cupsclient: 'puppet:///modules/tada-hiera/cups-client.conf'

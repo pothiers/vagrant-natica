@@ -10,6 +10,12 @@ node default {
 node mountain {
   include tada
   include tada::mountain
+  @user { 'vagrant':
+    groups     => ["vagrant"],
+    membership => minimum,
+  }
+
+  User <| title == vagrant |> { groups +> "tada" }
 }
 
 node valley {
@@ -20,6 +26,5 @@ node valley {
     groups     => ["vagrant"],
     membership => minimum,
   }
-
   User <| title == vagrant |> { groups +> "tada" }
 }

@@ -1,8 +1,4 @@
 ---
 qname: 'transfer'
-rsyncpwd: 'puppet:///modules/tada-hiera/rsync.pwd'
-rsyncdscr: 'puppet:///modules/tada-hiera/rsyncd.scr'
-rsyncdconf: 'puppet:///modules/tada-hiera/rsyncd.conf'
-cupsdconf: 'puppet:///modules/tada/new-cupsd.conf'
-pushfilesh: 'puppet:///modules/tada-hiera/pushfile.sh'
-astropost: 'puppet:///modules/tada-hiera/astropost'
+tada_host_type: 'MOUNTAIN'
+dqd_conf: 'puppet:///modules/tada/dqd.transfer.conf'

@@ -1,9 +1,5 @@
 ---
 qname: 'submit'
-rsyncpwd: 'puppet:///modules/tada-hiera/rsync.pwd'
-rsyncdscr: 'puppet:///modules/tada-hiera/rsyncd.scr'
-rsyncdconf: 'puppet:///modules/tada-hiera/rsyncd.conf'
-irodsdata: 'puppet:///modules/tada-hiera/iinit.in'
-irodsenv: 'puppet:///modules/tada-hiera/irodsEnv.dev'
-irodstgz: 'puppet:///modules/tada/irods-3.3.1.tgz'
-cupsclient: 'puppet:///modules/tada-hiera/cups-client.conf'
+tada_host_type: 'VALLEY'
+dqd_conf: 'puppet:///modules/tada/dqd.submit.conf'
+
