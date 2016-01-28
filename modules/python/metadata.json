@@ -1,6 +1,6 @@
 {
   "name": "stankevich-python",
-  "version": "1.7.9",
+  "version": "1.9.4",
   "author": "stankevich",
   "summary": "Python Module",
   "license": "Apache License, Version 2.0",
@@ -46,10 +46,6 @@
     }
   ],
   "dependencies": [
-    {
-      "name": "puppetlabs/stdlib",
-      "version_requirement": ">= 4.0.0"
-    },
     {"name":"puppetlabs/stdlib","version_requirement":">= 4.0.0"}
   ]
 }

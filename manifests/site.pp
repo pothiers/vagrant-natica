@@ -1,16 +1,47 @@
+
+if versioncmp($::puppetversion,'3.6.1') >= 0 {
+  Package { allow_virtual => true, }
+}
+
 node default {
-  notify {"DBG: site.pp; default":}
   class {'tada': }
 }
 
 node mountain {
-  notify {"DBG: site.pp; mountain.test.noao.edu":}
   include tada
   include tada::mountain
+  @user { 'vagrant':
+    groups     => ["vagrant"],
+    membership => minimum,
+  }
+
+  User <| title == vagrant |> { groups +> "tada" }
 }
 
 node valley {
-  notify {"DBG: site.pp; valley.test.noao.edu":}
   include tada
   include tada::valley
+  $rsyncpwd       = hiera('rsyncpwd')
+
+  @user { 'vagrant':
+    groups     => ["vagrant"],
+    membership => minimum,
+  }
+  User <| title == vagrant |> { groups +> "tada" }
+
+  file { '/home/vagrant/.tada':
+    ensure  => 'directory',
+    owner   => 'vagrant',
+    group   => 'tada',
+    mode    => '0744',
+  }
+  file { '/home/vagrant/.tada/rsync.pwd':
+    ensure  => 'present',
+    owner   => 'vagrant',
+    group   => 'tada',
+    mode    => '0400',
+    source  => "${rsyncpwd}",
+  }
+  
 }
+

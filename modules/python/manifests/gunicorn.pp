@@ -25,6 +25,20 @@
 # [*environment*]
 #  Set ENVIRONMENT variable. Default: none
 #
+# [*appmodule*]
+#  Set the application module name for gunicorn to load when not using Django.
+#  Default: app:app
+#
+# [*osenv*]
+#  Allows setting environment variables for the gunicorn service. Accepts a
+#  hash of 'key': 'value' pairs.
+#  Default: false
+#
+# [*timeout*]
+#  Allows setting the gunicorn idle worker process time before being killed.
+#  The unit of time is seconds.
+#  Default: 30
+#
 # [*template*]
 #  Which ERB template to use. Default: python/gunicorn.erb
 #
@@ -39,6 +53,9 @@
 #   environment => 'prod',
 #   owner       => 'www-data',
 #   group       => 'www-data',
+#   appmodule   => 'app:app',
+#   osenv       => { 'DBHOST' => 'dbserver.example.com' },
+#   timeout     => 30,
 #   template    => 'python/gunicorn.erb',
 # }
 #
@@ -49,15 +66,21 @@
 # Marc Fournier
 #
 define python::gunicorn (
-  $ensure        = present,
-  $virtualenv    = false,
-  $mode          = 'wsgi',
-  $dir           = false,
-  $bind          = false,
-  $environment   = false,
-  $owner         = 'www-data',
-  $group         = 'www-data',
-  $template      = 'python/gunicorn.erb',
+  $ensure            = present,
+  $virtualenv        = false,
+  $mode              = 'wsgi',
+  $dir               = false,
+  $bind              = false,
+  $environment       = false,
+  $owner             = 'www-data',
+  $group             = 'www-data',
+  $appmodule         = 'app:app',
+  $osenv             = false,
+  $timeout           = 30,
+  $access_log_format = false,
+  $accesslog         = false,
+  $errorlog          = false,
+  $template          = 'python/gunicorn.erb',
 ) {
 
   # Parameter validation

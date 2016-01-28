@@ -1,8 +1,5 @@
 ---
-queuename: 'submit'
-irodsdata: '/sandbox/tada-hiera/files/iinit.in'
-irodsenv: '/sandbox/tada-hiera/files/irodsEnv.dev'
-irodstgz: 'puppet:///modules/tada/irods-3.3.1.tgz'
-rsyncdscr: '/sandbox/tada-hiera/files/rsyncd.scr'
-rsyncdconf: '/sandbox/tada-hiera/files/rsyncd.conf'
-cupsclient: '/sandbox/tada-hiera/files/cups-client.conf'
+qname: 'submit'
+tada_host_type: 'VALLEY'
+dqd_conf: 'puppet:///modules/tada/dqd.submit.conf'
+

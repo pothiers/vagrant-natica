@@ -25,9 +25,9 @@ Vagrant.configure("2") do |config|
   #!   inline: "yum upgrade -y puppet" #! Remove for production!!!
 
   config.vm.synced_folder "..", "/sandbox"
-  config.vm.synced_folder "../data", "/data"
-  #config.vm.box     = 'centos65'
-  #config.vm.box_url = 'http://puppet-vagrant-boxes.puppetlabs.com/centos-65-x64-virtualbox-puppet.box'
+  config.vm.synced_folder "../../dev-scripts", "/dbin"
+  config.vm.synced_folder "../../logs", "/logs"
+  config.vm.synced_folder "../../data", "/data"
   config.vm.box     = 'puppetlabs/centos-6.6-64-puppet'
   config.vm.box_url = 'https://atlas.hashicorp.com/puppetlabs/boxes/centos-6.6-64-puppet'
   
@@ -37,6 +37,7 @@ Vagrant.configure("2") do |config|
     mountain.vm.hostname = "mountain.test.noao.edu" 
     mountain.hostmanager.aliases =  %w(mountain)
 
+    # COMMENT OUT TO SPEED VM CREATION (if small disk is good enough)
     # disk to use for mountain-mirror
     mountain.vm.provider "virtualbox" do | v |
       v.customize ['createhd', '--filename', mountain_disk,
@@ -50,32 +51,19 @@ Vagrant.configure("2") do |config|
 
     
     mountain.vm.provision :puppet do |puppet|
-      ###################################
-      ## Use ORIG style (ad-hoc)
-      ##
-      #!puppet.manifests_path = "mountain/manifests"
-      #!puppet.module_path = "mountain/modules"
-      #!puppet.manifest_file = "init.pp"
-      ##
-      ################
-
-      ###################################
-      ## Use SDM style used under Foreman
-      ##
       puppet.manifests_path = "manifests"
-      puppet.module_path = "modules"
       puppet.manifest_file = "site.pp"
-      #puppet.manifest_file = "tadamountaininit.pp" 
-      ##
-      ################
+      puppet.module_path = ["modules", "../puppet-modules"]
 
       puppet.options = [
        '--verbose',
        '--report',
        '--show_diff',
+       '--graph',
+       '--graphdir /vagrant/graphs/mountain',
        '--pluginsync',
        '--hiera_config /vagrant/hiera.yaml',
-       '--debug', #+++ #! Remove for production!!!
+       #!'--debug', #+++ #! Remove for production!!!
       ]
     end
   end
@@ -85,6 +73,7 @@ Vagrant.configure("2") do |config|
     valley.vm.hostname = "valley.test.noao.edu"
     valley.hostmanager.aliases =  %w(valley)
 
+    # COMMENT OUT TO SPEED VM CREATION
     # disk to use for mountain-mirror
     valley.vm.provider "virtualbox" do | v |
       v.customize ['createhd', '--filename', valley_disk,
@@ -98,20 +87,20 @@ Vagrant.configure("2") do |config|
     valley.vm.provision "shell", path: "disk2.sh"
       
     valley.vm.provision :puppet do |puppet|
-      #!puppet.manifests_path = "valley/manifests"
-      #!puppet.module_path = "valley/modules"
-      #!puppet.manifest_file = "init.pp"
       puppet.manifests_path = "manifests"
-      puppet.module_path = "modules"
       puppet.manifest_file = "site.pp" 
+      puppet.module_path = ["modules", "../puppet-modules"]
+
 
       puppet.options = [
        '--verbose',
        '--report',
        '--show_diff',
+       '--graph',
+       '--graphdir /vagrant/graphs/valley',
        '--pluginsync',
        '--hiera_config /vagrant/hiera.yaml',
-       '--debug', #+++
+       #!'--debug', #+++
       ]
     end
   end

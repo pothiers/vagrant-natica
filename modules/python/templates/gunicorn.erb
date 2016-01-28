@@ -6,6 +6,9 @@ CONFIG = {
 <% end -%>
 <% if @virtualenv -%>
   'environment': {
+<% if @osenv -%><% @osenv.sort.each do |key, value| -%>
+    '<%= key %>': '<%= value %>',
+<% end -%><% end -%>
 <% if @environment -%>
     'ENVIRONMENT': '<%= @environment %>',
 <% end -%>
@@ -29,9 +32,18 @@ CONFIG = {
     '--bind=<%= @bind %>',
 <% end -%>
     '--workers=<%= @processorcount.to_i*2 %>',
-    '--timeout=30',
+    '--timeout=<%= @timeout %>',
+<% if @access_log_format -%>
+    '--access-logformat=<%= @access_log_format %>',
+<% end -%>
+<% if @accesslog -%>
+    '--access-logfile=<%= @accesslog %>',
+<% end -%>
+<% if @errorlog -%>
+    '--error-logfile=<%= @errorlog %>',
+<% end -%>
 <% if @mode != 'django' -%>
-    'app:app',
+    '<%= @appmodule %>',
 <% end -%>
   ),
 }

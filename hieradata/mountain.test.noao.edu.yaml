@@ -1,7 +1,4 @@
 ---
-queuename: 'transfer'
-rsyncpwd: '/sandbox/demo/conf/rsync.pwd'
-cupsdconf: '/vagrant/mountain/files/new-cupsd.conf'
-pushfilesh: '/sandbox/tada/astro/pushfile.sh'
-astropost: '/sandbox/tada/astro/astropost'
-mtncache: '/var/tada/mountain_cache'
+qname: 'transfer'
+tada_host_type: 'MOUNTAIN'
+dqd_conf: 'puppet:///modules/tada/dqd.transfer.conf'
