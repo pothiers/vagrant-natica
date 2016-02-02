@@ -28,5 +28,7 @@ echo "Done: " `date`
 cat tt.out | mail -s "Try valley! NO CLEAN ($emins)" pothier@email.noao.edu
 
 echo "  vagrant ssh valley -c /sandbox/tada/tests/smoke/smoke.all.sh"
+vagrant ssh valley -c /sandbox/tada/tests/smoke/smoke.all.sh
+
 
 
