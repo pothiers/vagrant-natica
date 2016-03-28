@@ -5,7 +5,8 @@ echo -e "\n###################################################################"
 #!echo "Expect full provisioning to take about: 0:30"
 #! echo "Expect full provisioning to take about: 0:50 with Perl stuff"
 #! echo "Expect full provisioning to take about: 0:40; With Perl stuff, without irods"
-echo "Expect full provisioning to take about: 0:17; Without Perl stuff, without irods"
+#! echo "Expect full provisioning to take about: 0:17; Without Perl stuff, without irods"
+echo "Expect full provisioning to take about: 0:33; With smoke test"
 
 sdate=`date`
 echo "Starting: $sdate"
