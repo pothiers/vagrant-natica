@@ -16,7 +16,21 @@ node mountain {
   }
 
   User <| title == vagrant |> { groups +> "tada" }
+  file { [ '/home/vagrant/bin']:
+    ensure => 'directory',
+    owner   => 'vagrant',
+    group   => 'tada',
+  }
+  file { '/home/vagrant/bin/install.sh':
+    ensure  => 'present',
+    content  => "#/bin/sh\n/sandbox/tada-tools/dev-scripts/install.sh\n",
+    owner   => 'vagrant',
+    group   => 'tada',
+    mode    => '0744',
+  }
 }
+
+# /sandbox/tada-tools/dev-scripts/
 
 node valley {
   include tada
@@ -42,6 +56,17 @@ node valley {
     mode    => '0400',
     source  => "${rsyncpwd}",
   }
-  
-}
+  file { [ '/home/vagrant/bin']:
+    ensure => 'directory',
+    owner   => 'vagrant',
+    group   => 'tada',
+  }
+  file { '/home/vagrant/bin/install.sh':
+    ensure  => 'present',
+    content  => "#/bin/sh\n/sandbox/tada-tools/dev-scripts/install.sh\n",
+    owner   => 'vagrant',
+    group   => 'tada',
+    mode    => '0744',
+  }
 
+}

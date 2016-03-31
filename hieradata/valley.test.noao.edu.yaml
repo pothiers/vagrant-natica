@@ -1,5 +1,11 @@
 ---
-qname: 'submit'
-tada_host_type: 'VALLEY'
-dqd_conf: 'puppet:///modules/tada/dqd.submit.conf'
-
+tada_host_type: VALLEY
+qname: submit
+dqd_conf: puppet:///modules/tada/dqd.submit.conf
+arch_host: nsaserver.pat.sdm.noao.edu
+arch_port: 9000
+arch_irods_host: db.pat.sdm.noao.edu
+arch_irods_port: 1247
+arch_irods_resource: tadaResc
+archive_irods331: /noao-tuc-z1/tada/ 
+valley_host: valley.test.noao.edu

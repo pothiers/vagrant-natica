@@ -26,6 +26,7 @@ echo "  vagrant ssh valley -c /sandbox/tada/tests/smoke/smoke.sh" >> tt.out
 
 
 echo "  vagrant ssh valley -c /sandbox/tada/tests/smoke/smoke.all.sh"
+#echo "DISABLED auto run of smoke tests"
 vagrant ssh valley -c /sandbox/tada/tests/smoke/smoke.all.sh >> tt.out
 
 echo "Done: " `date`

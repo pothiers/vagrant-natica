@@ -39,15 +39,15 @@ Vagrant.configure("2") do |config|
 
     # COMMENT OUT TO SPEED VM CREATION (if small disk is good enough)
     # disk to use for mountain-mirror
-    mountain.vm.provider "virtualbox" do | v |
-      v.customize ['createhd', '--filename', mountain_disk,
-                   '--size', 200 * 1024]
-      # list all controllers: "VBoxManage  list vms --long"
-      v.customize ['storageattach', :id, '--storagectl', 'IDE Controller',
-                   '--port', 1, '--device', 0, '--type', 'hdd',
-                   '--medium', mountain_disk]
-    end
-    mountain.vm.provision "shell", path: "disk2.sh"
+    #! mountain.vm.provider "virtualbox" do | v |
+    #!   v.customize ['createhd', '--filename', mountain_disk,
+    #!                '--size', 200 * 1024]
+    #!   # list all controllers: "VBoxManage  list vms --long"
+    #!   v.customize ['storageattach', :id, '--storagectl', 'IDE Controller',
+    #!                '--port', 1, '--device', 0, '--type', 'hdd',
+    #!                '--medium', mountain_disk]
+    #! end
+    #! mountain.vm.provision "shell", path: "disk2.sh"
 
     
     mountain.vm.provision :puppet do |puppet|
@@ -59,11 +59,11 @@ Vagrant.configure("2") do |config|
        '--verbose',
        '--report',
        '--show_diff',
-       '--graph',
-       '--graphdir /vagrant/graphs/mountain',
        '--pluginsync',
        '--hiera_config /vagrant/hiera.yaml',
-       #!'--debug', #+++ #! Remove for production!!!
+       #'--graph',
+       #'--graphdir /vagrant/graphs/mountain',
+       #'--debug', #+++ #! Remove for production!!!
       ]
     end
   end
@@ -75,16 +75,16 @@ Vagrant.configure("2") do |config|
 
     # COMMENT OUT TO SPEED VM CREATION
     # disk to use for mountain-mirror
-    valley.vm.provider "virtualbox" do | v |
-      v.customize ['createhd', '--filename', valley_disk,
-                   '--size', 200 * 1024,  # megabytes
-                  ]
-      # list all controllers: "VBoxManage  list vms --long"
-      v.customize ['storageattach', :id, '--storagectl', 'IDE Controller',
-                   '--port', 1, '--device', 0, '--type', 'hdd',
-                   '--medium', valley_disk]
-    end
-    valley.vm.provision "shell", path: "disk2.sh"
+    #!valley.vm.provider "virtualbox" do | v |
+    #!  v.customize ['createhd', '--filename', valley_disk,
+    #!               '--size', 200 * 1024,  # megabytes
+    #!              ]
+    #!  # list all controllers: "VBoxManage  list vms --long"
+    #!  v.customize ['storageattach', :id, '--storagectl', 'IDE Controller',
+    #!               '--port', 1, '--device', 0, '--type', 'hdd',
+    #!               '--medium', valley_disk]
+    #!end
+    #!valley.vm.provision "shell", path: "disk2.sh"
       
     valley.vm.provision :puppet do |puppet|
       puppet.manifests_path = "manifests"
@@ -96,11 +96,11 @@ Vagrant.configure("2") do |config|
        '--verbose',
        '--report',
        '--show_diff',
-       '--graph',
-       '--graphdir /vagrant/graphs/valley',
        '--pluginsync',
        '--hiera_config /vagrant/hiera.yaml',
-       #!'--debug', #+++
+       #'--graph',
+       #'--graphdir /vagrant/graphs/valley',
+       #'--debug', #+++
       ]
     end
   end

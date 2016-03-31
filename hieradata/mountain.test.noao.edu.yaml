@@ -1,4 +1,11 @@
 ---
-qname: 'transfer'
-tada_host_type: 'MOUNTAIN'
-dqd_conf: 'puppet:///modules/tada/dqd.transfer.conf'
+qname: transfer
+tada_host_type: MOUNTAIN
+dqd_conf: puppet:///modules/tada/dqd.transfer.conf
+arch_host: nsaserver.pat.sdm.noao.edu
+arch_port: 9000
+arch_irods_host: db.pat.sdm.noao.edu
+arch_irods_port: 1247
+arch_irods_resource: tadaResc
+archive_irods331: /noao-tuc-z1/tada/
+valley_host: valley.test.noao.edu
