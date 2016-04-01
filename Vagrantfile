@@ -54,7 +54,8 @@ Vagrant.configure("2") do |config|
       puppet.manifests_path = "manifests"
       puppet.manifest_file = "site.pp"
       puppet.module_path = ["modules", "../puppet-modules"]
-
+      #!puppet.environment_path = "../puppet/environments"
+      #!puppet.environment = "pat"
       puppet.options = [
        '--verbose',
        '--report',
@@ -90,8 +91,8 @@ Vagrant.configure("2") do |config|
       puppet.manifests_path = "manifests"
       puppet.manifest_file = "site.pp" 
       puppet.module_path = ["modules", "../puppet-modules"]
-
-
+      #!puppet.environment_path = "../puppet/environments"
+      #!puppet.environment = "pat"
       puppet.options = [
        '--verbose',
        '--report',

@@ -1,0 +1,10 @@
+---
+arch_host: nsaserver.pat.sdm.noao.edu
+arch_port: 9000
+arch_irods_host: db.pat.sdm.noao.edu
+arch_irods_port: 1247
+arch_irods_resource: tadaResc
+archive_irods331: /noao-tuc-z1/tada/ 
+
+irodsdata: 'puppet:///modules/dmo-hiera/iinit.in'
+irodsenv: 'puppet:///modules/dmo-hiera/irodsEnv.dev'

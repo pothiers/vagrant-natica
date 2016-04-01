@@ -1,15 +1,18 @@
 ---
+# These are normaly in pat.yaml (environment)
+irodsdata: 'puppet:///modules/dmo-hiera/iinit.in'
+irodsenv: 'puppet:///modules/dmo-hiera/irodsEnv.dev'
+
 dq_host: %{::clientcert}
 dq_port: 9988
-redis_port: 6379
-fpacktgz: 'puppet:///modules/tada/fpack-bin-centos-6.6.tgz'
+dq_loglevel: DEBUG
+
 tada_conf: 'puppet:///modules/dmo-hiera/tada-config.yaml'
 tada_logging_conf: 'puppet:///modules/dmo-hiera/tada-logging.yaml'
 watch_logging_conf: 'puppet:///modules/dmo-hiera/watch-logging.yaml'
 dqcli_logging_conf: 'puppet:///modules/dmo-hiera/dqcli-logging.yaml'
-dqlog: '/var/log/tada/dqsvcpop.log'
-irodsdata: 'puppet:///modules/dmo-hiera/iinit.in'
-irodsenv: 'puppet:///modules/dmo-hiera/irodsEnv.dev'
+
+fpacktgz: 'puppet:///modules/tada/fpack-bin-centos-6.6.tgz'
 irodstgz: 'puppet:///modules/tada/irods-3.3.1.tgz'
 rsyncdconf: 'puppet:///modules/dmo-hiera/rsyncd.conf'
 rsyncdscr: 'puppet:///modules/dmo-hiera/rsyncd.scr'
