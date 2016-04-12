@@ -68,5 +68,12 @@ node valley {
     group   => 'tada',
     mode    => '0744',
   }
+  file { '/home/vagrant/bin/smoke.all.sh':
+    ensure  => 'present',
+    content  => "#/bin/sh\n/sandbox/tada/tests/smoke/smoke.all.sh\n",
+    owner   => 'vagrant',
+    group   => 'tada',
+    mode    => '0744',
+  }
 
 }
