@@ -28,8 +28,12 @@ Vagrant.configure("2") do |config|
   config.vm.synced_folder "../../dev-scripts", "/dbin"
   config.vm.synced_folder "../../logs", "/logs"
   config.vm.synced_folder "../../data", "/data"
-  config.vm.box     = 'puppetlabs/centos-6.6-64-puppet'
-  config.vm.box_url = 'https://atlas.hashicorp.com/puppetlabs/boxes/centos-6.6-64-puppet'
+  # WARNING: DMO is using puppet version 3.8.6  (not version 4.*)
+  # Uses Puppet version 4.3.2
+  #!config.vm.box     = 'puppetlabs/centos-6.6-64-puppet'
+  #!config.vm.box_url = 'https://atlas.hashicorp.com/puppetlabs/boxes/centos-6.6-64-puppet'
+  config.vm.box     = 'vStone/centos-6.x-puppet.3.x'
+  config.vm.box_url = 'https://atlas.hashicorp.com/vStone/boxes/centos-6.x-puppet.3.x'
   
   
   config.vm.define "mountain" do |mountain|
@@ -54,17 +58,17 @@ Vagrant.configure("2") do |config|
       puppet.manifests_path = "manifests"
       puppet.manifest_file = "site.pp"
       puppet.module_path = ["modules", "../puppet-modules"]
-      #!puppet.environment_path = "../puppet/environments"
-      #!puppet.environment = "pat"
+      puppet.environment_path = "environments"
+      puppet.environment = "pat"
       puppet.options = [
        '--verbose',
        '--report',
        '--show_diff',
        '--pluginsync',
        '--hiera_config /vagrant/hiera.yaml',
+       #!'--debug', #+++ #! Remove for production!!!
        #'--graph',
        #'--graphdir /vagrant/graphs/mountain',
-       #'--debug', #+++ #! Remove for production!!!
       ]
     end
   end
@@ -91,17 +95,17 @@ Vagrant.configure("2") do |config|
       puppet.manifests_path = "manifests"
       puppet.manifest_file = "site.pp" 
       puppet.module_path = ["modules", "../puppet-modules"]
-      #!puppet.environment_path = "../puppet/environments"
-      #!puppet.environment = "pat"
+      puppet.environment_path = "environments"
+      puppet.environment = "pat"
       puppet.options = [
        '--verbose',
        '--report',
        '--show_diff',
        '--pluginsync',
        '--hiera_config /vagrant/hiera.yaml',
+       #!'--debug', #+++
        #'--graph',
        #'--graphdir /vagrant/graphs/valley',
-       #'--debug', #+++
       ]
     end
   end
