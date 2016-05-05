@@ -5,12 +5,13 @@ if versioncmp($::puppetversion,'3.6.1') >= 0 {
 
 node default {
   class {'tada': }
-  package{ ['mailx'] : }
 }
 
 node mountain {
   include tada
   include tada::mountain
+  package{ ['mailx'] : }
+
   @user { 'vagrant':
     groups     => ["vagrant"],
     membership => minimum,
@@ -36,6 +37,8 @@ node mountain {
 node valley {
   include tada
   include tada::valley
+  package{ ['mailx'] : }
+  
   $rsyncpwd       = hiera('rsyncpwd')
 
   @user { 'vagrant':
