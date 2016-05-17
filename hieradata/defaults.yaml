@@ -7,6 +7,9 @@ dq_host: %{::clientcert}
 dq_port: 9988
 dq_loglevel: DEBUG
 
+mars_host: localhost
+do_audit : true
+
 tada_conf: 'puppet:///modules/dmo-hiera/tada-config.yaml'
 tada_logging_conf: 'puppet:///modules/dmo-hiera/tada-logging.yaml'
 watch_logging_conf: 'puppet:///modules/dmo-hiera/watch-logging.yaml'

@@ -8,3 +8,6 @@ archive_irods331: /noao-tuc-z1/tada/
 
 irodsdata: 'puppet:///modules/dmo-hiera/iinit.in'
 irodsenv: 'puppet:///modules/dmo-hiera/irodsEnv.dev'
+
+mars_host: mars.sdm.noao.edu
+mars_port: 8000
