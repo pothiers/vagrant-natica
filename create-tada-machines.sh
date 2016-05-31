@@ -31,6 +31,6 @@ vagrant ssh valley -c /sandbox/tada/tests/smoke/smoke.all.sh >> tt.out
 
 echo "Done: " `date`
 emins=$(((`date +'%s'` - tic)/60))
-cat tt.out | mail -s "Vagrant VMs created and smoke run ($emins)" pothier@email.noao.edu
+cat tt.out | mail -s "Vagrant VMs created and smoke run ($emins minutes)" pothier@email.noao.edu
 
 
