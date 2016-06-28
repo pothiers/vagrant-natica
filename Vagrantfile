@@ -35,6 +35,11 @@ Vagrant.configure("2") do |config|
   config.vm.box     = 'vStone/centos-6.x-puppet.3.x'
   config.vm.box_url = 'https://atlas.hashicorp.com/vStone/boxes/centos-6.x-puppet.3.x'
   
+  # Attempt to speed up connection to remote hosts (e.g. connection to MARS services)
+  config.vm.provider :virtualbox do |vb|
+      vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+      vb.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
+  end    
   
   config.vm.define "mountain" do |mountain|
     mountain.vm.network :private_network, ip: "172.16.1.11"
@@ -90,6 +95,7 @@ Vagrant.configure("2") do |config|
     #!               '--medium', valley_disk]
     #!end
     #!valley.vm.provision "shell", path: "disk2.sh"
+
       
     valley.vm.provision :puppet do |puppet|
       puppet.manifests_path = "manifests"
