@@ -38,7 +38,7 @@ Vagrant.configure("2") do |config|
   # Attempt to speed up connection to remote hosts (e.g. connection to MARS services)
   config.vm.provider :virtualbox do |vb|
       vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
-      vb.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
+      vb.customize ["modifyvm", :id, "--natdnsproxy1", "off"]
   end    
   
   config.vm.define "mountain" do |mountain|
