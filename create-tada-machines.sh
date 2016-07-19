@@ -28,9 +28,9 @@ echo "Done provisioning: $sdate to " `date` >> $LOG
 #!echo "  vagrant ssh valley -c /sandbox/tada/tests/smoke/smoke.sh" >> $LOG
 
 
-#echo "DISABLED auto run of smoke tests"
-echo "  vagrant ssh valley -c /sandbox/tada/tests/smoke/smoke.all.sh: " `date`
-vagrant ssh valley -c /sandbox/tada/tests/smoke/smoke.all.sh          >> $LOG
+echo "DISABLED auto run of smoke tests"
+#echo "  vagrant ssh valley -c /sandbox/tada/tests/smoke/smoke.all.sh: " `date`
+#vagrant ssh valley -c /sandbox/tada/tests/smoke/smoke.all.sh          >> $LOG
 
 echo "Done: " `date`
 emins=$(((`date +'%s'` - tic)/60))

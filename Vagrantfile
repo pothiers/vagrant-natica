@@ -35,19 +35,26 @@ Vagrant.configure("2") do |config|
   config.vm.box     = 'vStone/centos-6.x-puppet.3.x'
   config.vm.box_url = 'https://atlas.hashicorp.com/vStone/boxes/centos-6.x-puppet.3.x'
   
-  # Attempt to speed up connection to remote hosts (e.g. connection to MARS services)
+  # Attempt to speed up connection to remote hosts
+  # (e.g. connection to MARS services)
   config.vm.provider :virtualbox do |vb|
-      vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
-      vb.customize ["modifyvm", :id, "--natdnsproxy1", "off"]
+    # No luck with this pair; doesn't break, but still slow
+    vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+    vb.customize ["modifyvm", :id, "--natdnsproxy1", "off"]
+    #vb.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
+
+    # Try this; won't boot from chimp16
+    #vb.customize ["modifyvm", :id, "--nictype1", "virtio"]
   end    
   
+
   config.vm.define "mountain" do |mountain|
     mountain.vm.network :private_network, ip: "172.16.1.11"
     mountain.vm.hostname = "mountain.test.noao.edu" 
     mountain.hostmanager.aliases =  %w(mountain)
 
     # COMMENT OUT TO SPEED VM CREATION (if small disk is good enough)
-    # disk to use for mountain-mirror
+    # disk to use for cache
     #! mountain.vm.provider "virtualbox" do | v |
     #!   v.customize ['createhd', '--filename', mountain_disk,
     #!                '--size', 200 * 1024]
@@ -84,7 +91,7 @@ Vagrant.configure("2") do |config|
     valley.hostmanager.aliases =  %w(valley)
 
     # COMMENT OUT TO SPEED VM CREATION
-    # disk to use for mountain-mirror
+    # disk to use for cache
     #!valley.vm.provider "virtualbox" do | v |
     #!  v.customize ['createhd', '--filename', valley_disk,
     #!               '--size', 200 * 1024,  # megabytes
@@ -116,4 +123,26 @@ Vagrant.configure("2") do |config|
     end
   end
 
+  config.vm.define "mars" do |mars|
+    mars.vm.network :private_network, ip: "172.16.1.13"
+    mars.vm.hostname = "mars.test.noao.edu" 
+    mars.hostmanager.aliases =  %w(mars)
+    
+    mars.vm.provision :puppet do |puppet|
+      puppet.manifests_path = "manifests"
+      puppet.manifest_file = "site.pp"
+      puppet.module_path = ["modules", "../puppet-modules"]
+      puppet.environment_path = "environments"
+      puppet.environment = "pat"
+      puppet.options = [
+       '--verbose',
+       '--report',
+       '--show_diff',
+       '--pluginsync',
+       '--hiera_config /vagrant/hiera.yaml',
+      ]
+    end
+  end
+
 end
+

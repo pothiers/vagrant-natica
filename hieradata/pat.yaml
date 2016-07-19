@@ -11,3 +11,4 @@ irodsenv: 'puppet:///modules/dmo-hiera/irodsEnv.dev'
 
 mars_host: valley.sdm.noao.edu
 mars_port: 8000
+localdjango: 'puppet:///modules/dmo-hiera/django_settings_local_pat.py'

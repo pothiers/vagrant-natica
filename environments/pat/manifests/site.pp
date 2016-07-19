@@ -77,3 +77,8 @@ node valley {
   }
 
 }
+
+
+node mars {
+  include mars
+}
