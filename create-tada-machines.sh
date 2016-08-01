@@ -34,6 +34,6 @@ vagrant ssh valley -c /sandbox/tada/tests/smoke/smoke.all.sh          >> $LOG
 
 echo "Done: " `date`
 emins=$(((`date +'%s'` - tic)/60))
-echo "See attachment for log of smoke.all.sh" | mail -n -a $LOG -s "Vagrant VMs created on $here. Smoke run. ($emins minutes)" pothier@email.noao.edu
+echo "See attachment for log of smoke.all.sh" | mail -n -a $LOG -s "Vagrant VMs created on $here. Smoke run. ($emins minutes total)" pothier@email.noao.edu
 
 
