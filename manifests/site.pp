@@ -83,6 +83,7 @@ node valley {
 }
 
 node mars {
+  notice("Loading site.pp::mars")
   include mars
 }
 

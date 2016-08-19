@@ -79,6 +79,12 @@ node valley {
 }
 
 
+#node mars {
 node mars {
-  include mars
+  notify{"notify-Loading site.pp::mars":}
+  notice("notice-Loading site.pp::mars")
+
+  include foobar
+  include snafu
+  include marssnafu
 }

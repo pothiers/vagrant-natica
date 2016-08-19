@@ -1,0 +1,3 @@
+localdjango:
+  'puppet:///modules/dmo-hiera/django_settings_local_dev.py'
+  

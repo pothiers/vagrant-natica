@@ -135,11 +135,12 @@ Vagrant.configure("2") do |config|
       puppet.environment_path = "environments"
       puppet.environment = "pat"
       puppet.options = [
-       '--verbose',
-       '--report',
-       '--show_diff',
-       '--pluginsync',
-       '--hiera_config /vagrant/hiera.yaml',
+        #!'--debug', #+++
+        '--verbose',
+        '--report',
+        '--show_diff',
+        '--pluginsync',
+        '--hiera_config /vagrant/hiera.yaml',
       ]
     end
   end
