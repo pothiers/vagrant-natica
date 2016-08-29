@@ -19,7 +19,7 @@ Vagrant.configure("2") do |config|
   config.hostmanager.include_offline = true
 
   config.ssh.forward_agent = true
-  config.ssh.forward_x11 = true
+  #!config.ssh.forward_x11 = true
 
   #! config.vm.provision "shell",
   #!   inline: "yum upgrade -y puppet" #! Remove for production!!!
