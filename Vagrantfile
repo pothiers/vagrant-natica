@@ -25,7 +25,7 @@ Vagrant.configure("2") do |config|
   #!   inline: "yum upgrade -y puppet" #! Remove for production!!!
 
   config.vm.synced_folder "..", "/sandbox"
-  config.vm.synced_folder "../../dev-scripts", "/dbin"
+  config.vm.synced_folder "../tada-tools/dev-scripts", "/dbin"
   config.vm.synced_folder "../../logs", "/logs"
   config.vm.synced_folder "../../data", "/data"
   # WARNING: DMO is using puppet version 3.8.6  (not version 4.*)
