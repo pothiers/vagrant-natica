@@ -95,7 +95,7 @@ node mars {
            '/home/vagrant/sandbox']:
     ensure => 'directory',
     #group  => 'root',
-    mode   => '0774',
+    mode   => '0777',
   } ->
   vcsrepo { '/home/vagrant/sandbox/mars' :
     ensure   => latest,
