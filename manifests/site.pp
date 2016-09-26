@@ -37,7 +37,11 @@ node mountain {
 node valley {
   include tada
   include tada::valley
-  package{ ['mailx'] : }
+  package{ ['mailx', 'rpm-build', 'ruby', 'rubygems', 'ruby-devel'] : }
+  # sudo gem install fpm ## WILL FAIL  but allows next to work
+  # sudo gem install fpm --version 1.4.0
+  # fpm --python-bin python3 -s python -t rpm setup.py
+
   
   $rsyncpwd       = hiera('rsyncpwd')
 
@@ -79,6 +83,7 @@ node valley {
     group   => 'tada',
     mode    => '0744',
   }
+
 
 }
 
