@@ -3,7 +3,7 @@ tada_host_type: VALLEY
 qname: submit
 dqd_conf: puppet:///modules/tada/dqd.submit.conf
 
-dq_host: valley.test.noao.edu
+dq_host: valley.vagrant.noao.edu
 dq_port: 9988
 dq_loglevel: DEBUG
 dq_unblock_timeout: 600 # seconds to wait before unblocking on queue pop
@@ -14,8 +14,4 @@ arch_irods_host: db.pat.sdm.noao.edu
 arch_irods_port: 1247
 arch_irods_resource: tadaResc
 archive_irods331: /noao-tuc-z1/tada/ 
-valley_host: valley.test.noao.edu
-
-#valley.sdm.noao.edu
-mars_host: mars.test.noao.edu
-mars_port: 8000
+valley_host: valley.vagrant.noao.edu

@@ -50,7 +50,7 @@ Vagrant.configure("2") do |config|
 
   config.vm.define "mountain" do |mountain|
     mountain.vm.network :private_network, ip: "172.16.1.11"
-    mountain.vm.hostname = "mountain.test.noao.edu" 
+    mountain.vm.hostname = "mountain.vagrant.noao.edu" 
     mountain.hostmanager.aliases =  %w(mountain)
 
     # COMMENT OUT TO SPEED VM CREATION (if small disk is good enough)
@@ -87,7 +87,7 @@ Vagrant.configure("2") do |config|
 
   config.vm.define "valley" do |valley|
     valley.vm.network :private_network, ip: "172.16.1.12"
-    valley.vm.hostname = "valley.test.noao.edu"
+    valley.vm.hostname = "valley.vagrant.noao.edu"
     valley.hostmanager.aliases =  %w(valley)
 
     # COMMENT OUT TO SPEED VM CREATION
@@ -126,7 +126,7 @@ Vagrant.configure("2") do |config|
   config.vm.define "mars" do |mars|
     mars.vm.network :private_network, ip: "172.16.1.13"
     mars.vm.network :forwarded_port, guest: 8000, host: 8000
-    mars.vm.hostname = "mars.test.noao.edu" 
+    mars.vm.hostname = "mars.vagrant.noao.edu" 
     mars.hostmanager.aliases =  %w(mars)
     
     mars.vm.provision :puppet do |puppet|
@@ -146,5 +146,28 @@ Vagrant.configure("2") do |config|
     end
   end
 
+  config.vm.define "marsdeploy" do |mars|
+    mars.vm.network :private_network, ip: "172.16.1.14"
+    mars.vm.network :forwarded_port, guest: 8080, host: 8080
+    mars.vm.hostname = "marsdeploy.vagrant.noao.edu" 
+    mars.hostmanager.aliases =  %w(mars)
+    
+    mars.vm.provision :puppet do |puppet|
+      puppet.manifests_path = "manifests"
+      puppet.manifest_file = "site.pp"
+      puppet.module_path = ["modules", "../puppet-modules"]
+      puppet.environment_path = "environments"
+      puppet.environment = "pat"
+      puppet.options = [
+        #!'--debug', #+++
+        '--verbose',
+        '--report',
+        '--show_diff',
+        '--pluginsync',
+        '--hiera_config /vagrant/hiera.yaml',
+      ]
+    end
+  end
+  
 end
 
