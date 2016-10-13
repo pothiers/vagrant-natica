@@ -87,12 +87,12 @@ node valley {
 
 }
 
-#node FUTUREmars {
-#  notice("Loading site.pp::mars")
-#  include mars
-#}
-
 node mars {
+  notice("Loading site.pp::mars")
+  include marsFOO
+}
+
+node WORKSmars {
   ensure_resource('package', ['git', ], {'ensure' => 'present'})
   include augeas
 
@@ -254,14 +254,14 @@ node marsdeploy {
   file { '/usr/local/bin/python3':
     ensure => 'link',
     target => '/usr/bin/python3',
-    } ->
+  } ->
   python::pyvenv { '/var/www/project2' :
     ensure       => present,
     systempkgs   => true,
     venv_dir     => '/opt/mars/virtualenvs',
     owner        => 'vagrant',
     group        => 'vagrant',
-    } ->
+  } ->
   python::requirements { '/opt/mars/requirements.txt': } 
 
   file { '/etc/yum.repos.d/nginx.repo':
