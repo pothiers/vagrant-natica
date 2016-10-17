@@ -63,7 +63,7 @@ node valley {
     group   => 'tada',
     mode    => '0400',
     source  => "${rsyncpwd}",
-  }
+ } 
   file { [ '/home/vagrant/bin']:
     ensure => 'directory',
     owner   => 'vagrant',
@@ -84,15 +84,14 @@ node valley {
     mode    => '0744',
   }
 
-
-}
+} # END: node valley
 
 node mars {
   notice("Loading site.pp::mars")
-  include marsFOO
+  include mars::install
 }
 
-node WORKSmars {
+node goodmars {
   ensure_resource('package', ['git', ], {'ensure' => 'present'})
   include augeas
 
