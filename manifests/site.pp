@@ -89,6 +89,7 @@ node valley {
 node mars {
   notice("Loading site.pp::mars")
   include mars::install
+  #include mars
 }
 
 node goodmars {

@@ -21,6 +21,10 @@ describe 'python::requirements', :type => :define do
         let (:params) {{ :requirements => "/requirements.txt" }}
         it { is_expected.to contain_file("/requirements.txt").with_mode('0644') }
       end
+      context "/requirements.txt" do
+        let (:params) {{ :requirements => "/requirements.txt", :manage_requirements => false }}
+        it { is_expected.not_to contain_file("/requirements.txt") }
+      end
 
       describe "with owner" do
         context "bob:bob" do
@@ -30,7 +34,7 @@ describe 'python::requirements', :type => :define do
             }}
           it do
             expect {
-              should compile
+              is_expected.to compile
             }.to raise_error(/root user must be used when virtualenv is system/)
           end
         end

@@ -42,6 +42,9 @@
 # [*template*]
 #  Which ERB template to use. Default: python/gunicorn.erb
 #
+# [*args*]
+#  Custom arguments to add in gunicorn config file. Default: []
+#
 # === Examples
 #
 # python::gunicorn { 'vhost':
@@ -77,16 +80,21 @@ define python::gunicorn (
   $appmodule         = 'app:app',
   $osenv             = false,
   $timeout           = 30,
+  $workers           = false,
   $access_log_format = false,
   $accesslog         = false,
   $errorlog          = false,
+  $log_level          = 'error',
   $template          = 'python/gunicorn.erb',
+  $args              = [],
 ) {
 
   # Parameter validation
   if ! $dir {
     fail('python::gunicorn: dir parameter must not be empty')
   }
+
+  validate_re($log_level, 'debug|info|warning|error|critical', "Invalid \$log_level value ${log_level}")
 
   file { "/etc/gunicorn.d/${name}":
     ensure  => $ensure,
