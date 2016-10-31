@@ -1,4 +1,7 @@
 #!/bin/bash
+# To recreate TADA and MARS on vagrant VMs and run full smoke, do:
+#    vagrant destroy -f mars; vagrant up mars; ./tt0
+
 LOG=/tmp/create-tada-tt.$$.log
 here=`hostname`
 now=`date`
