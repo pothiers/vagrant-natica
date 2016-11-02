@@ -200,7 +200,10 @@ node marsdeploy {
   apache::vhost { 'www.mars.vagrant.com':
     port   => '80',
     docroot => '/var/www/mars',
-  }
+  } ->
+  class { 'apache::mod::wsgi':
+    wsgi_python_home => '/opt/mars/venv',
+  } 
   
 
   file { [ '/var/run/mars', '/var/log/mars', '/etc/mars', '/var/mars',
