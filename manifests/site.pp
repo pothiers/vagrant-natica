@@ -93,6 +93,7 @@ node mars {
   #include mars
 }
 
+
 node goodmars {
   ensure_resource('package', ['git', ], {'ensure' => 'present'})
   include augeas
