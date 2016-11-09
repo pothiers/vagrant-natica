@@ -11,6 +11,7 @@ irodsenv: 'puppet:///modules/dmo-hiera/irodsEnv.dev'
 
 localdjango: 'puppet:///modules/dmo-hiera/django_settings_local_pat.py'
 
+smoke_conf: 'puppet:///modules/dmo-hiera/smoke-config.sh'
 mars_host: mars.vagrant.noao.edu
 mars_port: 8000
 mars_vhost: www.mars.noao.edu
