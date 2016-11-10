@@ -32,7 +32,7 @@ echo "Done provisioning: $sdate to " `date` >> $LOG
 
 
 #echo "DISABLED auto run of smoke tests"
-echo "  vagrant ssh valley -c /sandbox/tada/tests/smoke/smoke.all.sh: " `date`
+echo "  vagrant ssh valley -c /opt/tada/tests/smoke/smoke.all.sh: " `date`
 vagrant ssh valley -c /sandbox/tada/tests/smoke/smoke.all.sh          >> $LOG
 
 echo "Done: " `date`
