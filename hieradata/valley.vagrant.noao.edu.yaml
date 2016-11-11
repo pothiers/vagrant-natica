@@ -16,12 +16,3 @@ arch_irods_resource: tadaResc
 archive_irods331: /noao-tuc-z1/tada/ 
 valley_host: valley.vagrant.noao.edu
 
-#!tadaversion: 2.5.17
-#!dataqversion: 2.5.17
-#!marsversion: 1.5
-
-tadaversion: master
-dataqversion: master
-marsversion: master
-
-
