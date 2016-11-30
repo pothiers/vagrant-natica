@@ -18,8 +18,8 @@ mars_port: 8000
 
 #!tadaversion: 2.5.17rc4
 #!dataqversion: 2.5.17rc1
+#!marsversion: 1.5
+
 tadaversion: pat
 dataqversion: master
-
-marsversion: 1.5
-#!marsversion: pat
+marsversion: pat

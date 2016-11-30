@@ -19,7 +19,7 @@ echo "Starting: $sdate"
 
 tic=`date +'%s'`
 vagrant destroy -f valley mountain
-time vagrant up valley mountain
+time vagrant up valley mountain mars
 
 
 # For workflow: Edit(manifest);Provision, use:
@@ -32,8 +32,10 @@ echo "Done provisioning: $sdate to " `date` >> $LOG
 
 
 #echo "DISABLED auto run of smoke tests"
-echo "  vagrant ssh valley -c /opt/tada/tests/smoke/smoke.all.sh: " `date`
-vagrant ssh valley -c /sandbox/tada/tests/smoke/smoke.all.sh          >> $LOG
+#echo "  vagrant ssh valley -c /opt/tada/tests/smoke/smoke.all.sh: " `date`
+#vagrant ssh valley -c /sandbox/tada/tests/smoke/smoke.all.sh          >> $LOG
+echo "  run-smoke-as-tester.sh: " `date`
+~/sandbox/tada/tests/smoke/run-smoke-as-tester.sh                     >> $LOG
 
 echo "Done: " `date`
 emins=$(((`date +'%s'` - tic)/60))
