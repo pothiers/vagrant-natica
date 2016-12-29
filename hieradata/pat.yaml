@@ -1,7 +1,7 @@
 ---
 arch_host: nsaserver.pat.sdm.noao.edu
 arch_port: 9000
-arch_timeout: 9
+arch_timeout: 11
 arch_irods_host: db.pat.sdm.noao.edu
 arch_irods_port: 1247
 arch_irods_resource: tadaResc
