@@ -16,6 +16,6 @@ mars_vhost: www.mars.noao.edu
 mars_host: mars.vagrant.noao.edu
 mars_port: 8000
 
-tadaversion: pat
-dataqversion: master
-marsversion: pat
+tadaversion: dev
+dataqversion: dev
+marsversion: dev
