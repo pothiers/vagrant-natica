@@ -135,6 +135,7 @@ Vagrant.configure("2") do |config|
   config.vm.define "mars" do |mars|
     mars.vm.network :private_network, ip: "172.16.1.13"
     mars.vm.network :forwarded_port, guest: 8000, host: 8000
+    mars.vm.network :forwarded_port, guest: 8001, host: 8001
     mars.vm.hostname = "mars.vagrant.noao.edu" 
     mars.hostmanager.aliases =  %w(mars)
     
