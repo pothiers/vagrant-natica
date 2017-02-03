@@ -17,9 +17,8 @@ nginx_conf: 'puppet:///modules/dmo-hiera/nginx.conf'
 smoke_conf: 'puppet:///modules/dmo-hiera/smoke-config.dev.sh'
 mars_vhost: www.mars.noao.edu
 
-
-
-mars_host: mars.vagrant.noao.edu
+#mars_host: mars.vagrant.noao.edu
+mars_host: mars1.sdm.noao.edu
 mars_port: 8000
 
 tadaversion: dev
