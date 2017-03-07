@@ -19,7 +19,7 @@ echo "Starting: $sdate"
 
 tic=`date +'%s'`
 vagrant destroy -f valley mountain
-time vagrant up valley mountain mars
+time vagrant up mars valley mountain 
 
 
 # For workflow: Edit(manifest);Provision, use:
