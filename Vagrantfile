@@ -119,8 +119,8 @@ Vagrant.configure("2") do |config|
        '--pluginsync',
        '--hiera_config /vagrant/hiera.yaml',
        #!'--debug', #+++
-       '--graph',
-       '--graphdir /vagrant/graphs/valley',
+       #!'--graph',
+       #!'--graphdir /vagrant/graphs/valley',
       ]
     end
 
