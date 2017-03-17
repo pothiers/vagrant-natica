@@ -19,6 +19,9 @@ echo "Starting: $sdate"
 
 tic=`date +'%s'`
 vagrant destroy -f valley mountain
+# Must bring up MARS first because
+#    tada/scripts/tada-valley-install.sh
+# uses tables from MARS during tada install!
 time vagrant up mars valley mountain 
 
 
