@@ -24,3 +24,5 @@ mars_port: 8000
 tadaversion: dev
 dataqversion: dev
 marsversion: dev
+
+djangoserver: /sandbox/mars/start-mars-development.sh
