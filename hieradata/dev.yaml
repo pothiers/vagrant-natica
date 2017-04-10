@@ -21,8 +21,11 @@ mars_host: mars.vagrant.noao.edu
 #mars_host: mars1.sdm.noao.edu
 mars_port: 8000
 
-tadaversion: dev
-dataqversion: dev
-marsversion: dev
+#!tadaversion: dev
+#!dataqversion: dev
+#!marsversion: dev
+tadaversion: 2.7.5
+dataqversion: 2.6
+marsversion: 1.7
 
 djangoserver: /sandbox/mars/start-mars-development.sh
