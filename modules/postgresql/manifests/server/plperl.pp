@@ -10,10 +10,18 @@ class postgresql::server::plperl(
     tag    => 'postgresql',
   }
 
-  anchor { 'postgresql::server::plperl::start': }->
-  Class['postgresql::server::install']->
-  Package['postgresql-plperl']->
-  Class['postgresql::server::service']->
-  anchor { 'postgresql::server::plperl::end': }
+  if($package_ensure == 'present' or $package_ensure == true) {
+    anchor { 'postgresql::server::plperl::start': }->
+    Class['postgresql::server::install']->
+    Package['postgresql-plperl']->
+    Class['postgresql::server::service']->
+    anchor { 'postgresql::server::plperl::end': }
+  } else {
+    anchor { 'postgresql::server::plperl::start': }->
+    Class['postgresql::server::service']->
+    Package['postgresql-plperl']->
+    Class['postgresql::server::install']->
+    anchor { 'postgresql::server::plperl::end': }
+  }
 
 }

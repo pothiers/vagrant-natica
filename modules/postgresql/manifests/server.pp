@@ -1,15 +1,16 @@
 # This installs a PostgreSQL server. See README.md for more details.
 class postgresql::server (
+  $ensure                     = $postgresql::params::ensure,
+
   $postgres_password          = undef,
 
   $package_name               = $postgresql::params::server_package_name,
   $client_package_name        = $postgresql::params::client_package_name,
-  $package_ensure             = $postgresql::params::package_ensure,
+  $package_ensure             = $ensure,
 
   $plperl_package_name        = $postgresql::params::plperl_package_name,
 
   $service_ensure             = $postgresql::params::service_ensure,
-  $service_enable             = $postgresql::params::service_enable,
   $service_name               = $postgresql::params::service_name,
   $service_provider           = $postgresql::params::service_provider,
   $service_status             = $postgresql::params::service_status,
@@ -26,7 +27,6 @@ class postgresql::server (
   $createdb_path              = $postgresql::params::createdb_path,
   $psql_path                  = $postgresql::params::psql_path,
   $pg_hba_conf_path           = $postgresql::params::pg_hba_conf_path,
-  $pg_ident_conf_path         = $postgresql::params::pg_ident_conf_path,
   $postgresql_conf_path       = $postgresql::params::postgresql_conf_path,
 
   $datadir                    = $postgresql::params::datadir,
@@ -42,29 +42,42 @@ class postgresql::server (
   $encoding                   = $postgresql::params::encoding,
   $locale                     = $postgresql::params::locale,
 
+  $manage_firewall            = $postgresql::params::manage_firewall,
   $manage_pg_hba_conf         = $postgresql::params::manage_pg_hba_conf,
-  $manage_pg_ident_conf       = $postgresql::params::manage_pg_ident_conf,
+  $firewall_supported         = $postgresql::params::firewall_supported,
 
   #Deprecated
-  $version                    = undef,
+  $version                    = $postgresql::params::version,
 ) inherits postgresql::params {
   $pg = 'postgresql::server'
 
   if $version != undef {
     warning('Passing "version" to postgresql::server is deprecated; please use postgresql::globals instead.')
-    $_version = $version
-  } else {
     $_version = $postgresql::params::version
+  } else {
+    $_version = $version
   }
 
-  # Reload has its own ordering, specified by other defines
-  class { "${pg}::reload": require => Class["${pg}::install"] }
+  if ($ensure == 'present' or $ensure == true) {
+    # Reload has its own ordering, specified by other defines
+    class { "${pg}::reload": require => Class["${pg}::install"] }
 
-  anchor { "${pg}::start": }->
-  class { "${pg}::install": }->
-  class { "${pg}::initdb": }->
-  class { "${pg}::config": }->
-  class { "${pg}::service": }->
-  class { "${pg}::passwd": }->
-  anchor { "${pg}::end": }
+    anchor { "${pg}::start": }->
+    class { "${pg}::install": }->
+    class { "${pg}::initdb": }->
+    class { "${pg}::config": }->
+    class { "${pg}::service": }->
+    class { "${pg}::passwd": }->
+    class { "${pg}::firewall": }->
+    anchor { "${pg}::end": }
+  } else {
+    anchor { "${pg}::start": }->
+    class { "${pg}::firewall": }->
+    class { "${pg}::passwd": }->
+    class { "${pg}::service": }->
+    class { "${pg}::install": }->
+    class { "${pg}::initdb": }->
+    class { "${pg}::config": }->
+    anchor { "${pg}::end": }
+  }
 }

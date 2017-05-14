@@ -1,5 +1,6 @@
 # PRIVATE CLASS: do not use directly
 class postgresql::repo (
+  $ensure  = $postgresql::params::ensure,
   $version = undef
 ) inherits postgresql::params {
   case $::osfamily {

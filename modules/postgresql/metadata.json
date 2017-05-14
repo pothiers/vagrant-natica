@@ -1,12 +1,12 @@
 {
   "name": "puppetlabs-postgresql",
-  "version": "4.0.0",
+  "version": "3.4.2",
   "author": "Inkling/Puppet Labs",
   "summary": "PostgreSQL defined resource types",
   "license": "ASL 2.0",
   "source": "git://github.com/puppetlabs/puppet-postgresql.git",
   "project_page": "https://github.com/puppetlabs/puppet-postgresql",
-  "issues_url": "https://tickets.puppetlabs.com/browse/MODULES",
+  "issues_url": "https://github.com/puppetlabs/puppet-postgresql/issues",
   "operatingsystem_support": [
     {
       "operatingsystem": "RedHat",
@@ -36,7 +36,8 @@
       "operatingsystem": "Scientific",
       "operatingsystemrelease": [
         "5",
-        "6"
+        "6",
+        "7"
       ]
     },
     {
@@ -58,16 +59,30 @@
   "requirements": [
     {
       "name": "pe",
-      "version_requirement": "3.x"
+      "version_requirement": ">= 3.2.0 < 3.4.0"
     },
     {
       "name": "puppet",
       "version_requirement": "3.x"
     }
   ],
+  "description": "PostgreSQL defined resource types",
   "dependencies": [
-    {"name":"puppetlabs/stdlib","version_requirement":"4.x"},
-    {"name":"puppetlabs/apt","version_requirement":">=1.1.0 <2.0.0"},
-    {"name":"puppetlabs/concat","version_requirement":">= 1.1.0 <2.0.0"}
+    {
+      "name": "puppetlabs/stdlib",
+      "version_requirement": ">=3.2.0 <5.0.0"
+    },
+    {
+      "name": "puppetlabs/firewall",
+      "version_requirement": ">= 0.0.4"
+    },
+    {
+      "name": "puppetlabs/apt",
+      "version_requirement": ">=1.1.0 <2.0.0"
+    },
+    {
+      "name": "puppetlabs/concat",
+      "version_requirement": ">= 1.0.0 <2.0.0"
+    }
   ]
 }

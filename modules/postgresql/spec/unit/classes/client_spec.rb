@@ -18,7 +18,7 @@ describe 'postgresql::client', :type => :class do
     end
 
     it 'should modify package' do
-      is_expected.to contain_package("postgresql-client").with({
+      should contain_package("postgresql-client").with({
         :ensure => 'absent',
         :name => 'mypackage',
         :tag => 'postgresql',
@@ -28,7 +28,7 @@ describe 'postgresql::client', :type => :class do
 
   describe 'with no parameters' do
     it 'should create package with postgresql tag' do
-      is_expected.to contain_package('postgresql-client').with({
+      should contain_package('postgresql-client').with({
         :tag => 'postgresql',
       })
     end

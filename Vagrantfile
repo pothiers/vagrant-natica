@@ -159,18 +159,19 @@ Vagrant.configure("2") do |config|
     end
   end
 
-  config.vm.define "marsdeploy" do |mars|
-    mars.vm.network :private_network, ip: "172.16.1.14"
-    mars.vm.network :forwarded_port, guest: 8080, host: 8080
-    mars.vm.hostname = "marsdeploy.vagrant.noao.edu" 
-    mars.hostmanager.aliases =  %w(mars)
+
+  config.vm.define "db" do |db|
+    db.vm.network :private_network, ip: "172.16.1.14"
+    db.vm.network :forwarded_port, guest: 8010, host: 8010
+    db.vm.network :forwarded_port, guest: 8011, host: 8011
+    db.vm.hostname = "db.vagrant.noao.edu" 
+    db.hostmanager.aliases =  %w(db)
     
-    mars.vm.provision :puppet do |puppet|
+    db.vm.provision :puppet do |puppet|
       puppet.manifests_path = "manifests"
       puppet.manifest_file = "site.pp"
       puppet.module_path = ["modules", "../puppet-modules"]
       puppet.environment_path = "environments"
-      #!puppet.environment = "pat"
       puppet.environment = "dev"
       puppet.options = [
         #!'--debug', #+++
@@ -182,6 +183,30 @@ Vagrant.configure("2") do |config|
       ]
     end
   end
+  
+#!  config.vm.define "marsdeploy" do |mars|
+#!    mars.vm.network :private_network, ip: "172.16.1.14"
+#!    mars.vm.network :forwarded_port, guest: 8080, host: 8080
+#!    mars.vm.hostname = "marsdeploy.vagrant.noao.edu" 
+#!    mars.hostmanager.aliases =  %w(mars)
+#!    
+#!    mars.vm.provision :puppet do |puppet|
+#!      puppet.manifests_path = "manifests"
+#!      puppet.manifest_file = "site.pp"
+#!      puppet.module_path = ["modules", "../puppet-modules"]
+#!      puppet.environment_path = "environments"
+#!      #!puppet.environment = "pat"
+#!      puppet.environment = "dev"
+#!      puppet.options = [
+#!        #!'--debug', #+++
+#!        '--verbose',
+#!        '--report',
+#!        '--show_diff',
+#!        '--pluginsync',
+#!        '--hiera_config /vagrant/hiera.yaml',
+#!      ]
+#!    end
+#!  end
   
 end
 

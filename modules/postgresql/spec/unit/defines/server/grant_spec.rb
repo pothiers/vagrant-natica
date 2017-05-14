@@ -28,5 +28,5 @@ describe 'postgresql::server::grant', :type => :define do
     "class {'postgresql::server':}"
   end
 
-  it { is_expected.to contain_postgresql__server__grant('test') }
+  it { should contain_postgresql__server__grant('test') }
 end

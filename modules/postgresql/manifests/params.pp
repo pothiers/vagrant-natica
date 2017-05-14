@@ -1,5 +1,6 @@
 # PRIVATE CLASS: do not use directly
 class postgresql::params inherits postgresql::globals {
+  $ensure                     = present
   $version                    = $globals_version
   $postgis_version            = $globals_postgis_version
   $listen_addresses           = 'localhost'
@@ -10,12 +11,10 @@ class postgresql::params inherits postgresql::globals {
   $ipv6acls                   = []
   $encoding                   = $encoding
   $locale                     = $locale
-  $service_ensure             = 'running'
-  $service_enable             = true
+  $service_ensure             = undef
   $service_provider           = $service_provider
+  $manage_firewall            = $manage_firewall
   $manage_pg_hba_conf         = pick($manage_pg_hba_conf, true)
-  $manage_pg_ident_conf       = pick($manage_pg_ident_conf, true)
-  $package_ensure             = 'present'
 
   # Amazon Linux's OS Family is 'Linux', operating system 'Amazon'.
   case $::osfamily {
@@ -23,6 +22,7 @@ class postgresql::params inherits postgresql::globals {
       $user               = pick($user, 'postgres')
       $group              = pick($group, 'postgres')
       $needs_initdb       = pick($needs_initdb, true)
+      $firewall_supported = pick($firewall_supported, true)
       $version_parts      = split($version, '[.]')
       $package_version    = "${version_parts[0]}${version_parts[1]}"
 
@@ -73,6 +73,10 @@ class postgresql::params inherits postgresql::globals {
     }
 
     'Archlinux': {
+      # Based on the existing version of the firewall module, this is normally
+      # true for Archlinux, but archlinux users want more control.
+      # so they can set it themself
+      $firewall_supported = pick($firewall_supported, true)
       $needs_initdb       = pick($needs_initdb, true)
       $user               = pick($user, 'postgres')
       $group              = pick($group, 'postgres')
@@ -112,7 +116,7 @@ class postgresql::params inherits postgresql::globals {
         $service_name = $::operatingsystem ? {
           'Debian' => pick($service_name, 'postgresql'),
           'Ubuntu' => $::lsbmajdistrelease ? {
-            /^10/ => pick($service_name, "postgresql-${version}"),
+            '10' => pick($service_name, "postgresql-${version}"),
             default => pick($service_name, 'postgresql'),
           },
           default => undef
@@ -140,6 +144,8 @@ class postgresql::params inherits postgresql::globals {
       $confdir              = pick($confdir, "/etc/postgresql/${version}/main")
       $service_status       = pick($service_status, "/etc/init.d/${service_name} status | /bin/egrep -q 'Running clusters: .+|online'")
       $psql_path            = pick($psql_path, "/usr/bin/psql")
+
+      $firewall_supported   = pick($firewall_supported, true)
     }
 
     'FreeBSD': {
@@ -162,33 +168,15 @@ class postgresql::params inherits postgresql::globals {
       $service_status       = pick($service_status, "/usr/local/etc/rc.d/${service_name} status")
       $psql_path            = pick($psql_path, "${bindir}/psql")
 
-      $needs_initdb         = pick($needs_initdb, true)
-    }
-
-    'Suse': {
-      $user                 = pick($user, 'postgres')
-      $group                = pick($group, 'postgres')
-
-      $client_package_name  = pick($client_package_name, "postgresql${version}")
-      $server_package_name  = pick($server_package_name, "postgresql${version}-server")
-      $contrib_package_name = pick($contrib_package_name, "postgresql${version}-contrib")
-      $devel_package_name   = pick($devel_package_name, "postgresql${version}-devel")
-      $java_package_name    = pick($java_package_name, undef)
-      $perl_package_name    = pick($plperl_package_name, undef)
-      $plperl_package_name  = pick($plperl_package_name, undef)
-      $python_package_name  = pick($python_package_name, undef)
-
-      $service_name         = pick($service_name, 'postgresql')
-      $bindir               = pick($bindir, "/usr/lib/postgresql${version}/bin")
-      $datadir              = pick($datadir, '/var/lib/pgsql/data')
-      $confdir              = pick($confdir, $datadir)
-      $service_status       = pick($service_status, "/etc/init.d/${service_name} status")
-      $psql_path            = pick($psql_path, "${bindir}/psql")
-
+      $firewall_supported   = pick($firewall_supported, false)
       $needs_initdb         = pick($needs_initdb, true)
     }
 
     default: {
+      # Based on the existing version of the firewall module, this is normally
+      # false for other OS, but this allows an escape hatch to override it.
+      $firewall_supported = pick($firewall_supported, false)
+
       $psql_path            = pick($psql_path, "${bindir}/psql")
 
       # Since we can't determine defaults on our own, we rely on users setting
@@ -209,7 +197,6 @@ class postgresql::params inherits postgresql::globals {
   $createdb_path        = pick($createdb_path, "${bindir}/createdb")
   $pg_hba_conf_path     = pick($pg_hba_conf_path, "${confdir}/pg_hba.conf")
   $pg_hba_conf_defaults = pick($pg_hba_conf_defaults, true)
-  $pg_ident_conf_path   = pick($pg_ident_conf_path, "${confdir}/pg_ident.conf")
   $postgresql_conf_path = pick($postgresql_conf_path, "${confdir}/postgresql.conf")
   $default_database     = pick($default_database, 'postgres')
 }

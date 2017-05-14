@@ -27,5 +27,5 @@ describe 'postgresql::server::tablespace', :type => :define do
     "class {'postgresql::server':}"
   end
 
-  it { is_expected.to contain_postgresql__server__tablespace('test') }
+  it { should contain_postgresql__server__tablespace('test') }
 end

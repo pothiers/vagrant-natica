@@ -26,6 +26,3 @@ end
 def param(type, title, param)
   param_value(catalogue, type, title, param)
 end
-
-# With rspec-puppet v2.0 this allows coverage checks.
-#at_exit { RSpec::Puppet::Coverage.report! }

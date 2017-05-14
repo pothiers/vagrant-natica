@@ -1,6 +1,5 @@
 # Install client cli tool. See README.md for more details.
 class postgresql::client (
-  $file_ensure    = 'file',
   $package_name   = $postgresql::params::client_package_name,
   $package_ensure = 'present'
 ) inherits postgresql::params {
@@ -12,12 +11,19 @@ class postgresql::client (
     tag     => 'postgresql',
   }
 
-  file { '/usr/local/bin/validate_postgresql_connection.sh':
+  $file_ensure = $package_ensure ? {
+    'present' => 'file',
+    true      => 'file',
+    'absent'  => 'absent',
+    false     => 'absent',
+    default   => 'file',
+  }
+  file { "/usr/local/bin/validate_postgresql_connection.sh":
     ensure => $file_ensure,
-    source => 'puppet:///modules/postgresql/validate_postgresql_connection.sh',
+    source => "puppet:///modules/postgresql/validate_postgresql_connection.sh",
     owner  => 0,
     group  => 0,
-    mode   => '0755',
+    mode   => 0755,
   }
 
 }
