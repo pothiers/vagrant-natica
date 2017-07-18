@@ -12,8 +12,8 @@ arch_irods_resource: tadaResc
 archive_irods331: /noao-tuc-z1/tada/ 
 irodsdata: 'puppet:///modules/dmo-hiera/iinit.in'
 irodsenv: 'puppet:///modules/dmo-hiera/irodsEnv.dev'
-#localdjango: 'puppet:///modules/dmo-hiera/django_settings_local_pat.py'
-localdjango: 'puppet:///modules/dmo-hiera/django_settings_local_dev.py'
+localdjango: 'puppet:///modules/dmo-hiera/django_settings_local_pat.py'
+#localdjango: 'puppet:///modules/dmo-hiera/django_settings_local_dev.py'
 nginx_conf: 'puppet:///modules/dmo-hiera/nginx.conf'
 smoke_conf: 'puppet:///modules/dmo-hiera/smoke-config.dev.sh'
 mars_vhost: www.mars.noao.edu

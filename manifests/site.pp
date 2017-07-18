@@ -95,30 +95,11 @@ node mars {
 
 node db {
   notice("Loading site.pp::db")
-  class { 'postgresql::globals':
-    manage_package_repo => true,
-    version             => '9.3',
-    } ->
-  class { 'postgresql::server':
-    postgres_password       => 'marstada',
-    ip_mask_allow_all_users => '0.0.0.0/0',
-    listen_addresses        => '*',
-    manage_firewall         => true,
-    } ->
-    postgresql::server::db { 'mars':
-      user     => 'django',
-      password => postgresql_password('django', 'djang0'),
-
-      } ->
-    package { ['postgresql93-contrib']: } ->
-    exec { "/usr/bin/psql -d mars -c 'CREATE EXTENSION hstore;'":
-      user   => "postgres",
-      unless => "/usr/bin/psql -d mars -c '\\dx' | grep hstore",
-    }
+  include lsadb
 }
 
 
-#! ode goodmars {
+#! node goodmars {
 #!  ensure_resource('package', ['git', ], {'ensure' => 'present'})
 #!  include augeas
 #! 
