@@ -27,5 +27,16 @@ describe 'postgresql::server::tablespace', :type => :define do
     "class {'postgresql::server':}"
   end
 
-  it { should contain_postgresql__server__tablespace('test') }
+  it { is_expected.to contain_postgresql__server__tablespace('test') }
+
+  context "with different owner" do
+    let :params do
+      {
+        :location => '/srv/data/foo',
+        :owner    => 'test_owner',
+      }
+    end
+
+    it { is_expected.to contain_postgresql_psql('ALTER TABLESPACE "test" OWNER TO "test_owner"') }
+  end
 end

@@ -1,55 +1,5 @@
 Puppet::Type.type(:postgresql_psql).provide(:ruby) do
 
-  def command()
-    if ((! resource[:unless]) or (resource[:unless].empty?))
-      if (resource.refreshonly?)
-        # So, if there's no 'unless', and we're in "refreshonly" mode,
-        # we need to return the target command here.  If we don't,
-        # then Puppet will generate an event indicating that this
-        # property has changed.
-        return resource[:command]
-      end
-
-      # if we're not in refreshonly mode, then we return nil,
-      # which will cause Puppet to sync this property.  This
-      # is what we want if there is no 'unless' value specified.
-      return nil
-    end
-
-    if Puppet::PUPPETVERSION.to_f < 4
-      output, status = run_unless_sql_command(resource[:unless])
-    else
-      output = run_unless_sql_command(resource[:unless])
-      status = output.exitcode
-    end
-
-    if status != 0
-      puts status
-      self.fail("Error evaluating 'unless' clause: '#{output}'")
-    end
-    result_count = output.strip.to_i
-    if result_count > 0
-      # If the 'unless' query returned rows, then we don't want to execute
-      # the 'command'.  Returning the target 'command' here will cause
-      # Puppet to treat this property as already being 'insync?', so it
-      # won't call the setter to run the 'command' later.
-      return resource[:command]
-    end
-
-    # Returning 'nil' here will cause Puppet to see this property
-    # as out-of-sync, so it will call the setter later.
-    nil
-  end
-
-  def command=(val)
-    output, status = run_sql_command(val)
-
-    if status != 0
-      self.fail("Error executing SQL; psql returned #{status}: '#{output}'")
-    end
-  end
-
-
   def run_unless_sql_command(sql)
     # for the 'unless' queries, we wrap the user's query in a 'SELECT COUNT',
     # which makes it easier to parse and process the output.
@@ -64,20 +14,56 @@ Puppet::Type.type(:postgresql_psql).provide(:ruby) do
     command = [resource[:psql_path]]
     command.push("-d", resource[:db]) if resource[:db]
     command.push("-p", resource[:port]) if resource[:port]
-    command.push("-t", "-c", sql)
+    command.push("-t", "-c", '"' + sql.gsub('"', '\"') + '"')
+
+    environment = get_environment
 
     if resource[:cwd]
       Dir.chdir resource[:cwd] do
-        run_command(command, resource[:psql_user], resource[:psql_group])
+        run_command(command, resource[:psql_user], resource[:psql_group], environment)
       end
     else
-      run_command(command, resource[:psql_user], resource[:psql_group])
+      run_command(command, resource[:psql_user], resource[:psql_group], environment)
     end
   end
 
-  def run_command(command, user, group)
-    if Puppet::PUPPETVERSION.to_f < 3.4
-      Puppet::Util::SUIDManager.run_and_capture(command, user, group)
+  private
+
+  def get_environment
+    environment = (resource[:connect_settings] || {}).dup
+    if envlist = resource[:environment]
+      envlist = [envlist] unless envlist.is_a? Array
+      envlist.each do |setting|
+        if setting =~ /^(\w+)=((.|\n)+)$/
+          env_name = $1
+          value = $2
+          if environment.include?(env_name) || environment.include?(env_name.to_sym)
+            if env_name == 'NEWPGPASSWD'
+              warning "Overriding environment setting '#{env_name}' with '****'"
+            else
+              warning "Overriding environment setting '#{env_name}' with '#{value}'"
+            end
+          end
+          environment[env_name] = value
+        else
+          warning "Cannot understand environment setting #{setting.inspect}"
+        end
+      end
+    end
+    return environment
+  end
+
+  def run_command(command, user, group, environment)
+    command = command.join ' '
+    if Puppet::PUPPETVERSION.to_f < 3.0
+      require 'puppet/util/execution'
+      Puppet::Util::Execution.withenv environment do
+        Puppet::Util::SUIDManager.run_and_capture(command, user, group)
+      end
+    elsif Puppet::PUPPETVERSION.to_f < 3.4
+      Puppet::Util.withenv environment do
+        Puppet::Util::SUIDManager.run_and_capture(command, user, group)
+      end
     else
       output = Puppet::Util::Execution.execute(command, {
         :uid                => user,
@@ -85,7 +71,7 @@ Puppet::Type.type(:postgresql_psql).provide(:ruby) do
         :failonfail         => false,
         :combine            => true,
         :override_locale    => true,
-        :custom_environment => {}
+        :custom_environment => environment,
       })
       [output, $CHILD_STATUS.dup]
     end

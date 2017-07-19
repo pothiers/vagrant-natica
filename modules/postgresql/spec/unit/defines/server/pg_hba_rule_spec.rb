@@ -37,7 +37,7 @@ describe 'postgresql::server::pg_hba_rule', :type => :define do
       }
     end
     it do
-      should contain_concat__fragment('pg_hba_rule_test').with({
+      is_expected.to contain_concat__fragment('pg_hba_rule_test').with({
         :content => /host\s+all\s+all\s+1\.1\.1\.1\/24\s+md5/
       })
     end
@@ -60,7 +60,7 @@ describe 'postgresql::server::pg_hba_rule', :type => :define do
       }
     end
     it do
-      should contain_concat__fragment('pg_hba_rule_test').with({
+      is_expected.to contain_concat__fragment('pg_hba_rule_test').with({
         :content => /local\s+all\s+all\s+ident/
       })
     end
@@ -85,7 +85,7 @@ describe 'postgresql::server::pg_hba_rule', :type => :define do
       }
     end
     it do
-      should contain_concat__fragment('pg_hba_rule_test').with({
+      is_expected.to contain_concat__fragment('pg_hba_rule_test').with({
         :content => /host\s+all\s+all\s+0\.0\.0\.0\/0\s+ldap\s+foo=bar/
       })
     end
@@ -110,7 +110,7 @@ describe 'postgresql::server::pg_hba_rule', :type => :define do
         }
       end
       it 'should fail parsing when type is not valid' do
-        expect {subject}.to raise_error(Puppet::Error,
+        expect { catalogue }.to raise_error(Puppet::Error,
           /The type you specified \[invalid\] must be one of/)
       end
     end
@@ -134,7 +134,7 @@ describe 'postgresql::server::pg_hba_rule', :type => :define do
       end
 
       it 'should fail parsing when auth_method is not valid' do
-        expect {subject}.to raise_error(Puppet::Error,
+        expect { catalogue }.to raise_error(Puppet::Error,
           /The auth_method you specified \[invalid\] must be one of/)
       end
     end
@@ -161,8 +161,8 @@ describe 'postgresql::server::pg_hba_rule', :type => :define do
       end
 
       it 'should fail parsing when auth_method is not valid' do
-        expect {subject}.to raise_error(Puppet::Error,
-          /The auth_method you specified \[peer\] must be one of: trust, reject, md5, sha1, password, gss, sspi, krb5, ident, ldap, radius, cert, pam/)
+        expect { catalogue }.to raise_error(Puppet::Error,
+          /The auth_method you specified \[peer\] must be one of: trust, reject, md5, password, gss, sspi, krb5, ident, ldap, radius, cert, pam/)
       end
     end
 
@@ -188,7 +188,7 @@ describe 'postgresql::server::pg_hba_rule', :type => :define do
       end
 
       it do
-        should contain_concat__fragment('pg_hba_rule_test').with({
+        is_expected.to contain_concat__fragment('pg_hba_rule_test').with({
           :content => /local\s+all\s+all\s+0\.0\.0\.0\/0\s+peer/
 	})
       end

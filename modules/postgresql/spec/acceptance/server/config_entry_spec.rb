@@ -1,44 +1,38 @@
 require 'spec_helper_acceptance'
 
-describe 'postgresql::server::config_entry:', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfamily')) do
-  after :all do
-    # Cleanup after tests have ran
-    apply_manifest("class { 'postgresql::server': ensure => absent }", :catch_failures => true)
-  end
+describe 'postgresql::server::config_entry' do
 
-  it 'should change setting and reflect it in show all' do
-    pp = <<-EOS.unindent
-      class { 'postgresql::server': }
-
-      postgresql::server::config_entry { 'check_function_bodies':
-        value => 'off',
+  let(:pp_setup) { <<-EOS
+    class { 'postgresql::server':
+      postgresql_conf_path => '/tmp/postgresql.conf',
       }
     EOS
+  }
 
-    apply_manifest(pp, :catch_failures => true)
-    apply_manifest(pp, :catch_changes => true)
-
-    psql('--command="show all" postgres') do |r|
-      expect(r.stdout).to match(/check_function_bodies.+off/)
-      expect(r.stderr).to eq('')
-    end
-  end
-
-  it 'should correctly set a quotes-required string' do
-    pp = <<-EOS.unindent
-      class { 'postgresql::server': }
-
-      postgresql::server::config_entry { 'log_directory':
-        value => '/tmp/testfile',
+  context 'unix_socket_directories' do
+    let(:pp_test) { pp_setup + <<-EOS
+      postgresql::server::config_entry { 'unix_socket_directories':
+        value => '/var/socket/, /root/'
       }
-    EOS
+      EOS
+    }
 
-    apply_manifest(pp, :catch_failures => true)
+    #get postgresql version
+    apply_manifest("class { 'postgresql::server': }")
+    result = shell('psql --version')
+    version = result.stdout.match(%r{\s(\d\.\d)})[1]
 
-    psql('--command="show all" postgres') do |r|
-      r.stdout.should =~ /log_directory.+\/tmp\/testfile/
-      r.stderr.should be_empty
-      r.exit_code.should == 0
+    if version >= '9.3'
+      it 'is expected to run idempotently' do
+        apply_manifest(pp_test, :catch_failures => true)
+        apply_manifest(pp_test, :catch_changes => true)
+      end
+
+      it 'is expected to contain directories' do
+        shell('cat /tmp/postgresql.conf') do |output|
+          expect(output.stdout).to contain("unix_socket_directories = '/var/socket/, /root/'")
+        end
+      end
     end
   end
 end

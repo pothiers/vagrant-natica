@@ -14,10 +14,10 @@ describe Puppet::Type.type(:postgresql_psql).provider(:ruby) do
 
       it "executes with the given psql_path on the given DB" do
         expect(provider).to receive(:run_command).with(['psql', '-d',
-          attributes[:db], '-t', '-c', 'SELECT something'], 'postgres',
-          'postgres')
+          attributes[:db], '-t', '-c', '"SELECT \'something\' as \"Custom column\""'], 'postgres',
+          'postgres', {})
 
-        provider.run_sql_command("SELECT something")
+        provider.run_sql_command('SELECT \'something\' as "Custom column"')
       end
     end
     describe "with psql_path and db" do
@@ -32,10 +32,10 @@ describe Puppet::Type.type(:postgresql_psql).provider(:ruby) do
       it "executes with the given psql_path on the given DB" do
         expect(Dir).to receive(:chdir).with(attributes[:cwd]).and_yield
         expect(provider).to receive(:run_command).with([attributes[:psql_path],
-          '-d', attributes[:db], '-t', '-c', 'SELECT something'],
-          attributes[:psql_user], attributes[:psql_group])
+          '-d', attributes[:db], '-t', '-c', '"SELECT \'something\' as \"Custom column\""'],
+          attributes[:psql_user], attributes[:psql_group], {})
 
-        provider.run_sql_command("SELECT something")
+        provider.run_sql_command('SELECT \'something\' as "Custom column"')
       end
     end
     describe "with search_path string" do
@@ -45,10 +45,10 @@ describe Puppet::Type.type(:postgresql_psql).provider(:ruby) do
 
       it "executes with the given search_path" do
         expect(provider).to receive(:run_command).with(['psql', '-t', '-c',
-          'set search_path to schema1; SELECT something'],
-          'postgres', 'postgres')
+          '"set search_path to schema1; SELECT \'something\' as \"Custom column\""'],
+          'postgres', 'postgres', {})
 
-        provider.run_sql_command("SELECT something")
+        provider.run_sql_command('SELECT \'something\' as "Custom column"')
       end
     end
     describe "with search_path array" do
@@ -58,83 +58,47 @@ describe Puppet::Type.type(:postgresql_psql).provider(:ruby) do
 
       it "executes with the given search_path" do
         expect(provider).to receive(:run_command).with(['psql', '-t', '-c',
-          'set search_path to schema1,schema2; SELECT something'],
+          '"set search_path to schema1,schema2; SELECT \'something\' as \"Custom column\""'],
           'postgres',
-          'postgres'
+          'postgres',
+          {}
         )
+
+        provider.run_sql_command('SELECT \'something\' as "Custom column"')
+      end
+    end
+  end
+   describe "with port string" do
+      let(:attributes) do { :port => '5555' } end
+
+      it "executes with the given port" do
+        expect(provider).to receive(:run_command).with(["psql",
+        "-p", "5555",
+        "-t", "-c", "\"SELECT something\""],
+        "postgres", "postgres", {} )
+
+        provider.run_sql_command("SELECT something")
+      end
+    end
+    describe "with connect_settings" do
+      let(:attributes) do { :connect_settings => { 'PGHOST' => '127.0.0.1' } } end
+
+      it "executes with the given host" do
+        expect(provider).to receive(:run_command).with(["psql",
+          "-t", "-c",
+          "\"SELECT something\""],
+          "postgres", "postgres", { 'PGHOST' => '127.0.0.1' } )
 
         provider.run_sql_command("SELECT something")
       end
     end
 
-  end
+  context("#run_unless_sql_command") do
+    let(:attributes) do { } end
 
-  context("#command") do
-    context "when unless is specified" do
-      [:true, :false, true, false].each do |refresh|
-        context "and refreshonly is #{refresh}" do
-          let(:attributes) { {
-            :command     => 'SELECT something',
-            :db          => 'spec_db',
-            :unless      => 'SELECT something',
-            :refreshonly => refresh
-          } }
-
-          it "does not fail when the status is successful" do
-            expect(provider).to receive(:run_unless_sql_command).and_return ["1 row returned", 0]
-            provider.command
-          end
-
-          it "returns the given command when rows are returned" do
-            expect(provider).to receive(:run_unless_sql_command).and_return ["1 row returned", 0]
-            expect(provider.command).to eq("SELECT something")
-          end
-
-          it "does not return the given command when no rows are returned" do
-            expect(provider).to receive(:run_unless_sql_command).and_return ["0 rows returned", 0]
-            expect(provider.command).to_not eq("SELECT something")
-          end
-
-          it "raises an error when the sql command fails" do
-            allow(provider).to receive(:run_unless_sql_command).and_return ["Something went wrong", 1]
-            expect { provider.command }.to raise_error(Puppet::Error, /Something went wrong/)
-          end
-        end
-      end
-    end
-
-    context "when unless is not specified" do
-      context "and refreshonly is true" do
-        let(:attributes) do {
-          :command     => 'SELECT something',
-          :db          => 'spec_db',
-          :refreshonly => :true
-        } end
-        it "does not run unless sql command" do
-          expect(provider).to_not receive(:run_unless_sql_command)
-          provider.command
-        end
-
-        it "returns the given command do disable sync" do
-          expect(provider.command).to eq("SELECT something")
-        end
-      end
-
-      context "and refreshonly is false" do
-        let(:attributes) do {
-          :command     => 'SELECT something',
-          :db          => 'spec_db',
-          :refreshonly => :false
-        } end
-        it "does not run unless sql command" do
-          expect(provider).to_not receive(:run_unless_sql_command)
-          provider.command
-        end
-
-        it "does not return the command so as to enable sync" do
-          expect(provider.command).to_not eq("SELECT something")
-        end
-      end
+    it "calls #run_sql_command with SQL" do
+      expect(provider).to receive(:run_sql_command).with('SELECT COUNT(*) FROM (SELECT 1) count')
+      provider.run_unless_sql_command('SELECT 1')
     end
   end
 end

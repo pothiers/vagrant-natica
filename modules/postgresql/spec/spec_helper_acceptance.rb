@@ -1,5 +1,14 @@
 require 'beaker-rspec/spec_helper'
 require 'beaker-rspec/helpers/serverspec'
+require 'beaker/puppet_install_helper'
+require 'beaker/module_install_helper'
+
+run_puppet_install_helper
+install_ca_certs unless ENV['PUPPET_INSTALL_TYPE'] =~ /pe/i
+install_module_on(hosts)
+install_module_dependencies_on(hosts)
+
+UNSUPPORTED_PLATFORMS = ['AIX','windows','Solaris','Suse']
 
 class String
   # Provide ability to remove indentation from strings, for the purpose of
@@ -34,54 +43,50 @@ def psql(psql_cmd, user = 'postgres', exit_codes = [0,1], &block)
   shell("su #{shellescape(user)} -c #{shellescape(psql)}", :acceptable_exit_codes => exit_codes, &block)
 end
 
-unless ENV['RS_PROVISION'] == 'no' or ENV['BEAKER_provision'] == 'no'
-  if hosts.first.is_pe?
-    install_pe
-  else
-    install_puppet
-  end
-  hosts.each do |host|
-    shell("mkdir -p #{host['distmoduledir']}")
-    if ! host.is_pe?
-      # Augeas is only used in one place, for Redhat.
-      if fact('osfamily') == 'RedHat'
-        install_package host, 'ruby-devel'
-        install_package host, 'augeas-devel'
-        install_package host, 'ruby-augeas'
-      end
-    end
-  end
-end
-
-UNSUPPORTED_PLATFORMS = ['AIX','windows','Solaris','Suse']
-
 RSpec.configure do |c|
-  # Project root
-  proj_root = File.expand_path(File.join(File.dirname(__FILE__), '..'))
-
   # Readable test descriptions
   c.formatter = :documentation
 
   # Configure all nodes in nodeset
   c.before :suite do
-    # Install module and dependencies
-    puppet_module_install(:source => proj_root, :module_name => 'postgresql')
+    # Set up selinux if appropriate.
+    if fact('osfamily') == 'RedHat' && fact('selinux') == 'true'
+      pp = <<-EOS
+        if $::osfamily == 'RedHat' and $::selinux == 'true' {
+          $semanage_package = $::operatingsystemmajrelease ? {
+            '5'     => 'policycoreutils',
+            default => 'policycoreutils-python',
+          }
+
+          package { $semanage_package: ensure => installed }
+          exec { 'set_postgres':
+            command     => 'semanage port -a -t postgresql_port_t -p tcp 5433',
+            path        => '/bin:/usr/bin/:/sbin:/usr/sbin',
+            subscribe   => Package[$semanage_package],
+          }
+        }
+      EOS
+
+      apply_manifest_on(agents, pp, :catch_failures => false)
+    end
+
+    # net-tools required for netstat utility being used by be_listening
+    if fact('osfamily') == 'RedHat' && fact('operatingsystemmajrelease') == '7'
+      pp = <<-EOS
+        package { 'net-tools': ensure => installed }
+      EOS
+
+      apply_manifest_on(agents, pp, :catch_failures => false)
+    end
+
     hosts.each do |host|
-      on host, "/bin/touch #{default['puppetpath']}/hiera.yaml"
+      on host, "/bin/touch #{host['puppetpath']}/hiera.yaml"
       on host, 'chmod 755 /root'
-      if fact('osfamily') == 'Debian'
+      if fact_on(host, 'osfamily') == 'Debian'
         on host, "echo \"en_US ISO-8859-1\nen_NG.UTF-8 UTF-8\nen_US.UTF-8 UTF-8\n\" > /etc/locale.gen"
         on host, '/usr/sbin/locale-gen'
         on host, '/usr/sbin/update-locale'
       end
-      if fact('osfamily') == 'RedHat'
-        shell('yum -y install policycoreutils-python')
-        shell('semanage port -a -t postgresql_port_t -p tcp 5433')
-      end
-      on host, puppet('module','install','puppetlabs-stdlib'), { :acceptable_exit_codes => [0,1] }
-      on host, puppet('module','install','puppetlabs-firewall'), { :acceptable_exit_codes => [0,1] }
-      on host, puppet('module','install','puppetlabs-apt'), { :acceptable_exit_codes => [0,1] }
-      on host, puppet('module','install','puppetlabs-concat'), { :acceptable_exit_codes => [0,1] }
     end
   end
 end
