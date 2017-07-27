@@ -93,9 +93,27 @@ node mars {
   #include mars
 }
 
+node archive {
+  notice("Loading site.pp::archive")
+  include mars::install
+  include mars::service
+  #include mars
+  
+  
+  file { [ '/var/log/mars', '/etc/natica']:
+    ensure => 'directory',
+    mode   => '0777',
+  } ->
+  exec { 'patch1':
+    command => 'ln -s /etc/mars/django_local_settings.py /etc/natica/django_local_settings.py',
+    creates => '/etc/natica/django_local_settings.py',
+    path    => ['/usr/bin', '/usr/sbin',],    
+    }
+}
+
 node db {
   notice("Loading site.pp::db")
-  include lsadb
+  include naticadb
 }
 
 

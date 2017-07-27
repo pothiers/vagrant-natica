@@ -10,7 +10,6 @@ describe 'postgresql::server::config_entry', :type => :define do
       :concat_basedir => tmpfilename('contrib'),
       :id => 'root',
       :path => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
-      :selinux => true,
     }
   end
 
@@ -40,7 +39,6 @@ describe 'postgresql::server::config_entry', :type => :define do
           :concat_basedir => tmpfilename('contrib'),
           :id => 'root',
           :path => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
-          :selinux => true,
         }
       end
       let(:params) {{ :ensure => 'present', :name => 'port_spec', :value => '5432' }}
@@ -60,7 +58,6 @@ describe 'postgresql::server::config_entry', :type => :define do
           :concat_basedir => tmpfilename('contrib'),
           :id => 'root',
           :path => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
-          :selinux => true,
         }
       end
       let(:params) {{ :ensure => 'present', :name => 'port_spec', :value => '5432' }}
@@ -80,7 +77,6 @@ describe 'postgresql::server::config_entry', :type => :define do
           :concat_basedir => tmpfilename('contrib'),
           :id => 'root',
           :path => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
-          :selinux => true,
         }
       end
       let(:params) {{ :ensure => 'present', :name => 'port_spec', :value => '5432' }}
@@ -108,29 +104,6 @@ describe 'postgresql::server::config_entry', :type => :define do
       is_expected.to contain_postgresql_conf('check_function_bodies').with({
         :name  => 'check_function_bodies',
         :value => 'off' })
-    end
-  end
-
-  context 'unix_socket_directories' do
-    let :facts do
-      {
-        :osfamily => 'RedHat',
-        :operatingsystem => 'RedHat',
-        :operatingsystemrelease => '7.0',
-        :kernel => 'Linux',
-        :concat_basedir => tmpfilename('contrib'),
-        :id => 'root',
-        :path => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
-        :selinux => true,
-      }
-    end
-    let(:params) {{ :ensure => 'present', :name => 'unix_socket_directories', :value => '/var/pgsql, /opt/postgresql, /root/' }}
-
-    it 'should restart the server and change unix_socket_directories to the provided list' do
-      is_expected.to contain_postgresql_conf('unix_socket_directories')
-                      .with({ :name => 'unix_socket_directories',
-                              :value => '/var/pgsql, /opt/postgresql, /root/'})
-                      .that_notifies('Class[postgresql::server::service]')
     end
   end
 end

@@ -2,7 +2,6 @@
 class postgresql::repo (
   $version = undef,
   $proxy = undef,
-  $baseurl = undef,
 ) {
   case $::osfamily {
     'RedHat', 'Linux': {

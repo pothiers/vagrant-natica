@@ -180,10 +180,38 @@ Vagrant.configure("2") do |config|
         '--show_diff',
         '--pluginsync',
         '--hiera_config /vagrant/hiera.yaml',
+        '--graph',
+        '--graphdir /vagrant/graphs/db',
+
       ]
     end
   end
   
+  config.vm.define "archive" do |archive|
+    archive.vm.network :private_network, ip: "172.16.1.15"
+    archive.vm.network :forwarded_port, guest: 8000, host: 8080
+    archive.vm.network :forwarded_port, guest: 8001, host: 8081
+    archive.vm.hostname = "archive.vagrant.noao.edu" 
+    archive.hostmanager.aliases =  %w(archive)
+    
+    archive.vm.provision :puppet do |puppet|
+      puppet.manifests_path = "manifests"
+      puppet.manifest_file = "site.pp"
+      puppet.module_path = ["modules", "../puppet-modules"]
+      puppet.environment_path = "environments"
+      #!puppet.environment = "pat"
+      puppet.environment = "dev"
+      puppet.options = [
+        #!'--debug', #+++
+        '--verbose',
+        '--report',
+        '--show_diff',
+        '--pluginsync',
+        '--hiera_config /vagrant/hiera.yaml',
+      ]
+    end
+  end
+
 #!  config.vm.define "marsdeploy" do |mars|
 #!    mars.vm.network :private_network, ip: "172.16.1.14"
 #!    mars.vm.network :forwarded_port, guest: 8080, host: 8080

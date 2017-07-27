@@ -52,18 +52,12 @@ describe 'postgresql::validate_db_connection', :type => :define do
     end
 
     let :pre_condition do
-      <<-EOS
-        class { 'postgresql::globals':
-          module_workdir => '/var/tmp',
-        } ->
-        class { 'postgresql::client': validcon_script_path => '/opt/something/validate.sh' }
-      EOS
-    end 
+      "class { 'postgresql::client': validcon_script_path => '/opt/something/validate.sh' }"
+    end
 
-    it 'should have proper path for validate command and correct cwd' do
+    it 'should have proper path for validate command' do
       is_expected.to contain_exec('validate postgres connection for test@test:5432/test').with({
-        :unless => %r'^/opt/something/validate.sh\s+\d+',
-        :cwd    => '/var/tmp',
+        :unless => %r'^/opt/something/validate.sh\s+\d+'
       })
     end
 

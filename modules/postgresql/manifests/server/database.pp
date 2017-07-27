@@ -2,7 +2,7 @@
 define postgresql::server::database(
   $comment          = undef,
   $dbname           = $title,
-  $owner            = undef,
+  $owner            = $postgresql::server::user,
   $tablespace       = undef,
   $template         = 'template0',
   $encoding         = $postgresql::server::encoding,
@@ -33,7 +33,6 @@ define postgresql::server::database(
 
   # Set the defaults for the postgresql_psql resource
   Postgresql_psql {
-    db               => $default_db,
     psql_user        => $user,
     psql_group       => $group,
     psql_path        => $psql_path,
@@ -46,7 +45,7 @@ define postgresql::server::database(
   if ($version != '8.1') {
     $locale_option = $locale ? {
       undef   => '',
-      default => "LC_COLLATE = '${locale}' LC_CTYPE = '${locale}'",
+      default => "LC_COLLATE='${locale}' LC_CTYPE='${locale}'",
     }
     $public_revoke_privilege = 'CONNECT'
   } else {
@@ -56,38 +55,41 @@ define postgresql::server::database(
 
   $template_option = $template ? {
     undef   => '',
-    default => "TEMPLATE = \"${template}\"",
+    default => "TEMPLATE=\"${template}\"",
   }
 
   $encoding_option = $encoding ? {
     undef   => '',
-    default => "ENCODING = '${encoding}'",
+    default => "ENCODING='${encoding}'",
   }
 
   $tablespace_option = $tablespace ? {
     undef   => '',
-    default => "TABLESPACE = \"${tablespace}\"",
+    default => "TABLESPACE=\"${tablespace}\"",
   }
 
-  if $createdb_path != undef {
+  if $createdb_path != undef{
     warning('Passing "createdb_path" to postgresql::database is deprecated, it can be removed safely for the same behaviour')
   }
 
-  postgresql_psql { "CREATE DATABASE \"${dbname}\"":
-    command => "CREATE DATABASE \"${dbname}\" WITH ${template_option} ${encoding_option} ${locale_option} ${tablespace_option}",
-    unless  => "SELECT 1 FROM pg_database WHERE datname = '${dbname}'",
+  postgresql_psql { "Create db '${dbname}'":
+    command => "CREATE DATABASE \"${dbname}\" WITH OWNER=\"${owner}\" ${template_option} ${encoding_option} ${locale_option} ${tablespace_option}",
+    unless  => "SELECT datname FROM pg_database WHERE datname='${dbname}'",
+    db      => $default_db,
     require => Class['postgresql::server::service']
   }~>
 
   # This will prevent users from connecting to the database unless they've been
   #  granted privileges.
-  postgresql_psql { "REVOKE ${public_revoke_privilege} ON DATABASE \"${dbname}\" FROM public":
+  postgresql_psql {"REVOKE ${public_revoke_privilege} ON DATABASE \"${dbname}\" FROM public":
+    db          => $default_db,
     refreshonly => true,
   }
 
-  Postgresql_psql["CREATE DATABASE \"${dbname}\""]->
-  postgresql_psql { "UPDATE pg_database SET datistemplate = ${istemplate} WHERE datname = '${dbname}'":
-    unless => "SELECT 1 FROM pg_database WHERE datname = '${dbname}' AND datistemplate = ${istemplate}",
+  Postgresql_psql[ "Create db '${dbname}'" ]->
+  postgresql_psql {"UPDATE pg_database SET datistemplate = ${istemplate} WHERE datname = '${dbname}'":
+    unless => "SELECT datname FROM pg_database WHERE datname = '${dbname}' AND datistemplate = ${istemplate}",
+    db     => $default_db,
   }
 
   if $comment {
@@ -96,33 +98,15 @@ define postgresql::server::database(
       '8.1'   => 'obj_description',
       default => 'shobj_description',
     }
-    Postgresql_psql["CREATE DATABASE \"${dbname}\""]->
-    postgresql_psql { "COMMENT ON DATABASE \"${dbname}\" IS '${comment}'":
-      unless => "SELECT 1 FROM pg_catalog.pg_database d WHERE datname = '${dbname}' AND pg_catalog.${comment_information_function}(d.oid, 'pg_database') = '${comment}'",
+    Postgresql_psql[ "Create db '${dbname}'" ]->
+    postgresql_psql {"COMMENT ON DATABASE \"${dbname}\" IS '${comment}'":
+      unless => "SELECT pg_catalog.${comment_information_function}(d.oid, 'pg_database') as \"Description\" FROM pg_catalog.pg_database d WHERE datname = '${dbname}' AND pg_catalog.${comment_information_function}(d.oid, 'pg_database') = '${comment}'",
       db     => $dbname,
     }
   }
 
-  if $owner {
-    postgresql_psql { "ALTER DATABASE \"${dbname}\" OWNER TO \"${owner}\"":
-      unless  => "SELECT 1 FROM pg_database JOIN pg_roles rol ON datdba = rol.oid WHERE datname = '${dbname}' AND rolname = '${owner}'",
-      require => Postgresql_psql["CREATE DATABASE \"${dbname}\""],
-    }
-
-    if defined(Postgresql::Server::Role[$owner]) {
-      Postgresql::Server::Role[$owner]->Postgresql_psql["ALTER DATABASE \"${dbname}\" OWNER TO \"${owner}\""]
-    }
-  }
-
-  if $tablespace {
-    postgresql_psql { "ALTER DATABASE \"${dbname}\" SET ${tablespace_option}":
-      unless  => "SELECT 1 FROM pg_database JOIN pg_tablespace spc ON dattablespace = spc.oid WHERE datname = '${dbname}' AND spcname = '${tablespace}'",
-      require => Postgresql_psql["CREATE DATABASE \"${dbname}\""],
-    }
-
-    if defined(Postgresql::Server::Tablespace[$tablespace]) {
-      # The tablespace must be there, before we create the database.
-      Postgresql::Server::Tablespace[$tablespace]->Postgresql_psql["CREATE DATABASE \"${dbname}\""]
-    }
+  # Build up dependencies on tablespace
+  if($tablespace != undef and defined(Postgresql::Server::Tablespace[$tablespace])) {
+    Postgresql::Server::Tablespace[$tablespace]->Postgresql_psql[ "Create db '${dbname}'" ]
   }
 }
