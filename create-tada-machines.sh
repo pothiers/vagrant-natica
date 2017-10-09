@@ -2,7 +2,7 @@
 # To recreate TADA and MARS on vagrant VMs and run full smoke, do:
 #    vagrant destroy -f mars; vagrant up mars; ./tt0
 
-LOG=/tmp/create-tada-tt.$$.log
+LOG=$HOME/create-tada-tt.$$.log
 here=`hostname`
 now=`date`
 echo "Creating VMs on $here at $now"  > $LOG
@@ -39,6 +39,7 @@ echo "Done provisioning: $sdate to " `date` >> $LOG
 #vagrant ssh valley -c /sandbox/tada/tests/smoke/smoke.all.sh          >> $LOG
 echo "  run-smoke-as-tester.sh: " `date`
 ~/sandbox/tada/tests/smoke/run-smoke-as-tester.sh                     >> $LOG
+echo "   Test log written to: $LOG"
 
 echo "Done: " `date`
 emins=$(((`date +'%s'` - tic)/60))

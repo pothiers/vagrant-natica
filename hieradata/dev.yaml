@@ -49,8 +49,10 @@ mars_host: mars.vagrant.noao.edu
 mars_port: 8000
 
 dataqversion: dev
-marsversion: dev
-tadaversion: dev
+#marsversion: dev
+#tadaversion: dev
+marsversion: mars-31
+tadaversion: mars-31
 #tadaversion: tada-51
 
 #dataqversion: 2.6
