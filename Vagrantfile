@@ -189,7 +189,8 @@ Vagrant.configure("2") do |config|
   
   config.vm.define "archive" do |archive|
     archive.vm.network :private_network, ip: "172.16.1.15"
-    archive.vm.network :forwarded_port, guest: 8000, host: 8080
+    # inside vagrant is GUEST, from the host running vagrant its HOST
+    archive.vm.network :forwarded_port, guest: 8000, host: 8080 
     archive.vm.network :forwarded_port, guest: 8001, host: 8081
     archive.vm.hostname = "archive.vagrant.noao.edu" 
     archive.hostmanager.aliases =  %w(archive)

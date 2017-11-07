@@ -100,7 +100,7 @@ node archive {
   #include mars
   
   
-  file { [ '/var/log/mars', '/etc/natica']:
+  file { [ '/etc/natica']: 
     ensure => 'directory',
     mode   => '0777',
   } ->
