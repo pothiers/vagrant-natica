@@ -105,7 +105,7 @@ node archive {
     mode   => '0777',
   } ->
   exec { 'patch1':
-    command => 'ln -s /etc/mars/django_local_settings.py /etc/natica/django_local_settings.py',
+    command => 'ln -s /etc/mars/django_local_setgtings.py /etc/natica/django_local_settings.py',
     creates => '/etc/natica/django_local_settings.py',
     path    => ['/usr/bin', '/usr/sbin',],    
     }
