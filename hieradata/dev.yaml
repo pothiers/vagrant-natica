@@ -57,4 +57,6 @@ dataqversion: 2.6.2
 marsversion: 1.12.0
 tadaversion: 2.10.1
 
-djangoserver: /sandbox/mars/start-mars-development.sh
+#djangoserver: /sandbox/mars/start-mars-development.sh
+djangoserver: /sandbox/natica/dev-start.sh
+
