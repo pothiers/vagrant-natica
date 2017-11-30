@@ -95,12 +95,7 @@ node mars {
 
 node archive {
   notice("Loading site.pp::archive")
-  include mars::install
-  include mars::service
-  #include mars
-  
-  
-  file { [ '/etc/natica']: 
+  file { [ '/etc/natica', '/opt/natica']: 
     ensure => 'directory',
     mode   => '0777',
   } ->
@@ -108,7 +103,23 @@ node archive {
     command => 'ln -s /etc/mars/django_local_setgtings.py /etc/natica/django_local_settings.py',
     creates => '/etc/natica/django_local_settings.py',
     path    => ['/usr/bin', '/usr/sbin',],    
-    }
+  }
+  python::pyvenv  { '/opt/natica/venv':
+    version  => '3.5',
+    owner    => 'devops',
+    group    => 'devops',
+    require  => [ User['devops'], ],
+  } ->
+  python::requirements  { '/sandbox/natica/requirements.txt':
+    virtualenv => '/opt/natica/venv',
+    owner    => 'devops',
+    group    => 'devops',
+    require  => [ User['devops'], ],
+  }
+
+
+  include mars::install
+  include mars::service
 }
 
 node db {
