@@ -48,14 +48,15 @@ mars_host: mars.vagrant.noao.edu
 #mars_host: mars1.sdm.noao.edu
 mars_port: 8000
 
-dataqversion: master
-marsversion: mars-31
-tadaversion: mars-31
+#!dataqversion: master
+#!tadaversion: mars-31
+#!marsversion: master
 
-#dataqversion: 2.6.2
-#marsversion: 1.12.0
-#tadaversion: 2.10.1
+dataqversion: 2.6.2
+tadaversion: 2.10.6
+#marsversion: 1.12.2
+marsversion: master
 
-djangoserver: /sandbox/mars/start-mars-development.sh
-#djangoserver: /sandbox/natica/dev-start.sh
+#djangoserver: /sandbox/mars/start-mars-development.sh
+djangoserver: /sandbox/natica/dev-start.sh
 

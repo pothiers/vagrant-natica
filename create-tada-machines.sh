@@ -5,6 +5,7 @@
 LOG=$HOME/create-tada-tt.$$.log
 here=`hostname`
 now=`date`
+echo "Writing log to: $LOG"
 echo "Creating VMs on $here at $now"  > $LOG
 pushd /home/pothiers/sandbox/vagrant-tada
 echo -e "\n###################################################################"
@@ -44,7 +45,9 @@ echo "   Test log written to: $LOG"
 echo "Done: " `date`
 emins=$(((`date +'%s'` - tic)/60))
 echo "See attachment for log of smoke.all.sh" | mail -n -a $LOG -s "Vagrant VMs created on $here. Smoke run. ($emins minutes total)" pothier@email.noao.edu
-# cat $LOG
 
+
+echo "TOTAL SCORE:"
+grep "Multi-test score" $LOG
 
 
