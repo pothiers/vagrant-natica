@@ -20,7 +20,6 @@ dqcli_logging_conf: 'puppet:///modules/dmo-hiera/dqcli-logging.yaml'
 
 localdjango: 'puppet:///modules/dmo-hiera/django_settings_local_pat.py'
 #localdjango: 'puppet:///modules/dmo-hiera/django_settings_local_dev.py'
-fpacktgz: 'puppet:///modules/tada/fpack-bin-centos-6.6.tgz'
 irodstgz: 'puppet:///modules/tada/irods-3.3.1.tgz'
 rsyncdconf: 'puppet:///modules/dmo-hiera/rsyncd.conf'
 rsyncdscr: 'puppet:///modules/dmo-hiera/rsyncd.scr'
@@ -42,21 +41,26 @@ tcp_accept_channel:
 
 nginx_conf: 'puppet:///modules/dmo-hiera/nginx.conf'
 smoke_conf: 'puppet:///modules/dmo-hiera/smoke-config.dev.sh'
-mars_vhost: www.mars.noao.edu
 
 mars_host: mars.vagrant.noao.edu
 #mars_host: mars1.sdm.noao.edu
 mars_port: 8000
 
-#!dataqversion: master
-#!tadaversion: mars-31
-#!marsversion: master
 
-dataqversion: 2.6.2
+#dataqversion: 2.6.2
+dataqversion: master
 tadaversion: 2.10.6
 #marsversion: 1.12.2
 marsversion: master
+djangoserver: /sandbox/marsnat/start-mars-development.sh
 
-#djangoserver: /sandbox/mars/start-mars-development.sh
-djangoserver: /sandbox/natica/dev-start.sh
+####################
+# NATICA
+natica_local_settings: 'puppet:///modules/dmo-hiera/natica_local_settings_dev.py'
+localnatica: 'puppet:///modules/dmo-hiera/django_settings_local_natica.py'
+
+natica_host: marsnat.vagrant.noao.edu
+tadanatversion: master
+marsnatversion: master
+
 

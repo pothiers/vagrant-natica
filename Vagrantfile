@@ -20,7 +20,6 @@ Vagrant.configure("2") do |config|
 
   config.ssh.forward_agent = true
   #!config.ssh.forward_x11 = true
-
   #! config.vm.provision "shell",
   #!   inline: "yum upgrade -y puppet" #! Remove for production!!!
 
@@ -34,6 +33,8 @@ Vagrant.configure("2") do |config|
   #!config.vm.box_url = 'https://atlas.hashicorp.com/puppetlabs/boxes/centos-6.6-64-puppet'
   config.vm.box     = 'vStone/centos-6.x-puppet.3.x'
   config.vm.box_url = 'https://atlas.hashicorp.com/vStone/boxes/centos-6.x-puppet.3.x'
+config.vm.box = "vStone/centos-6.x-puppet.3.x"
+
   
   # Attempt to speed up connection to remote hosts
   # (e.g. connection to MARS services)
@@ -48,24 +49,13 @@ Vagrant.configure("2") do |config|
   end    
   
 
-  config.vm.define "mountain" do |mountain|
+  ##############################################################################
+  ### LSA System
+
+  config.vm.define "mountain" do |mountain| #LSA
     mountain.vm.network :private_network, ip: "172.16.1.11"
     mountain.vm.hostname = "mountain.vagrant.noao.edu" 
     mountain.hostmanager.aliases =  %w(mountain)
-
-    # COMMENT OUT TO SPEED VM CREATION (if small disk is good enough)
-    # disk to use for cache
-    #! mountain.vm.provider "virtualbox" do | v |
-    #!   v.customize ['createhd', '--filename', mountain_disk,
-    #!                '--size', 200 * 1024]
-    #!   # list all controllers: "VBoxManage  list vms --long"
-    #!   v.customize ['storageattach', :id, '--storagectl', 'IDE Controller',
-    #!                '--port', 1, '--device', 0, '--type', 'hdd',
-    #!                '--medium', mountain_disk]
-    #! end
-    #! mountain.vm.provision "shell", path: "disk2.sh"
-
-    
     mountain.vm.provision :puppet do |puppet|
       puppet.manifests_path = "manifests"
       puppet.manifest_file = "site.pp"
@@ -86,25 +76,10 @@ Vagrant.configure("2") do |config|
     end
   end
 
-  config.vm.define "valley" do |valley|
+  config.vm.define "valley" do |valley| #LSA
     valley.vm.network :private_network, ip: "172.16.1.12"
     valley.vm.hostname = "valley.vagrant.noao.edu"
     valley.hostmanager.aliases =  %w(valley)
-
-    # COMMENT OUT TO SPEED VM CREATION
-    # disk to use for cache
-    #!valley.vm.provider "virtualbox" do | v |
-    #!  v.customize ['createhd', '--filename', valley_disk,
-    #!               '--size', 200 * 1024,  # megabytes
-    #!              ]
-    #!  # list all controllers: "VBoxManage  list vms --long"
-    #!  v.customize ['storageattach', :id, '--storagectl', 'IDE Controller',
-    #!               '--port', 1, '--device', 0, '--type', 'hdd',
-    #!               '--medium', valley_disk]
-    #!end
-    #!valley.vm.provision "shell", path: "disk2.sh"
-
-      
     valley.vm.provision :puppet do |puppet|
       puppet.manifests_path = "manifests"
       puppet.manifest_file = "site.pp" 
@@ -134,7 +109,7 @@ Vagrant.configure("2") do |config|
     
   end
 
-  config.vm.define "mars" do |mars|
+  config.vm.define "mars" do |mars| #LSA
     mars.vm.network :private_network, ip: "172.16.1.13"
     mars.vm.network :forwarded_port, guest: 8000, host: 8000
     mars.vm.network :forwarded_port, guest: 8001, host: 8001
@@ -159,15 +134,86 @@ Vagrant.configure("2") do |config|
     end
   end
 
+  ##############################################################################
+  ### NATICA System
 
-  config.vm.define "db" do |db|
-    db.vm.network :private_network, ip: "172.16.1.14"
-    db.vm.network :forwarded_port, guest: 8010, host: 8010
-    db.vm.network :forwarded_port, guest: 8011, host: 8011
-    db.vm.hostname = "db.vagrant.noao.edu" 
-    db.hostmanager.aliases =  %w(db)
+  config.vm.define "mtnnat" do |mtnnat| #natica
+    mtnnat.vm.network :private_network, ip: "172.16.1.21"
+    mtnnat.vm.hostname = "mtnnat.vagrant.noao.edu" 
+    mtnnat.hostmanager.aliases =  %w(mtnnat)
+    # COMMENT OUT TO SPEED VM CREATION (if small disk is good enough)
+    # disk to use for cache
+    #! mtnnat.vm.provider "virtualbox" do | v |
+    #!   v.customize ['createhd', '--filename', mtnnat_disk,
+    #!                '--size', 200 * 1024]
+    #!   # list all controllers: "VBoxManage  list vms --long"
+    #!   v.customize ['storageattach', :id, '--storagectl', 'IDE Controller',
+    #!                '--port', 1, '--device', 0, '--type', 'hdd',
+    #!                '--medium', mtnnat_disk]
+    #! end
+    #! mtnnat.vm.provision "shell", path: "disk2.sh"
     
-    db.vm.provision :puppet do |puppet|
+    mtnnat.vm.provision :puppet do |puppet|
+      puppet.manifests_path = "manifests"
+      puppet.manifest_file = "site.pp"
+      puppet.module_path = ["modules", "../puppet-modules"]
+      puppet.environment_path = "environments"
+      puppet.environment = "dev"
+      puppet.options = [
+       '--verbose',
+       '--report',
+       '--show_diff',
+       '--pluginsync',
+       '--hiera_config /vagrant/hiera.yaml',
+       #!'--debug', #+++ #! Remove for production!!!
+       #'--graph',
+       #'--graphdir /vagrant/graphs/mtnnat',
+      ]
+    end
+  end
+
+  config.vm.define "valnat" do |valnat| #natica
+    valnat.vm.network :private_network, ip: "172.16.1.22"
+    valnat.vm.hostname = "valnat.vagrant.noao.edu"
+    valnat.hostmanager.aliases =  %w(valnat)
+    valnat.vm.provision :puppet do |puppet|
+      puppet.manifests_path = "manifests"
+      puppet.manifest_file = "site.pp" 
+      puppet.module_path = ["modules", "../puppet-modules"]
+      puppet.environment_path = "environments"
+      #!puppet.environment = "pat"
+      puppet.environment = "dev"
+      puppet.options = [
+       '--verbose',
+       '--report',
+       '--show_diff',
+       '--pluginsync',
+       '--hiera_config /vagrant/hiera.yaml',
+       #!'--debug', #+++
+       #!'--graph',
+       #!'--graphdir /vagrant/graphs/valnat',
+      ]
+    end
+
+    valnat.vm.provision "shell" do |s|
+      ssh_pub_key = File.readlines("#{Dir.home}/.ssh/id_rsa.pub").first.strip
+      s.inline = <<-SHELL
+        echo #{ssh_pub_key} >> /home/tester/.ssh/authorized_keys
+        echo #{ssh_pub_key} >> /home/vagrant/.ssh/authorized_keys
+      SHELL
+    end
+    
+  end
+
+  
+  config.vm.define "marsnat" do |marsnat| # new mars containing natica
+    marsnat.vm.network :private_network, ip: "172.16.1.23"
+    marsnat.vm.network :forwarded_port, guest: 8000, host: 8020
+    marsnat.vm.network :forwarded_port, guest: 8001, host: 8021
+    marsnat.vm.hostname = "marsnat.vagrant.noao.edu" 
+    marsnat.hostmanager.aliases =  %w(marsnat)
+    
+    marsnat.vm.provision :puppet do |puppet|
       puppet.manifests_path = "manifests"
       puppet.manifest_file = "site.pp"
       puppet.module_path = ["modules", "../puppet-modules"]
@@ -180,14 +226,44 @@ Vagrant.configure("2") do |config|
         '--show_diff',
         '--pluginsync',
         '--hiera_config /vagrant/hiera.yaml',
-        '--graph',
-        '--graphdir /vagrant/graphs/db',
+      ]
+    end
+  end
 
+  # For use with natica
+  config.vm.define "dbnat" do |dbnat| #natica
+    dbnat.vm.network :private_network, ip: "172.16.1.24"
+    dbnat.vm.network :forwarded_port, guest: 8010, host: 8010
+    dbnat.vm.hostname = "dbnat.vagrant.noao.edu" 
+    dbnat.hostmanager.aliases =  %w(dbnat)
+    
+    dbnat.vm.provision :puppet do |puppet|
+      puppet.manifests_path = "manifests"
+      puppet.manifest_file = "site.pp"
+      puppet.module_path = ["modules", "../puppet-modules"]
+      puppet.environment_path = "environments"
+      puppet.environment = "dev"
+      puppet.options = [
+        #!'--debug', #+++
+        '--verbose',
+        '--report',
+        '--show_diff',
+        '--pluginsync',
+        '--hiera_config /vagrant/hiera.yaml',
+        #!'--graph',
+        #!'--graphdir /vagrant/graphs/dbnat',
       ]
     end
   end
   
-  config.vm.define "archive" do |archive|
+  ###
+  ### END NATICA system
+  ##############################################################################
+
+  ##############################################################################
+  ### Prototype
+  
+  config.vm.define "archive" do |archive| # use with NATICA prototype only
     archive.vm.network :private_network, ip: "172.16.1.15"
     # inside vagrant is GUEST, from the host running vagrant its HOST
     archive.vm.network :forwarded_port, guest: 8000, host: 8080 
@@ -202,40 +278,11 @@ Vagrant.configure("2") do |config|
       puppet.environment_path = "environments"
       #!puppet.environment = "pat"
       puppet.environment = "dev"
-      puppet.options = [
-        #!'--debug', #+++
-        '--verbose',
-        '--report',
-        '--show_diff',
-        '--pluginsync',
-        '--hiera_config /vagrant/hiera.yaml',
-      ]
+      puppet.options = ['--verbose', '--report', '--show_diff', '--pluginsync',
+        '--hiera_config /vagrant/hiera.yaml', ]
     end
   end
 
-#!  config.vm.define "marsdeploy" do |mars|
-#!    mars.vm.network :private_network, ip: "172.16.1.14"
-#!    mars.vm.network :forwarded_port, guest: 8080, host: 8080
-#!    mars.vm.hostname = "marsdeploy.vagrant.noao.edu" 
-#!    mars.hostmanager.aliases =  %w(mars)
-#!    
-#!    mars.vm.provision :puppet do |puppet|
-#!      puppet.manifests_path = "manifests"
-#!      puppet.manifest_file = "site.pp"
-#!      puppet.module_path = ["modules", "../puppet-modules"]
-#!      puppet.environment_path = "environments"
-#!      #!puppet.environment = "pat"
-#!      puppet.environment = "dev"
-#!      puppet.options = [
-#!        #!'--debug', #+++
-#!        '--verbose',
-#!        '--report',
-#!        '--show_diff',
-#!        '--pluginsync',
-#!        '--hiera_config /vagrant/hiera.yaml',
-#!      ]
-#!    end
-#!  end
   
 end
 
