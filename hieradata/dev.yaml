@@ -52,12 +52,13 @@ dataqversion: master
 tadaversion: 2.10.6
 #marsversion: 1.12.2
 marsversion: master
-djangoserver: /sandbox/marsnat/start-mars-development.sh
+#djangoserver: /sandbox/mars/start-mars-development.sh
 
 ####################
 # NATICA
 natica_local_settings: 'puppet:///modules/dmo-hiera/natica_local_settings_dev.py'
 localnatica: 'puppet:///modules/dmo-hiera/django_settings_local_natica.py'
+djangoserver: /sandbox/marsnat/start-mars-development.sh
 
 natica_host: marsnat.vagrant.noao.edu
 tadanatversion: master
