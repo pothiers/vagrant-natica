@@ -94,6 +94,8 @@ node mars {
   include mars::install
   include mars::service
   #include mars
+
+  # sudo chown vagrant /etc/mars/rsync.pwd
 }
 
 ###

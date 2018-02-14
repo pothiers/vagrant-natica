@@ -47,20 +47,20 @@ mars_host: mars.vagrant.noao.edu
 mars_port: 8000
 
 
-#dataqversion: 2.6.2
 dataqversion: master
-tadaversion: 2.10.6
-#marsversion: 1.12.2
+tadaversion: master
 marsversion: master
 #djangoserver: /sandbox/mars/start-mars-development.sh
 
 ####################
 # NATICA
-natica_local_settings: 'puppet:///modules/dmo-hiera/natica_local_settings_dev.py'
+#natica_local_settings:'puppet:///modules/dmo-hiera/natica_local_settings_dev.py'
 localnatica: 'puppet:///modules/dmo-hiera/django_settings_local_natica.py'
 djangoserver: /sandbox/marsnat/start-mars-development.sh
 
+natica_timeout: 2 # arch_timeout: 11
 natica_host: marsnat.vagrant.noao.edu
+natica_port: 8000
 tadanatversion: master
 marsnatversion: master
 
