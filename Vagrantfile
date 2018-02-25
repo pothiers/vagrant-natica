@@ -158,6 +158,7 @@ config.vm.box = "vStone/centos-6.x-puppet.3.x"
       puppet.manifest_file = "site.pp"
       puppet.module_path = ["modules", "../puppet-modules"]
       puppet.environment_path = "environments"
+      #!puppet.environment = "pat"
       puppet.environment = "dev"
       puppet.options = [
        '--verbose',
@@ -218,6 +219,7 @@ config.vm.box = "vStone/centos-6.x-puppet.3.x"
       puppet.manifest_file = "site.pp"
       puppet.module_path = ["modules", "../puppet-modules"]
       puppet.environment_path = "environments"
+      #!puppet.environment = "pat"
       puppet.environment = "dev"
       puppet.options = [
         #!'--debug', #+++
@@ -242,6 +244,7 @@ config.vm.box = "vStone/centos-6.x-puppet.3.x"
       puppet.manifest_file = "site.pp"
       puppet.module_path = ["modules", "../puppet-modules"]
       puppet.environment_path = "environments"
+      #!puppet.environment = "pat"
       puppet.environment = "dev"
       puppet.options = [
         #!'--debug', #+++
