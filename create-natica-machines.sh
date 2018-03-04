@@ -16,6 +16,7 @@ echo "Starting: $sdate"
 tic=`date +'%s'`
 vagrant destroy -f mtnnat valnat dbnat marsnat
 time vagrant up mtnnat valnat dbnat marsnat
+# TIME for dbnat+marsnat creation = ?
 
 # For workflow: Edit(manifest);Provision, use:
 #! vagrant provision mtnnat --provision-with puppet

@@ -112,7 +112,8 @@ node marsnat {
   include marsnat::install
   include marsnat::service
   exec { 'patch-for-testing':
-    command => 'chown vagrant /etc/mars/rsync.pwd'
+    command => '/bin/chown vagrant /etc/mars/rsync.pwd',
+    user    => 'root'
   }
 }
 
