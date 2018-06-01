@@ -28,12 +28,19 @@ Vagrant.configure("2") do |config|
   config.vm.synced_folder "../../logs", "/logs"
   config.vm.synced_folder "../../data", "/data"
   # WARNING: DMO is using puppet version 3.8.6  (not version 4.*)
-  # Uses Puppet version 4.3.2
-  #!config.vm.box     = 'puppetlabs/centos-6.6-64-puppet'
-  #!config.vm.box_url = 'https://atlas.hashicorp.com/puppetlabs/boxes/centos-6.6-64-puppet'
-  config.vm.box     = 'vStone/centos-6.x-puppet.3.x'
-  config.vm.box_url = 'https://atlas.hashicorp.com/vStone/boxes/centos-6.x-puppet.3.x'
-config.vm.box = "vStone/centos-6.x-puppet.3.x"
+  #! config.vm.box     = 'vStone/centos-6.x-puppet.3.x'
+  #! config.vm.box_url = 'https://atlas.hashicorp.com/vStone/boxes/centos-6.x-puppet.3.x'
+  #config.vm.box = "vStone/centos-6.x-puppet.3.x"
+
+  ##  Looks like this is a caching error: Vagrant stores in a file where it
+  ##  downloaded the box from.  So find all
+  ##  $VAGRANT_HOME/boxes/[box-slug]/metadata_url files and replace
+  ##  atlas.hashicorp.com with vagrantcloud.com. After that box updates
+  ##  should work fine again.
+  Vagrant::DEFAULT_SERVER_URL.replace('https://vagrantcloud.com')
+
+  # DMO demo machines: Puppet-3.7.5, OS=SL-7.4
+  config.vm.box = "vStone/centos-7.x-puppet.3.x" # atlas is GONE
 
   
   # Attempt to speed up connection to remote hosts
@@ -166,6 +173,7 @@ config.vm.box = "vStone/centos-6.x-puppet.3.x"
        '--show_diff',
        '--pluginsync',
        '--hiera_config /vagrant/hiera.yaml',
+       #'--parser future',  # breaks some 3.x features
        #!'--debug', #+++ #! Remove for production!!!
        #'--graph',
        #'--graphdir /vagrant/graphs/mtnnat',
