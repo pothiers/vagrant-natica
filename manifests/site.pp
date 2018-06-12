@@ -111,10 +111,10 @@ node marsnat {
   #!include 'marsnat'   #!!! NOT WORKING
   include marsnat::install
   include marsnat::service
-  exec { 'patch-for-testing':
-    command => '/bin/chown vagrant /etc/mars/rsync.pwd',
-    user    => 'root'
-  }
+#!  exec { 'patch-for-testing':
+#!    command => '/bin/chown vagrant /etc/mars/rsync.pwd',
+#!    user    => 'root'
+#!  }
 }
 
 node dbnat {
