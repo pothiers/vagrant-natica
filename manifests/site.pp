@@ -106,25 +106,18 @@ node mars {
 ##############################################################################
 ### NATICA System
 
-node marsnat {
-  notice("Loading site.pp::marsnat 3")
-  #!include 'marsnat'   #!!! NOT WORKING
-  include marsnat::install
-  include marsnat::service
-#!  exec { 'patch-for-testing':
-#!    command => '/bin/chown vagrant /etc/mars/rsync.pwd',
-#!    user    => 'root'
-#!  }
-}
-
 node dbnat {
   notice("Loading site.pp::dbnat")
   include naticadb
-}
-
+} 
+node marsnat {
+  notice("Loading site.pp::marsnat 3")
+  include marsnat::install
+  include marsnat::service
+} 
 node mtnnat {
   include tadanat
-}
+} 
 node valnat {
   include tadanat
 }

@@ -64,5 +64,8 @@ natica_port: 8000
 tadanatversion: master
 marsnatversion: clean-thread
 archive_topdir: '/data/natica-archive'
-
-
+patch_dbnat: 'puppet:///modules/dmo-hiera/patch-dbnat.sh'
+patch_marsnat: 'puppet:///modules/dmo-hiera/patch-marsnat.sh'
+patch_tadanat: 'puppet:///modules/dmo-hiera/patch-tadanat.sh'
+marsnat_pubkey: 'puppet:///modules/dmo-hiera/spdev1.id_dsa.pub'
+marsnat_privkey: 'puppet:///modules/dmo-hiera/spdev1.id_dsa'
