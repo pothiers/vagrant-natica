@@ -40,8 +40,10 @@ Vagrant.configure("2") do |config|
   Vagrant::DEFAULT_SERVER_URL.replace('https://vagrantcloud.com')
 
   # DMO demo machines: Puppet-3.7.5, OS=SL-7.4
+  # DMO dev.dm machines: Puppet-5.5.1, OS=SL-7.5
   config.vm.box = "vStone/centos-7.x-puppet.3.x" # atlas is GONE
-
+  #!config.vm.box = "gutocarvalho/scientific7x64puppet5"
+  #!config.vm.box_version = "1.0.0"
   
   # Attempt to speed up connection to remote hosts
   # (e.g. connection to MARS services)
