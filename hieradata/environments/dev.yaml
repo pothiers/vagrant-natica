@@ -1,0 +1,73 @@
+---
+# original defaults
+inotify_instances: 128
+inotify_watches: 8192
+
+arch_host: nsaserver.pat.sdm.noao.edu
+arch_port: 9000
+arch_timeout: 11
+arch_irods_host: db.pat.sdm.noao.edu
+arch_irods_port: 1247
+arch_irods_resource: tadaResc
+archive_irods331: /noao-tuc-z1/tada/ 
+irodsdata: 'puppet:///modules/dmo_hiera/iinit.in'
+irodsenv: 'puppet:///modules/dmo_hiera/irodsEnv.dev'
+
+tada_conf: 'puppet:///modules/dmo_hiera/tada-config.yaml'
+tada_logging_conf: 'puppet:///modules/dmo_hiera/tada-logging.yaml'
+watch_logging_conf: 'puppet:///modules/dmo_hiera/watch-logging.yaml'
+dqcli_logging_conf: 'puppet:///modules/dmo_hiera/dqcli-logging.yaml'
+
+localdjango: 'puppet:///modules/dmo_hiera/django_settings_local_pat.py'
+#localdjango: 'puppet:///modules/dmo_hiera/django_settings_local_dev.py'
+irodstgz: 'puppet:///modules/tada/irods-3.3.1.tgz'
+rsyncdconf: 'puppet:///modules/dmo_hiera/rsyncd.conf'
+rsyncdscr: 'puppet:///modules/dmo_hiera/rsyncd.scr'
+rsyncpwd: 'puppet:///modules/dmo_hiera/rsync.pwd'
+udp_recv_channel:
+  - port : 8649
+    bind : localhost
+  - port : 8649
+    bind : 0.0.0.0
+udp_send_channel:
+  - port : 8649
+    host : sdmvc.tuc.noao.edu
+    ttl  : 2
+  - port : 8649
+    host : sdmvm1.tuc.noao.edu
+    ttl  : 2
+tcp_accept_channel:
+  - port : 8649
+
+nginx_conf: 'puppet:///modules/dmo_hiera/nginx.conf'
+smoke_conf: 'puppet:///modules/dmo_hiera/smoke-config.dev.sh'
+
+mars_host: mars.vagrant.noao.edu
+#mars_host: mars1.sdm.noao.edu
+mars_port: 8000
+
+
+dataqversion: master
+tadaversion: master
+marsversion: master
+#djangoserver: /sandbox/mars/start-mars-development.sh
+
+####################
+# NATICA
+#natica_local_settings:'puppet:///modules/dmo_hiera/natica_local_settings_dev.py'
+localnatica: 'puppet:///modules/dmo_hiera/django_settings_local_natica.py'
+djangoserver: /sandbox/marsnat/start-mars-development.sh
+
+natica_timeout: 2 # arch_timeout: 11
+natica_host: marsnat.vagrant.noao.edu
+natica_port: 8000
+tadanatversion: master
+marsnatversion: clean-thread
+archive_topdir: '/data/natica-archive'
+patch_dbnat: 'puppet:///modules/dmo_hiera/patch-dbnat.sh'
+patch_marsnat: 'puppet:///modules/dmo_hiera/patch-marsnat.sh'
+#! patch_tadanat: 'puppet:///modules/dmo_hiera/patch-tadanat.sh'
+marsnat_pubkey: 'puppet:///modules/dmo_hiera/spdev1.id_dsa.pub'
+marsnat_privkey: 'puppet:///modules/dmo_hiera/spdev1.id_dsa'
+test_val_host: valnat.vagrant.noao.edu
+test_mtn_host: mtnnat.vagrant.noao.edu
