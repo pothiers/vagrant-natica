@@ -1,1 +1,0 @@
-localdjango:  'puppet:///modules/dmo-hiera/django_settings_local_natica.py'
