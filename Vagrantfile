@@ -73,18 +73,6 @@ Vagrant.configure("2") do |config|
     mtnnat.vm.network :private_network, ip: "172.16.1.21"
     mtnnat.vm.hostname = "mtnnat.vagrant.noao.edu" 
     mtnnat.hostmanager.aliases =  %w(mtnnat)
-    # COMMENT OUT TO SPEED VM CREATION (if small disk is good enough)
-    # disk to use for cache
-    #! mtnnat.vm.provider "virtualbox" do | v |
-    #!   v.customize ['createhd', '--filename', mtnnat_disk,
-    #!                '--size', 200 * 1024]
-    #!   # list all controllers: "VBoxManage  list vms --long"
-    #!   v.customize ['storageattach', :id, '--storagectl', 'IDE Controller',
-    #!                '--port', 1, '--device', 0, '--type', 'hdd',
-    #!                '--medium', mtnnat_disk]
-    #! end
-    #! mtnnat.vm.provision "shell", path: "disk2.sh"
-    
     mtnnat.vm.provision :puppet do |puppet|
       puppet.manifests_path = "manifests"
       puppet.manifest_file = "site.pp"
@@ -96,12 +84,20 @@ Vagrant.configure("2") do |config|
        '--verbose',
        '--report',
        '--show_diff',
-       #!'--hiera_config /vagrant/hiera.yaml',
        #'--debug',
        #'--graph',
        #'--graphdir /vagrant/graphs/mtnnat',
       ]
     end
+
+    mtnnat.vm.provision "shell" do |s|
+      ssh_pub_key = File.readlines("#{Dir.home}/.ssh/id_rsa.pub").first.strip
+      s.inline = <<-SHELL
+        echo #{ssh_pub_key} >> /home/tester/.ssh/authorized_keys
+        echo #{ssh_pub_key} >> /home/vagrant/.ssh/authorized_keys
+      SHELL
+    end
+
   end
 
   config.vm.define "valnat" do |valnat| #natica
@@ -111,14 +107,14 @@ Vagrant.configure("2") do |config|
     valnat.vm.provision :puppet do |puppet|
       puppet.manifests_path = "manifests"
       puppet.manifest_file = "site.pp" 
-      puppet.module_path = ["modules", "../puppet-modules"]
+      puppet.module_path = ["../puppet-modules", "modules"]
+      puppet.environment = PUPPETENV
       puppet.environment_path = "environments"
-      puppet.environment = "dev"
+      puppet.hiera_config_path = "hiera.yaml"
       puppet.options = [
        '--verbose',
        '--report',
        '--show_diff',
-       '--hiera_config /vagrant/hiera.yaml',
       ]
     end
 
@@ -143,14 +139,15 @@ Vagrant.configure("2") do |config|
     marsnat.vm.provision :puppet do |puppet|
       puppet.manifests_path = "manifests"
       puppet.manifest_file = "site.pp"
-      puppet.module_path = ["modules", "../puppet-modules"]
+      puppet.module_path = ["../puppet-modules", "modules"]
+      puppet.environment = PUPPETENV
       puppet.environment_path = "environments"
-      puppet.environment = "dev"
+      puppet.hiera_config_path = "hiera.yaml"
       puppet.options = [
+        #! '--debug',
         '--verbose',
         '--report',
         '--show_diff',
-        '--hiera_config /vagrant/hiera.yaml',
       ]
     end
   end
@@ -165,14 +162,14 @@ Vagrant.configure("2") do |config|
     dbnat.vm.provision :puppet do |puppet|
       puppet.manifests_path = "manifests"
       puppet.manifest_file = "site.pp"
-      puppet.module_path = ["modules", "../puppet-modules"]
+      puppet.module_path = ["../puppet-modules", "modules"]
+      puppet.environment = PUPPETENV
       puppet.environment_path = "environments"
-      puppet.environment = "dev"
+      puppet.hiera_config_path = "hiera.yaml"
       puppet.options = [
         '--verbose',
         '--report',
         '--show_diff',
-        '--hiera_config /vagrant/hiera.yaml',
         #!'--graph',
         #!'--graphdir /vagrant/graphs/dbnat',
       ]

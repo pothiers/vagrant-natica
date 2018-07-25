@@ -59,11 +59,13 @@ localnatica: 'puppet:///modules/dmo_hiera/django_settings_local_natica.py'
 djangoserver: /sandbox/marsnat/start-mars-development.sh
 
 natica_timeout: 2 # arch_timeout: 11
+
 natica_host: marsnat.vagrant.noao.edu
 natica_port: 8000
 tadanatversion: master
 marsnatversion: clean-thread
-archive_topdir: '/data/natica-archive'
+hdrfunclibversion: master
+archive_topdir: '/sandbox/natica-archive'
 patch_dbnat: 'puppet:///modules/dmo_hiera/patch-dbnat.sh'
 patch_marsnat: 'puppet:///modules/dmo_hiera/patch-marsnat.sh'
 #! patch_tadanat: 'puppet:///modules/dmo_hiera/patch-tadanat.sh'

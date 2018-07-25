@@ -1,21 +1,81 @@
 {
-  "name": "thomasvandoren-redis",
-  "version": "0.10.0",
-  "author": "Thomas Van Doren",
-  "summary": "Install and configure redis.",
-  "license": "BSD",
-  "source": "git://github.com/thomasvandoren/puppet-redis.git",
-  "project_page": "https://github.com/thomasvandoren/puppet-redis",
-  "issues_url": "https://github.com/thomasvandoren/puppet-redis/issues",
-  "description": "Install and configure redis.",
+  "name": "arioch-redis",
+  "version": "3.3.0",
+  "author": "Tom De Vylder",
+  "summary": "Redis module",
+  "license": "Apache-2.0",
+  "source": "https://github.com/arioch/puppet-redis",
+  "project_page": "http://arioch.github.io/puppet-redis/",
+  "issues_url": "https://github.com/arioch/puppet-redis/issues",
   "dependencies": [
     {
-      "name": "maestrodev/wget",
-      "version_requirement": ">= 1.1.0"
+    "name":"puppetlabs/apt",
+    "version_requirement":">= 2.3.0 <5.0.0"
+  }
+  ,
+    {
+    "name":"puppetlabs/stdlib",
+    "version_requirement":">= 1.0.2 <5.0.0"
+  }
+  ,
+    {
+    "name":"stahnma/epel",
+    "version_requirement":">= 1.2.2 <2.0.0"
+  }
+  ,
+    {
+    "name":"herculesteam/augeasproviders_sysctl",
+    "version_requirement":">=2.1.0 < 3.0.0"
+  }
+  ,
+    {
+    "name":"herculesteam/augeasproviders_core",
+    "version_requirement":">=2.1.0 < 3.0.0"
+  }
+  
+  ]
+  ,
+  "data_provider": null,
+  "description": "Redis module with cluster support",
+  "tags": [
+    "cluster",
+    "failover",
+    "loadbalancing",
+    "redis",
+    "sentinel"
+  ]
+  ,
+  "operatingsystem_support": [
+    {
+      "operatingsystem":"Debian",
+      "operatingsystemrelease":[
+        "8"
+      ]
     },
     {
-      "name": "puppetlabs/gcc",
-      "version_requirement": ">= 0.0.3"
+      "operatingsystem":"Ubuntu",
+      "operatingsystemrelease":[
+        "14.04",
+        "16.04"
+      ]
+    },
+    {
+      "operatingsystem":"RedHat",
+      "operatingsystemrelease":[
+        "6",
+        "7"
+      ]
+    },
+    {
+      "operatingsystem":"CentOS",
+      "operatingsystemrelease":[
+        "6",
+        "7"
+      ]
+    },
+    {
+      "operatingsystem":"Archlinux"
     }
   ]
+
 }

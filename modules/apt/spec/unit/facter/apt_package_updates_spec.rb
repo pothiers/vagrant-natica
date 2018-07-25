@@ -8,7 +8,7 @@ describe 'apt_package_updates fact' do
     before { 
       Facter.fact(:apt_has_updates).stubs(:value).returns false
     }
-    it { should be nil }
+    it { is_expected.to be nil }
   end
 
   describe 'when apt has updates' do
@@ -16,15 +16,18 @@ describe 'apt_package_updates fact' do
       Facter.fact(:osfamily).stubs(:value).returns 'Debian'
       File.stubs(:executable?) # Stub all other calls
       Facter::Util::Resolution.stubs(:exec) # Catch all other calls
-      File.expects(:executable?).with('/usr/lib/update-notifier/apt-check').returns true
-      Facter::Util::Resolution.expects(:exec).with('/usr/lib/update-notifier/apt-check 2>&1').returns "1;2"
-      Facter::Util::Resolution.expects(:exec).with('/usr/lib/update-notifier/apt-check -p 2>&1').returns "puppet-common\nlinux-generic\nlinux-image-generic"
+      File.expects(:executable?).with('/usr/bin/apt-get').returns true
+      Facter::Util::Resolution.expects(:exec).with('/usr/bin/apt-get -s upgrade 2>&1').returns ""+
+        "Inst tzdata [2015f-0+deb8u1] (2015g-0+deb8u1 Debian:stable-updates [all])\n"+
+        "Conf tzdata (2015g-0+deb8u1 Debian:stable-updates [all])\n"+
+        "Inst unhide.rb [13-1.1] (22-2~bpo8+1 Debian Backports:jessie-backports [all])\n"+
+        "Conf unhide.rb (22-2~bpo8+1 Debian Backports:jessie-backports [all])\n"
     }
     it {
       if Facter.version < '2.0.0'
-        should == 'puppet-common,linux-generic,linux-image-generic'
+        is_expected.to eq('tzdata,unhide.rb')
       else
-        should == ['puppet-common', 'linux-generic', 'linux-image-generic']
+        is_expected.to eq(['tzdata','unhide.rb'])
       end
     }
   end

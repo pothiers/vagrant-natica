@@ -7,7 +7,7 @@ pp2
 tt
 uu
 *.vdi
-
+OBSOLETE*/
 
 .bundle
 Gemfile.lock

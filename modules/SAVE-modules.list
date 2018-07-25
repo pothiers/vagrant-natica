@@ -1,0 +1,19 @@
+# NOT INSTALLED in NEW modules dir
+../SAVE-modules/apache/
+../SAVE-modules/concat/
+../SAVE-modules/cpan/
+../SAVE-modules/firewall/
+../SAVE-modules/ganglia/
+../SAVE-modules/gcc/
+../SAVE-modules/irods/
+../SAVE-modules/noao-tada/
+../SAVE-modules/profile/
+../SAVE-modules/redis/  'thomasvandoren/redis','0.10.0'
+../SAVE-modules/role/
+../SAVE-modules/rsync/
+../SAVE-modules/wget/
+../SAVE-modules/xinetd/
+
+../SAVE-modules/vcsrepo/  1.3.0 => 2.3.0
+../SAVE-modules/python/ 'puppet-python', '2.0.0' => 2.1.0
+apt 1.8.0 => 2.4.0

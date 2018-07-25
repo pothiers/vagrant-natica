@@ -1,0 +1,9 @@
+/home/pothiers/sandbox/vagrant-natica/modules
+├── puppetlabs-vcsrepo (v2.3.0)
+├─┬ puppet-python (v2.1.0)
+│ ├── puppetlabs-stdlib (v4.13.1)
+│ └── stahnma-epel (v1.3.0)
+├─┬ puppetlabs-docker (v1.0.4)
+│ └── puppetlabs-apt (v2.4.0)
+└─┬ puppetlabs-postgresql (v4.9.0)
+  └── puppetlabs-concat (v2.2.1)

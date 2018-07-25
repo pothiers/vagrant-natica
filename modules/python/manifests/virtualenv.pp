@@ -16,8 +16,12 @@
 # [*systempkgs*]
 #  Copy system site-packages into virtualenv. Default: don't
 #  If virtualenv version < 1.7 this flag has no effect since
+#
 # [*venv_dir*]
 #  Directory to install virtualenv to. Default: $name
+#
+# [*ensure_venv_dir*]
+# Create $venv_dir. Default: true
 #
 # [*distribute*]
 #  Include distribute in the virtualenv. Default: true
@@ -49,6 +53,9 @@
 # [*timeout*]
 #  The maximum time in seconds the "pip install" command should take. Default: 1800
 #
+# [*pip_args*]
+#  Arguments to pass to pip during initialization.  Default: blank
+#
 # [*extra_pip_args*]
 #  Extra arguments to pass to pip after requirements file.  Default: blank
 #
@@ -74,6 +81,7 @@ define python::virtualenv (
   $requirements     = false,
   $systempkgs       = false,
   $venv_dir         = $name,
+  $ensure_venv_dir  = true,
   $distribute       = true,
   $index            = false,
   $owner            = 'root',
@@ -84,16 +92,24 @@ define python::virtualenv (
   $path             = [ '/bin', '/usr/bin', '/usr/sbin', '/usr/local/bin' ],
   $cwd              = undef,
   $timeout          = 1800,
+  $pip_args         = '',
   $extra_pip_args   = '',
   $virtualenv       = undef
 ) {
   include ::python
+  $python_provider = getparam(Class['python'], 'provider')
+  $anaconda_path = getparam(Class['python'], 'anaconda_install_path')
 
   if $ensure == 'present' {
     $python = $version ? {
       'system' => 'python',
       'pypy'   => 'pypy',
       default  => "python${version}",
+    }
+
+    $_path = $python_provider ? {
+      'anaconda' => concat(["${anaconda_path}/bin"], $path),
+      default    => $path,
     }
 
     if $virtualenv == undef {
@@ -148,21 +164,25 @@ define python::virtualenv (
     # To check for this we test for wheel parameter using help and then using
     # version, this makes sure we only use wheels if they are supported
 
-    file { $venv_dir:
-      ensure => directory,
-      owner  => $owner,
-      group  => $group,
-      mode   => $mode
+    if $ensure_venv_dir {
+      file { $venv_dir:
+        ensure => directory,
+        owner  => $owner,
+        group  => $group,
+        mode   => $mode,
+      }
     }
 
     $virtualenv_cmd = "${python::exec_prefix}${used_virtualenv}"
-    $pip_cmd = "${python::exec_prefix}${venv_dir}/bin/pip"
+
+    $pip_cmd   = "${python::exec_prefix}${venv_dir}/bin/pip"
+    $pip_flags = "${pypi_index} ${proxy_flag} ${pip_args}"
 
     exec { "python_virtualenv_${venv_dir}":
-      command     => "true ${proxy_command} && ${virtualenv_cmd} ${system_pkgs_flag} -p ${python} ${venv_dir} && ${pip_cmd} wheel --help > /dev/null 2>&1 && { ${pip_cmd} wheel --version > /dev/null 2>&1 || wheel_support_flag='--no-use-wheel'; } ; { ${pip_cmd} --log ${venv_dir}/pip.log install ${pypi_index} ${proxy_flag} \$wheel_support_flag --upgrade pip ${distribute_pkg} || ${pip_cmd} --log ${venv_dir}/pip.log install ${pypi_index} ${proxy_flag}  --upgrade pip ${distribute_pkg} ;}",
+      command     => "true ${proxy_command} && ${virtualenv_cmd} ${system_pkgs_flag} -p ${python} ${venv_dir} && ${pip_cmd} --log ${venv_dir}/pip.log install ${pip_flags} --upgrade pip && ${pip_cmd} install ${pip_flags} --upgrade ${distribute_pkg}",
       user        => $owner,
       creates     => "${venv_dir}/bin/activate",
-      path        => $path,
+      path        => $_path,
       cwd         => '/tmp',
       environment => $environment,
       unless      => "grep '^[\\t ]*VIRTUAL_ENV=[\\\\'\\\"]*${venv_dir}[\\\"\\\\'][\\t ]*$' ${venv_dir}/bin/activate", #Unless activate exists and VIRTUAL_ENV is correct we re-create the virtualenv
@@ -171,13 +191,13 @@ define python::virtualenv (
 
     if $requirements {
       exec { "python_requirements_initial_install_${requirements}_${venv_dir}":
-        command     => "${pip_cmd} wheel --help > /dev/null 2>&1 && { ${pip_cmd} wheel --version > /dev/null 2>&1 || wheel_support_flag='--no-use-wheel'; } ; ${pip_cmd} --log ${venv_dir}/pip.log install ${pypi_index} ${proxy_flag} \$wheel_support_flag -r ${requirements} ${extra_pip_args}",
+        command     => "${pip_cmd} --log ${venv_dir}/pip.log install ${pypi_index} ${proxy_flag} --no-binary :all: -r ${requirements} ${extra_pip_args}",
         refreshonly => true,
         timeout     => $timeout,
         user        => $owner,
         subscribe   => Exec["python_virtualenv_${venv_dir}"],
         environment => $environment,
-        cwd         => $cwd
+        cwd         => $cwd,
       }
 
       python::requirements { "${requirements}_${venv_dir}":

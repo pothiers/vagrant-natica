@@ -7,7 +7,7 @@ Puppet::Type.newtype(:apt_key) do
     by apt to perform package validation. Apt has it's own GPG keyring that can
     be manipulated through the `apt-key` command.
 
-    apt_key { '4BD6EC30':
+    apt_key { '6F6B15509CF8E59E6E469F327F438280EF8D349F':
       source => 'http://apt.puppetlabs.com/pubkey.gpg'
     }
 
@@ -61,11 +61,11 @@ Puppet::Type.newtype(:apt_key) do
   newparam(:server) do
     desc 'The key server to fetch the key from based on the ID. It can either be a domain name or url.'
     defaultto :'keyserver.ubuntu.com'
-    
+
     newvalues(/\A((hkp|http|https):\/\/)?([a-z\d])([a-z\d-]{0,61}\.)+[a-z\d]+(:\d{2,5})?$/)
   end
 
-  newparam(:keyserver_options) do
+  newparam(:options) do
     desc 'Additional options to pass to apt-key\'s --keyserver-options.'
   end
 

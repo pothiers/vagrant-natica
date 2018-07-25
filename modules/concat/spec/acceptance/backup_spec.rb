@@ -26,14 +26,14 @@ describe 'concat backup parameter' do
 
     it 'applies the manifest twice with "Filebucketed" stdout and no stderr' do
       apply_manifest(pp, :catch_failures => true) do |r|
-        expect(r.stdout).to match(/Filebucketed #{basedir}\/file to puppet with sum 0140c31db86293a1a1e080ce9b91305f/) # sum is for file contents of 'old contents'
+        expect(r.stdout).to match(/Filebucketed #{basedir}\/file to puppet with sum 0140c31db86293a1a1e080ce9b91305f/)
       end
       apply_manifest(pp, :catch_changes => true)
     end
 
     describe file("#{basedir}/file") do
       it { should be_file }
-      it { should contain 'new contents' }
+      its(:content) { should match /new contents/ }
     end
   end
 
@@ -68,11 +68,11 @@ describe 'concat backup parameter' do
 
     describe file("#{basedir}/file") do
       it { should be_file }
-      it { should contain 'new contents' }
+      its(:content) { should match /new contents/ }
     end
     describe file("#{basedir}/file.backup") do
       it { should be_file }
-      it { should contain 'old contents' }
+      its(:content) { should match /old contents/ }
     end
   end
 
@@ -109,7 +109,7 @@ describe 'concat backup parameter' do
 
     describe file("#{basedir}/file") do
       it { should be_file }
-      it { should contain 'new contents' }
+      its(:content) { should match /new contents/ }
     end
   end
 end

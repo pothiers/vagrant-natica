@@ -1,115 +1,76 @@
 require 'spec_helper'
 
-describe 'redis::instance', :type => 'define' do
-  let(:title) { 'redis-instance' }
-
-  let :facts do
-    {
-      :osfamily  => 'RedHat'
-    }
-  end # let
-
-  context "On Debian systems with default parameters" do
-    it do
-      should contain_file('redis_port_6379.conf').with_content(/^port 6379$/)
-      should contain_file('redis_port_6379.conf').with_content(/^save 900 1$/)
-      should contain_file('redis_port_6379.conf').with_content(/^save 300 10$/)
-      should contain_file('redis_port_6379.conf').with_content(/^save 60 10000$/)
-    end # it
-  end # context
-
-  context "On Debian systems with no password parameter" do
-    let :params do
-      {
-        :redis_password => false
-      }
-    end # let
-
-    it do
-      should contain_file('redis_port_6379.conf').without_content(/^requirepass/)
-    end # it
-  end # context
-
-  context "On Debian systems with password parameter" do
-    let :params do
-      {
-        :redis_port     => '6900',
-        :redis_password => 'ThisIsAReallyBigSecret'
-      }
-    end # let
-
-    it do
-      should compile.with_all_deps
-
-      should contain_file('redis_port_6900.conf').with_content(/^requirepass ThisIsAReallyBigSecret/)
-      should contain_file('redis-init-6900').with_content(/^CLIEXEC="[\w\/]+redis-cli -h \$REDIS_BIND_ADDRESS -p \$REDIS_PORT -a ThisIsAReallyBigSecret/)
-    end # it
-  end # context
-
-  context "With a non-default port parameter" do
-    let :params do
-      {
-        :redis_port => '6900'
-      }
-    end # let
-
-    it do
-      should compile.with_all_deps
-
-      should contain_file('redis_port_6900.conf').with_content(/^port 6900$/)
-      should contain_file('redis_port_6900.conf').with_content(/^pidfile \/var\/run\/redis_6900\.pid$/)
-      should contain_file('redis_port_6900.conf').with_content(/^logfile \/var\/log\/redis_6900\.log$/)
-      should contain_file('redis_port_6900.conf').with_content(/^dir \/var\/lib\/redis\/6900$/)
-      should contain_file('redis-init-6900').with_content(/^REDIS_PORT="6900"$/)
-    end # it
-  end # context
-
-  context "With a non default bind address" do
-    let :params do
-      {
-        :redis_port => '6900',
-        :redis_bind_address => '10.1.2.3'
-      }
-    end # let
-
-    it do
-      should compile.with_all_deps
-
-      should contain_file('redis_port_6900.conf').with_content(/^bind 10\.1\.2\.3$/)
-      should contain_file('redis-init-6900').with_content(/^REDIS_BIND_ADDRESS="10.1.2.3"$/)
-    end # it
-  end # context
-
-  context "On Debian systems with no saves" do
-    let :params do
-      {
-        :redis_port  => '6380',
-        :redis_saves => false
-      }
+describe 'redis::instance', :type => :define do
+  let :pre_condition do
+    'class { "redis":
+      default_install => false,
+    }'
+  end
+  let :title do
+    'app2'
+  end
+  describe 'os-dependent items' do
+    context "on Ubuntu systems" do
+      context '14.04' do
+        let(:facts) {
+          ubuntu_1404_facts
+        }
+        it { should contain_file('/etc/redis/redis-server-app2.conf.puppet').with('content' => /^bind 127.0.0.1/) }
+        it { should contain_file('/etc/redis/redis-server-app2.conf.puppet').with('content' => /^logfile \/var\/log\/redis\/redis-server-app2.log/) }
+        it { should contain_file('/etc/redis/redis-server-app2.conf.puppet').with('content' => /^dir \/var\/lib\/redis\/redis-server-app2/) }
+        it { should contain_file('/etc/redis/redis-server-app2.conf.puppet').with('content' => /^unixsocket \/var\/run\/redis\/redis-server-app2.sock/) }
+        it { should contain_file('/var/lib/redis/redis-server-app2') }
+        it { should contain_service('redis-server-app2').with_ensure('running') }
+        it { should contain_service('redis-server-app2').with_enable('true') }
+        it { should contain_file('/etc/init.d/redis-server-app2').with_content(/DAEMON_ARGS=\/etc\/redis\/redis-server-app2.conf/) }
+        it { should contain_file('/etc/init.d/redis-server-app2').with_content(/PIDFILE=\/var\/run\/redis\/redis-server-app2.pid/) }
+      end
+      context '16.04' do
+        let(:facts) {
+          ubuntu_1604_facts.merge({
+            :service_provider => 'systemd',
+          })
+        }
+        it { should contain_file('/etc/redis/redis-server-app2.conf.puppet').with('content' => /^bind 127.0.0.1/) }
+        it { should contain_file('/etc/redis/redis-server-app2.conf.puppet').with('content' => /^logfile \/var\/log\/redis\/redis-server-app2.log/) }
+        it { should contain_file('/etc/redis/redis-server-app2.conf.puppet').with('content' => /^dir \/var\/lib\/redis\/redis-server-app2/) }
+        it { should contain_file('/etc/redis/redis-server-app2.conf.puppet').with('content' => /^unixsocket \/var\/run\/redis\/redis-server-app2.sock/) }
+        it { should contain_file('/var/lib/redis/redis-server-app2') }
+        it { should contain_service('redis-server-app2').with_ensure('running') }
+        it { should contain_service('redis-server-app2').with_enable('true') }
+        it { should contain_file('/etc/systemd/system/redis-server-app2.service').with_content(/ExecStart=\/usr\/bin\/redis-server \/etc\/redis\/redis-server-app2.conf/) }
+      end
     end
-
-    it do
-      should contain_file('redis_port_6380.conf').with_ensure('present')
-      should contain_file('redis_port_6380.conf').without_content(/^requirepass/)
-      should contain_file('redis_port_6380.conf').without_content(/^save 900 1$/)
-    end # it
-  end # context
-
-  context "On Debian systems with saves set to \['save 3600 1000000'\]" do
-    let :params do
-      {
-        :redis_port  => '7000',
-        :redis_saves => ['save 3600 1000000', 'save 17 42']
-      }
-    end # let
-
-    it do
-      should contain_file('redis_port_7000.conf').with_ensure('present')
-      should contain_file('redis_port_7000.conf').without_content(/^requirepass/)
-      should contain_file('redis_port_7000.conf').with_content(/^port 7000$/)
-      should contain_file('redis_port_7000.conf').with_content(/^save 3600 1000000$/)
-      should contain_file('redis_port_7000.conf').with_content(/^save 17 42$/)
-      should contain_file('redis_port_7000.conf').without_content(/^save 900 1$/)
-    end # it
-  end # context
-end # describe
+    context "on CentOS systems" do
+      context '6' do
+        let(:facts) {
+          centos_6_facts
+        }
+        it { should contain_file('/etc/redis-server-app2.conf.puppet').with('content' => /^bind 127.0.0.1/) }
+        it { should contain_file('/etc/redis-server-app2.conf.puppet').with('content' => /^logfile \/var\/log\/redis\/redis-server-app2.log/) }
+        it { should contain_file('/etc/redis-server-app2.conf.puppet').with('content' => /^dir \/var\/lib\/redis\/redis-server-app2/) }
+        it { should contain_file('/etc/redis-server-app2.conf.puppet').with('content' => /^unixsocket \/var\/run\/redis\/redis-server-app2.sock/) }
+        it { should contain_file('/var/lib/redis/redis-server-app2') }
+        it { should contain_service('redis-server-app2').with_ensure('running') }
+        it { should contain_service('redis-server-app2').with_enable('true') }
+        it { should contain_file('/etc/init.d/redis-server-app2').with_content(/REDIS_CONFIG="\/etc\/redis-server-app2.conf"/) }
+        it { should contain_file('/etc/init.d/redis-server-app2').with_content(/pidfile="\/var\/run\/redis\/redis-server-app2.pid"/) }
+      end
+      context '7' do
+        let(:facts) {
+          centos_7_facts.merge({
+            :service_provider => 'systemd',
+          })
+        }
+        it { should contain_file('/etc/redis-server-app2.conf.puppet').with('content' => /^bind 127.0.0.1/) }
+        it { should contain_file('/etc/redis-server-app2.conf.puppet').with('content' => /^logfile \/var\/log\/redis\/redis-server-app2.log/) }
+        it { should contain_file('/etc/redis-server-app2.conf.puppet').with('content' => /^dir \/var\/lib\/redis\/redis-server-app2/) }
+        it { should contain_file('/etc/redis-server-app2.conf.puppet').with('content' => /^unixsocket \/var\/run\/redis\/redis-server-app2.sock/) }
+        it { should contain_file('/var/lib/redis/redis-server-app2') }
+        it { should contain_service('redis-server-app2').with_ensure('running') }
+        it { should contain_service('redis-server-app2').with_enable('true') }
+        it { should contain_file('/etc/systemd/system/redis-server-app2.service').with_content(/ExecStart=\/usr\/bin\/redis-server \/etc\/redis-server-app2.conf/) }
+      end
+    end
+  end
+end

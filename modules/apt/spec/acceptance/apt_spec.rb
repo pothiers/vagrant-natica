@@ -1,5 +1,9 @@
 require 'spec_helper_acceptance'
 
+MAX_TIMEOUT_RETRY              = 3
+TIMEOUT_RETRY_WAIT             = 5
+TIMEOUT_ERROR_MATCHER    = /no valid OpenPGP data found/
+
 describe 'apt class' do
 
   context 'reset' do
@@ -11,29 +15,42 @@ describe 'apt class' do
   context 'all the things' do
     it 'should work with no errors' do
       pp = <<-EOS
-      class { 'apt':
-        always_apt_update    => true,
-        disable_keys         => true,
-        purge_sources_list   => true,
-        purge_sources_list_d => true,
-        purge_preferences    => true,
-        purge_preferences_d  => true,
-        update_timeout       => '400',
-        update_tries         => '3',
-        sources              => {
+      if $::lsbdistcodename == 'lucid' {
+        $sources = undef
+      } else {
+        $sources = {
           'puppetlabs' => {
-            'ensure'     => present,
-            'location'   => 'http://apt.puppetlabs.com',
-            'repos'      => 'main',
-            'key'        => '47B320EB4C7C375AA9DAE1A01054B7A24BD6EC30',
-            'key_server' => 'pgp.mit.edu',
-          }
+            'ensure'   => present,
+            'location' => 'http://apt.puppetlabs.com',
+            'repos'    => 'main',
+            'key'      => {
+              'id'     => '6F6B15509CF8E59E6E469F327F438280EF8D349F',
+              'server' => 'hkps.pool.sks-keyservers.net',
+            },
+          },
+        }
+      }
+      class { 'apt':
+        update => {
+          'frequency' => 'always',
+          'timeout'   => '400',
+          'tries'     => '3',
         },
-        fancy_progress       => true,
+        purge => {
+          'sources.list'   => true,
+          'sources.list.d' => true,
+          'preferences'    => true,
+          'preferences.d'  => true,
+        },
+        sources => $sources,
       }
       EOS
 
-      apply_manifest(pp, :catch_failures => true)
+      #Apply the manifest (Retry if timeout error is received from key pool)
+      retry_on_error_matching(MAX_TIMEOUT_RETRY, TIMEOUT_RETRY_WAIT, TIMEOUT_ERROR_MATCHER) do
+        apply_manifest(pp, :catch_failures => true)
+      end
+
       apply_manifest(pp, :catch_failures => true)
     end
     it 'should still work' do

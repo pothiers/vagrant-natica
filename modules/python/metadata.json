@@ -1,15 +1,21 @@
 {
-  "name": "stankevich-python",
-  "version": "1.17.0",
-  "author": "stankevich",
+  "name": "puppet-python",
+  "version": "2.1.0",
+  "author": "Vox Pupuli",
   "summary": "Python Module",
   "license": "Apache-2.0",
-  "source": "git://github.com/stankevich/puppet-python.git",
-  "project_page": "https://github.com/stankevich/puppet-python",
-  "issues_url": "https://github.com/stankevich/puppet-python/issues",
+  "source": "git://github.com/voxpupuli/puppet-python.git",
+  "project_page": "https://github.com/voxpupuli/puppet-python",
+  "issues_url": "https://github.com/voxpupuli/puppet-python/issues",
   "dependencies": [
-    {"name":"puppetlabs/stdlib","version_requirement":">= 4.6.0 < 6.0.0"},
-    {"name":"stahnma/epel","version_requirement":">= 1.2.2 < 2.0.0"}
+    {
+      "name": "puppetlabs/stdlib",
+      "version_requirement": ">= 4.6.0 < 6.0.0"
+    },
+    {
+      "name": "stahnma/epel",
+      "version_requirement": ">= 1.2.2 < 2.0.0"
+    }
   ],
   "data_provider": null,
   "description": "Puppet module for Python",
@@ -23,7 +29,6 @@
     {
       "operatingsystem": "CentOS",
       "operatingsystemrelease": [
-        "5",
         "6",
         "7"
       ]
@@ -31,17 +36,18 @@
     {
       "operatingsystem": "Debian",
       "operatingsystemrelease": [
-        "6",
-        "7",
-        "8"
+        "8",
+        "9"
       ]
+    },
+    {
+      "operatingsystem": "Gentoo"
     },
     {
       "operatingsystem": "Ubuntu",
       "operatingsystemrelease": [
-        "10.04",
-        "12.04",
-        "14.04"
+        "14.04",
+        "16.04"
       ]
     },
     {
@@ -54,7 +60,7 @@
   "requirements": [
     {
       "name": "puppet",
-      "version_requirement": ">=3.0.0 < 5.0.0"
+      "version_requirement": ">= 4.10.0 < 6.0.0"
     }
   ]
 }
