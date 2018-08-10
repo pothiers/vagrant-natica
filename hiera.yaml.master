@@ -1,0 +1,17 @@
+version: 5
+defaults:
+  datadir: /etc/puppetlabs/hieradata
+  data_hash: yaml_data
+hierarchy:
+  - name: "Per-node data (yaml version)"
+    path: "nodes/%{trusted.certname}.yaml" 
+    # Omitting datadir and data_hash to use defaults.
+    # hiera3 was: - "%{::clientcert}"
+    
+  - name: "Per-ENVIRONMENT data (yaml version)" 
+    path: "environments/%{server_facts.environment}.yaml" 
+    # Omitting datadir and data_hash to use defaults.
+    # hiera3 was: - %{::environment}"
+    
+  - name: "Default (global) data (yaml version)"
+    path: "defaults.yaml" 
