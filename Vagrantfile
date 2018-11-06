@@ -62,8 +62,8 @@ Vagrant.configure("2") do |config|
     #!vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on" ]
     vb.customize ["modifyvm", :id, "--natdnsproxy1", "off", "--vram", "12"]
     #vb.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
+    #!vb.gui = true
   end    
-  
 
   ##############################################################################
   ### NATICA System
