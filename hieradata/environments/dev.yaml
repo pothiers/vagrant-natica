@@ -3,15 +3,15 @@
 inotify_instances: 128
 inotify_watches: 8192
 
-arch_host: nsaserver.pat.sdm.noao.edu
-arch_port: 9000
-arch_timeout: 11
-arch_irods_host: db.pat.sdm.noao.edu
-arch_irods_port: 1247
-arch_irods_resource: tadaResc
-archive_irods331: /noao-tuc-z1/tada/ 
-irodsdata: 'puppet:///modules/dmo_hiera/iinit.in'
-irodsenv: 'puppet:///modules/dmo_hiera/irodsEnv.dev'
+arch_host: NA
+arch_port: NA
+arch_timeout: NA
+arch_irods_host: NA
+arch_irods_port: NA
+arch_irods_resource: NA
+archive_irods331: NA
+irodsdata: NA
+irodsenv: NA
 
 tada_conf: 'puppet:///modules/dmo_hiera/tada-config.yaml'
 tada_logging_conf: 'puppet:///modules/dmo_hiera/tada-logging.yaml'
@@ -62,6 +62,8 @@ natica_timeout: 2 # arch_timeout: 11
 
 natica_host: marsnat.vagrant.noao.edu
 natica_port: 8000
+dq_host: localhost
+dq_port: 9988
 tadanatversion: master
 marsnatversion: clean-thread
 hdrfunclibversion: master
