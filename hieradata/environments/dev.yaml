@@ -1,4 +1,10 @@
 ---
+###
+### For use in vagrant dev ENV with NATICA.
+### For PAT equiv with hiera4, see:
+###    dmo_hiera/hieradata/pat/common.yaml
+###
+
 # original defaults
 inotify_instances: 128
 inotify_watches: 8192
@@ -49,7 +55,7 @@ mars_port: 8000
 
 dataqversion: master
 tadaversion: master
-marsversion: master
+marsversion: ingest2
 #djangoserver: /sandbox/mars/start-mars-development.sh
 
 ####################
@@ -65,7 +71,7 @@ natica_port: 8000
 dq_host: localhost
 dq_port: 9988
 tadanatversion: master
-marsnatversion: clean-thread
+marsnatversion: ingest2
 hdrfunclibversion: master
 archive_topdir: '/sandbox/natica-archive'
 patch_dbnat: 'puppet:///modules/dmo_hiera/patch-dbnat.sh'
