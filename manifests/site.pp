@@ -16,10 +16,6 @@ node marsnat {
   include marsnat::config
   include marsnat::install
   include marsnat::service
-
-  # Move tadanat into marsnat but we won't actually use TADA python code
-  # Do use dropbox stuff (dataq, watcher)
-  # include tadanat  
 } 
 #!node mtnnat {
 #!  include tadanat
