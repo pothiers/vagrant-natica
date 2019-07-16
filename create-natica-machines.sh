@@ -14,8 +14,10 @@ sdate=`date`
 echo "Starting: $sdate"
 
 tic=`date +'%s'`
-vagrant destroy -f mtnnat valnat dbnat marsnat
-time vagrant up mtnnat valnat dbnat marsnat
+#!vagrant destroy -f mtnnat valnat dbnat marsnat
+#!time vagrant up mtnnat valnat dbnat marsnat
+vagrant destroy -f dbnat marsnat
+time vagrant up dbnat marsnat
 # TIME for dbnat+marsnat creation = ?
 
 # For workflow: Edit(manifest);Provision, use:

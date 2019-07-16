@@ -16,6 +16,11 @@ node marsnat {
   include marsnat::config
   include marsnat::install
   include marsnat::service
+
+  user { 'vagrant':
+    ensure => present,
+    groups => ['devops', 'tester', 'tada'],
+  }
 } 
 #!node mtnnat {
 #!  include tadanat
