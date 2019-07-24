@@ -17,6 +17,7 @@ node marsnat {
   include marsnat::install
   include marsnat::service
 
+  # sudo usermod -aG devops,tester,tada vagrant
   user { 'vagrant':
     ensure => present,
     groups => ['devops', 'tester', 'tada'],
