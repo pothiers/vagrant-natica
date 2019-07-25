@@ -6,7 +6,7 @@ here=`hostname`
 now=`date`
 echo "Writing log to: $LOG"
 echo "Creating VMs on $here at $now"  > $LOG
-#pushd /home/pothiers/sandbox/vagrant-natica
+pushd $HOME/sandbox/vagrant-natica
 echo -e "\n###################################################################"
 echo "Expect full provisioning to take about: 0:33; With smoke test"
 
