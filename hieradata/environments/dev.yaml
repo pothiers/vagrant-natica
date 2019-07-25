@@ -70,10 +70,13 @@ natica_host: marsnat.vagrant.noao.edu
 natica_port: 8000
 dq_host: localhost
 dq_port: 9988
-tadanatversion: master
+#tadanatversion: master
 #marsnatversion: ingest2
+#hdrfunclibversion: master
 marsnatversion: master
-hdrfunclibversion: master
+dqnatversion: master
+personalityversion: master
+
 archive_topdir: '/sandbox/natica-archive'
 patch_dbnat: 'puppet:///modules/dmo_hiera/patch-dbnat.sh'
 patch_marsnat: 'puppet:///modules/dmo_hiera/patch-marsnat.sh'
