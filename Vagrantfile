@@ -69,64 +69,64 @@ Vagrant.configure("2") do |config|
   ### NATICA System
 
 
-  config.vm.define "mtnnat" do |mtnnat| #natica
-    mtnnat.vm.network :private_network, ip: "172.16.1.21"
-    mtnnat.vm.hostname = "mtnnat.vagrant.noao.edu" 
-    mtnnat.hostmanager.aliases =  %w(mtnnat)
-    mtnnat.vm.provision :puppet do |puppet|
-      puppet.manifests_path = "manifests"
-      puppet.manifest_file = "site.pp"
-      puppet.module_path = ["../puppet-modules", "modules"]
-      puppet.environment = PUPPETENV 
-      puppet.environment_path = "environments" #@@@
-      puppet.hiera_config_path = "hiera.yaml"
-      puppet.options = [
-       '--verbose',
-       '--report',
-       '--show_diff',
-       #'--debug',
-       #'--graph',
-       #'--graphdir /vagrant/graphs/mtnnat',
-      ]
-    end
-
-    mtnnat.vm.provision "shell" do |s|
-      ssh_pub_key = File.readlines("#{Dir.home}/.ssh/id_rsa.pub").first.strip
-      s.inline = <<-SHELL
-        echo #{ssh_pub_key} >> /home/tester/.ssh/authorized_keys
-        echo #{ssh_pub_key} >> /home/vagrant/.ssh/authorized_keys
-      SHELL
-    end
-
-  end
-
-  config.vm.define "valnat" do |valnat| #natica
-    valnat.vm.network :private_network, ip: "172.16.1.22"
-    valnat.vm.hostname = "valnat.vagrant.noao.edu"
-    valnat.hostmanager.aliases =  %w(valnat)
-    valnat.vm.provision :puppet do |puppet|
-      puppet.manifests_path = "manifests"
-      puppet.manifest_file = "site.pp" 
-      puppet.module_path = ["../puppet-modules", "modules"]
-      puppet.environment = PUPPETENV
-      puppet.environment_path = "environments"
-      puppet.hiera_config_path = "hiera.yaml"
-      puppet.options = [
-       '--verbose',
-       '--report',
-       '--show_diff',
-      ]
-    end
-
-    valnat.vm.provision "shell" do |s|
-      ssh_pub_key = File.readlines("#{Dir.home}/.ssh/id_rsa.pub").first.strip
-      s.inline = <<-SHELL
-        echo #{ssh_pub_key} >> /home/tester/.ssh/authorized_keys
-        echo #{ssh_pub_key} >> /home/vagrant/.ssh/authorized_keys
-      SHELL
-    end
-    
-  end
+#!  config.vm.define "mtnnat" do |mtnnat| #natica
+#!    mtnnat.vm.network :private_network, ip: "172.16.1.21"
+#!    mtnnat.vm.hostname = "mtnnat.vagrant.noao.edu" 
+#!    mtnnat.hostmanager.aliases =  %w(mtnnat)
+#!    mtnnat.vm.provision :puppet do |puppet|
+#!      puppet.manifests_path = "manifests"
+#!      puppet.manifest_file = "site.pp"
+#!      puppet.module_path = ["../puppet-modules", "modules"]
+#!      puppet.environment = PUPPETENV 
+#!      puppet.environment_path = "environments" #@@@
+#!      puppet.hiera_config_path = "hiera.yaml"
+#!      puppet.options = [
+#!       '--verbose',
+#!       '--report',
+#!       '--show_diff',
+#!       #'--debug',
+#!       #'--graph',
+#!       #'--graphdir /vagrant/graphs/mtnnat',
+#!      ]
+#!    end
+#!
+#!    mtnnat.vm.provision "shell" do |s|
+#!      ssh_pub_key = File.readlines("#{Dir.home}/.ssh/id_rsa.pub").first.strip
+#!      s.inline = <<-SHELL
+#!        echo #{ssh_pub_key} >> /home/tester/.ssh/authorized_keys
+#!        echo #{ssh_pub_key} >> /home/vagrant/.ssh/authorized_keys
+#!      SHELL
+#!    end
+#!
+#!  end
+#!
+#!  config.vm.define "valnat" do |valnat| #natica
+#!    valnat.vm.network :private_network, ip: "172.16.1.22"
+#!    valnat.vm.hostname = "valnat.vagrant.noao.edu"
+#!    valnat.hostmanager.aliases =  %w(valnat)
+#!    valnat.vm.provision :puppet do |puppet|
+#!      puppet.manifests_path = "manifests"
+#!      puppet.manifest_file = "site.pp" 
+#!      puppet.module_path = ["../puppet-modules", "modules"]
+#!      puppet.environment = PUPPETENV
+#!      puppet.environment_path = "environments"
+#!      puppet.hiera_config_path = "hiera.yaml"
+#!      puppet.options = [
+#!       '--verbose',
+#!       '--report',
+#!       '--show_diff',
+#!      ]
+#!    end
+#!
+#!    valnat.vm.provision "shell" do |s|
+#!      ssh_pub_key = File.readlines("#{Dir.home}/.ssh/id_rsa.pub").first.strip
+#!      s.inline = <<-SHELL
+#!        echo #{ssh_pub_key} >> /home/tester/.ssh/authorized_keys
+#!        echo #{ssh_pub_key} >> /home/vagrant/.ssh/authorized_keys
+#!      SHELL
+#!    end
+#!    
+#!  end
 
   
   config.vm.define "marsnat" do |marsnat| # new mars containing natica
