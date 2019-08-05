@@ -73,7 +73,8 @@ dq_port: 9988
 #tadanatversion: master
 #marsnatversion: ingest2
 #hdrfunclibversion: master
-marsnatversion: refactor-urls
+#marsnatversion: refactor-urls
+marsnatversion: master
 dqnatversion: master
 personalityversion: master
 
