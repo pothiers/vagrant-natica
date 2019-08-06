@@ -71,7 +71,8 @@ Vagrant.configure("2") do |config|
   config.vm.define "marsnat" do |marsnat| # new mars containing natica
     marsnat.vm.network :private_network, ip: "172.16.1.23"
     marsnat.vm.network :forwarded_port, guest: 8000, host: 8020
-    marsnat.vm.network :forwarded_port, guest: 8001, host: 8021
+    marsnat.vm.network :forwarded_port, guest: 80, host: 8021
+    marsnat.vm.network :forwarded_port, guest: 443, host: 443
     marsnat.vm.hostname = "marsnat.vagrant.noao.edu" 
     marsnat.hostmanager.aliases =  %w(marsnat)
     
