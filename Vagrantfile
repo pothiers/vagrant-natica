@@ -120,6 +120,12 @@ Vagrant.configure("2") do |config|
   ### END NATICA system
   ##############################################################################
 
-  
+##  config.vm.define "mtnnat" do |mtnnat| 
+##    mtnnat.vm.network :private_network, ip: "172.16.1.25"
+##  end  
+##  config.vm.define "valnat" do |valnat| 
+##    valnat.vm.network :private_network, ip: "172.16.1.25"
+##  end  
+
 end
 
