@@ -12,10 +12,10 @@ inotify_watches: 8192
 arch_host: NA
 arch_port: NA
 arch_timeout: NA
-arch_irods_host: NA
-arch_irods_port: NA
-arch_irods_resource: NA
-archive_irods331: NA
+#!arch_irods_host: NA
+#!arch_irods_port: NA
+#!arch_irods_resource: NA
+#!archive_irods331: NA
 irodsdata: NA
 irodsenv: NA
 
