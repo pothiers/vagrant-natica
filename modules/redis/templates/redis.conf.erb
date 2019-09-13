@@ -33,10 +33,12 @@ port <%= @port %>
 # in order to get the desired effect.
 tcp-backlog <%= @tcp_backlog %>
 
+<% unless @bind_arr.empty? -%>
 # If you want you can bind a single interface, if the bind option is not
 # specified all the interfaces will listen for incoming connections.
 #
-bind <%= @bind %>
+bind <%= @bind_arr.join(' ') %>
+<% end -%>
 
 # Specify the path for the unix socket that will be used to listen for
 # incoming connections. There is no default, so Redis will not listen
@@ -751,6 +753,9 @@ aof-rewrite-incremental-fsync <% if @aof_rewrite_incremental_fsync -%>yes<% else
 cluster-enabled yes
 cluster-config-file <%= @cluster_config_file %>
 cluster-node-timeout <%= @cluster_node_timeout %>
+cluster-slave-validity-factor <%= @cluster_slave_validity_factor %>
+cluster-require-full-coverage <% if @cluster_require_full_coverage -%>yes<% else -%>no<% end %>
+cluster-migration-barrier <%= @cluster_migration_barrier %>
 <% end -%>
 
 

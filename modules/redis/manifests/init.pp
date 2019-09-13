@@ -9,25 +9,35 @@
 #     slaveof => '10.0.1.1 6379',
 #   }
 #
+# @example Binding on multiple interfaces
+#   class { 'redis':
+#     bind => ['127.0.0.1', '10.0.0.1', '10.1.0.1'],
+#   }
+#
+# @example Binding on all interfaces
+#   class { 'redis':
+#     bind => [],
+#   }
+#
 # @param [String] activerehashing   Enable/disable active rehashing.
 # @param [String] aof_load_truncated   Enable/disable loading truncated AOF file
 # @param [String] aof_rewrite_incremental_fsync   Enable/disable fsync for AOF file
 # @param [String] appendfilename   The name of the append only file
-# @param [String] appendfsync   Adjust fsync mode. Valid options: always, everysec, no. Default:  everysec
+# @param appendfsync Adjust fsync mode. Default: `everysec`
 # @param [String] appendonly   Enable/disable appendonly mode.
 # @param [String] auto_aof_rewrite_min_size   Adjust minimum size for auto-aof-rewrite.
 # @param [String] auto_aof_rewrite_percentage   Adjust percentatge for auto-aof-rewrite.
-# @param [String] bind   Configure which IP address to listen on.
-# @param [String] config_dir   Directory containing the configuration files.
-# @param [String] config_dir_mode   Adjust mode for directory containing configuration files.
+# @param bind Configure which IP address(es) to listen on. To bind on all interfaces, use an empty array.
+# @param config_dir Directory containing the configuration files.
+# @param config_dir_mode Adjust mode for directory containing configuration files.
 # @param [String] config_file_orig   The location and name of a config file that provides the source
 # @param [String] config_file   Adjust main configuration file.
-# @param [String] config_file_mode   Adjust permissions for configuration files.
+# @param config_file_mode Adjust permissions for configuration files.
 # @param [String] config_group   Adjust filesystem group for config files.
 # @param [String] config_owner   Adjust filesystem owner for config files.
 # @param [String] conf_template   Define which template to use.
 # @param [String] daemonize   Have Redis run as a daemon.
-# @param [String] default_install  Configure a default install of redis
+# @param default_install Configure a default install of redis.
 # @param [String] databases   Set the number of databases.
 # @param [String] dbfilename   The filename where to dump the DB
 # @param [String] extra_config_file   Description
@@ -38,12 +48,12 @@
 # @param [String] latency_monitor_threshold   Latency monitoring threshold in milliseconds
 # @param [String] list_max_ziplist_entries   Set max ziplist entries for lists.
 # @param [String] list_max_ziplist_value   Set max ziplist values for lists.
-# @param [String] log_dir   Specify directory where to write log entries.
-# @param [String] log_dir_mode   Adjust mode for directory containing log files.
-# @param [String] log_file   Specify file where to write log entries.
+# @param log_dir Specify directory where to write log entries.
+# @param log_dir_mode Adjust mode for directory containing log files.
+# @param log_file Specify file where to write log entries.
 # @param [String] log_level   Specify the server verbosity level.
-# @param [String] manage_repo   Enable/disable upstream repository configuration.
-# @param [String] manage_package   Enable/disable management of package
+# @param manage_repo Enable/disable upstream repository configuration.
+# @param manage_package Enable/disable management of package
 # @param [String] managed_by_cluster_manager Choose if redis will be managed by a cluster manager such as pacemaker or rgmanager
 # @param [String] masterauth   If the master is password protected (using the "requirepass" configuration
 # @param [String] maxclients   Set the max number of connected clients at the same time.
@@ -58,7 +68,7 @@
 # @param [String] package_ensure   Default action for package.
 # @param [String] package_name   Upstream package name.
 # @param [String] pid_file   Where to store the pid.
-# @param [String] port   Configure which port to listen on.
+# @param port Configure which port to listen on.
 # @param [String] protected_mode  Whether protected mode is enabled or not.  Only applicable when no bind is set.
 # @param [String] ppa_repo   Specify upstream (Ubuntu) PPA entry.
 # @param [String] rdbcompression   Enable/disable compression of string objects using LZF when dumping.
@@ -71,7 +81,7 @@
 #   other commands.
 # @param [String] save_db_to_disk   Set if save db to disk.
 # @param [String] save_db_to_disk_interval    save the dataset every N seconds if there are at least M changes in the dataset
-# @param [String] service_manage   Specify if the service should be part of the catalog.
+# @param service_manage Specify if the service should be part of the catalog.
 # @param [String] service_enable   Enable/disable daemon at boot.
 # @param [String] service_ensure   Specify if the server should be running.
 # @param [String] service_group   Specify which group to run as.
@@ -121,121 +131,134 @@
 # @param [String] ulimit   Limit the use of system-wide resources.
 # @param [String] unixsocket   Define unix socket path
 # @param [String] unixsocketperm   Define unix socket file permissions
-# @param [String] workdir   The DB will be written inside this directory, with the filename specified
+# @param workdir The DB will be written inside this directory, with the filename specified
 #   above using the 'dbfilename' configuration directive.
 #   Default: /var/lib/redis/
-# @param [String] workdir_mode   Adjust mode for data directory.
+# @param workdir_mode   Adjust mode for data directory.
 # @param [String] zset_max_ziplist_entries   Set max entries for sorted sets.
 # @param [String] zset_max_ziplist_value   Set max values for sorted sets.
-# @param [String] cluster_enabled   Enables redis 3.0 cluster functionality
+# @param cluster_enabled Enables redis 3.0 cluster functionality
 # @param [String] cluster_config_file   Config file for saving cluster nodes configuration. This file is never touched by humans.
 #   Only set if cluster_enabled is true
 #   Default: nodes.conf
 # @param [String] cluster_node_timeout   Node timeout
 #   Only set if cluster_enabled is true
 #   Default: 5000
+# @param [Integer] cluster_slave_validity_factor   Control variable to disable promoting slave in case of disconnection from master
+#   Only set if cluster_enabled is true
+#   Default: 0
+# @param [Boolean] cluster_require_full_coverage   If false Redis Cluster will server queries even if requests about a subset of keys can be processed
+#   Only set if cluster_enabled is true
+#   Default: true
+# @param [Integer] cluster_migration_barrier    Minimum number of slaves master will remain connected with, for another slave to migrate to a  master which is no longer covered by any slave
+#   Only set if cluster_enabled is true
+#   Default: 1
 class redis (
-  $activerehashing               = $::redis::params::activerehashing,
-  $aof_load_truncated            = $::redis::params::aof_load_truncated,
-  $aof_rewrite_incremental_fsync = $::redis::params::aof_rewrite_incremental_fsync,
-  $appendfilename                = $::redis::params::appendfilename,
-  $appendfsync                   = $::redis::params::appendfsync,
-  $appendonly                    = $::redis::params::appendonly,
-  $auto_aof_rewrite_min_size     = $::redis::params::auto_aof_rewrite_min_size,
-  $auto_aof_rewrite_percentage   = $::redis::params::auto_aof_rewrite_percentage,
-  $bind                          = $::redis::params::bind,
-  $output_buffer_limit_slave     = $::redis::params::output_buffer_limit_slave,
-  $output_buffer_limit_pubsub    = $::redis::params::output_buffer_limit_pubsub,
-  $conf_template                 = $::redis::params::conf_template,
-  $config_dir                    = $::redis::params::config_dir,
-  $config_dir_mode               = $::redis::params::config_dir_mode,
-  $config_file                   = $::redis::params::config_file,
-  $config_file_mode              = $::redis::params::config_file_mode,
-  $config_file_orig              = $::redis::params::config_file_orig,
-  $config_group                  = $::redis::params::config_group,
-  $config_owner                  = $::redis::params::config_owner,
-  $daemonize                     = $::redis::params::daemonize,
-  $databases                     = $::redis::params::databases,
-  $default_install               = $::redis::params::default_install,
-  $dbfilename                    = $::redis::params::dbfilename,
-  $extra_config_file             = $::redis::params::extra_config_file,
-  $hash_max_ziplist_entries      = $::redis::params::hash_max_ziplist_entries,
-  $hash_max_ziplist_value        = $::redis::params::hash_max_ziplist_value,
-  $hll_sparse_max_bytes          = $::redis::params::hll_sparse_max_bytes,
-  $hz                            = $::redis::params::hz,
-  $latency_monitor_threshold     = $::redis::params::latency_monitor_threshold,
-  $list_max_ziplist_entries      = $::redis::params::list_max_ziplist_entries,
-  $list_max_ziplist_value        = $::redis::params::list_max_ziplist_value,
-  $log_dir                       = $::redis::params::log_dir,
-  $log_dir_mode                  = $::redis::params::log_dir_mode,
-  $log_file                      = $::redis::params::log_file,
-  $log_level                     = $::redis::params::log_level,
-  $manage_package                = $::redis::params::manage_package,
-  $manage_repo                   = $::redis::params::manage_repo,
-  $masterauth                    = $::redis::params::masterauth,
-  $maxclients                    = $::redis::params::maxclients,
-  $maxmemory                     = $::redis::params::maxmemory,
-  $maxmemory_policy              = $::redis::params::maxmemory_policy,
-  $maxmemory_samples             = $::redis::params::maxmemory_samples,
-  $min_slaves_max_lag            = $::redis::params::min_slaves_max_lag,
-  $min_slaves_to_write           = $::redis::params::min_slaves_to_write,
-  $no_appendfsync_on_rewrite     = $::redis::params::no_appendfsync_on_rewrite,
-  $notify_keyspace_events        = $::redis::params::notify_keyspace_events,
-  $notify_service                = $::redis::params::notify_service,
-  $managed_by_cluster_manager    = $::redis::params::managed_by_cluster_manager,
-  $package_ensure                = $::redis::params::package_ensure,
-  $package_name                  = $::redis::params::package_name,
-  $pid_file                      = $::redis::params::pid_file,
-  $port                          = $::redis::params::port,
-  $protected_mode                = $::redis::params::protected_mode,
-  $ppa_repo                      = $::redis::params::ppa_repo,
-  $rdbcompression                = $::redis::params::rdbcompression,
-  $repl_backlog_size             = $::redis::params::repl_backlog_size,
-  $repl_backlog_ttl              = $::redis::params::repl_backlog_ttl,
-  $repl_disable_tcp_nodelay      = $::redis::params::repl_disable_tcp_nodelay,
-  $repl_ping_slave_period        = $::redis::params::repl_ping_slave_period,
-  $repl_timeout                  = $::redis::params::repl_timeout,
-  $requirepass                   = $::redis::params::requirepass,
-  $save_db_to_disk               = $::redis::params::save_db_to_disk,
-  $save_db_to_disk_interval      = $::redis::params::save_db_to_disk_interval,
-  $service_enable                = $::redis::params::service_enable,
-  $service_ensure                = $::redis::params::service_ensure,
-  $service_group                 = $::redis::params::service_group,
-  $service_hasrestart            = $::redis::params::service_hasrestart,
-  $service_hasstatus             = $::redis::params::service_hasstatus,
-  $service_manage                = $::redis::params::service_manage,
-  $service_name                  = $::redis::params::service_name,
-  $service_provider              = $::redis::params::service_provider,
-  $service_user                  = $::redis::params::service_user,
-  $set_max_intset_entries        = $::redis::params::set_max_intset_entries,
-  $slave_priority                = $::redis::params::slave_priority,
-  $slave_read_only               = $::redis::params::slave_read_only,
-  $slave_serve_stale_data        = $::redis::params::slave_serve_stale_data,
-  $slaveof                       = $::redis::params::slaveof,
-  $slowlog_log_slower_than       = $::redis::params::slowlog_log_slower_than,
-  $slowlog_max_len               = $::redis::params::slowlog_max_len,
-  $stop_writes_on_bgsave_error   = $::redis::params::stop_writes_on_bgsave_error,
-  $syslog_enabled                = $::redis::params::syslog_enabled,
-  $syslog_facility               = $::redis::params::syslog_facility,
-  $tcp_backlog                   = $::redis::params::tcp_backlog,
-  $tcp_keepalive                 = $::redis::params::tcp_keepalive,
-  $timeout                       = $::redis::params::timeout,
-  $unixsocket                    = $::redis::params::unixsocket,
-  $unixsocketperm                = $::redis::params::unixsocketperm,
-  $ulimit                        = $::redis::params::ulimit,
-  $workdir                       = $::redis::params::workdir,
-  $workdir_mode                  = $::redis::params::workdir_mode,
-  $zset_max_ziplist_entries      = $::redis::params::zset_max_ziplist_entries,
-  $zset_max_ziplist_value        = $::redis::params::zset_max_ziplist_value,
-  $cluster_enabled               = $::redis::params::cluster_enabled,
-  $cluster_config_file           = $::redis::params::cluster_config_file,
-  $cluster_node_timeout          = $::redis::params::cluster_node_timeout,
+  $activerehashing                                               = $::redis::params::activerehashing,
+  $aof_load_truncated                                            = $::redis::params::aof_load_truncated,
+  $aof_rewrite_incremental_fsync                                 = $::redis::params::aof_rewrite_incremental_fsync,
+  $appendfilename                                                = $::redis::params::appendfilename,
+  Enum['no', 'always', 'everysec'] $appendfsync                  = $::redis::params::appendfsync,
+  $appendonly                                                    = $::redis::params::appendonly,
+  $auto_aof_rewrite_min_size                                     = $::redis::params::auto_aof_rewrite_min_size,
+  $auto_aof_rewrite_percentage                                   = $::redis::params::auto_aof_rewrite_percentage,
+  Variant[Stdlib::IP::Address, Array[Stdlib::IP::Address]] $bind = $::redis::params::bind,
+  $output_buffer_limit_slave                                     = $::redis::params::output_buffer_limit_slave,
+  $output_buffer_limit_pubsub                                    = $::redis::params::output_buffer_limit_pubsub,
+  $conf_template                                                 = $::redis::params::conf_template,
+  Stdlib::Absolutepath $config_dir                               = $::redis::params::config_dir,
+  Stdlib::Filemode $config_dir_mode                              = $::redis::params::config_dir_mode,
+  $config_file                                                   = $::redis::params::config_file,
+  Stdlib::Filemode $config_file_mode                             = $::redis::params::config_file_mode,
+  $config_file_orig                                              = $::redis::params::config_file_orig,
+  $config_group                                                  = $::redis::params::config_group,
+  $config_owner                                                  = $::redis::params::config_owner,
+  $daemonize                                                     = $::redis::params::daemonize,
+  $databases                                                     = $::redis::params::databases,
+  Boolean $default_install                                       = $::redis::params::default_install,
+  $dbfilename                                                    = $::redis::params::dbfilename,
+  $extra_config_file                                             = $::redis::params::extra_config_file,
+  $hash_max_ziplist_entries                                      = $::redis::params::hash_max_ziplist_entries,
+  $hash_max_ziplist_value                                        = $::redis::params::hash_max_ziplist_value,
+  $hll_sparse_max_bytes                                          = $::redis::params::hll_sparse_max_bytes,
+  $hz                                                            = $::redis::params::hz,
+  $latency_monitor_threshold                                     = $::redis::params::latency_monitor_threshold,
+  $list_max_ziplist_entries                                      = $::redis::params::list_max_ziplist_entries,
+  $list_max_ziplist_value                                        = $::redis::params::list_max_ziplist_value,
+  Stdlib::Absolutepath $log_dir                                  = $::redis::params::log_dir,
+  Stdlib::Filemode $log_dir_mode                                 = $::redis::params::log_dir_mode,
+  Stdlib::Absolutepath $log_file                                 = $::redis::params::log_file,
+  $log_level                                                     = $::redis::params::log_level,
+  Boolean $manage_service_file                                   = $::redis::params::manage_service_file,
+  Boolean $manage_package                                        = $::redis::params::manage_package,
+  Boolean $manage_repo                                           = $::redis::params::manage_repo,
+  $masterauth                                                    = $::redis::params::masterauth,
+  $maxclients                                                    = $::redis::params::maxclients,
+  $maxmemory                                                     = $::redis::params::maxmemory,
+  $maxmemory_policy                                              = $::redis::params::maxmemory_policy,
+  $maxmemory_samples                                             = $::redis::params::maxmemory_samples,
+  $min_slaves_max_lag                                            = $::redis::params::min_slaves_max_lag,
+  $min_slaves_to_write                                           = $::redis::params::min_slaves_to_write,
+  $no_appendfsync_on_rewrite                                     = $::redis::params::no_appendfsync_on_rewrite,
+  $notify_keyspace_events                                        = $::redis::params::notify_keyspace_events,
+  $notify_service                                                = $::redis::params::notify_service,
+  $managed_by_cluster_manager                                    = $::redis::params::managed_by_cluster_manager,
+  $package_ensure                                                = $::redis::params::package_ensure,
+  $package_name                                                  = $::redis::params::package_name,
+  $pid_file                                                      = $::redis::params::pid_file,
+  Stdlib::Port $port                                             = $::redis::params::port,
+  $protected_mode                                                = $::redis::params::protected_mode,
+  $ppa_repo                                                      = $::redis::params::ppa_repo,
+  $rdbcompression                                                = $::redis::params::rdbcompression,
+  $repl_backlog_size                                             = $::redis::params::repl_backlog_size,
+  $repl_backlog_ttl                                              = $::redis::params::repl_backlog_ttl,
+  $repl_disable_tcp_nodelay                                      = $::redis::params::repl_disable_tcp_nodelay,
+  $repl_ping_slave_period                                        = $::redis::params::repl_ping_slave_period,
+  $repl_timeout                                                  = $::redis::params::repl_timeout,
+  $requirepass                                                   = $::redis::params::requirepass,
+  $save_db_to_disk                                               = $::redis::params::save_db_to_disk,
+  $save_db_to_disk_interval                                      = $::redis::params::save_db_to_disk_interval,
+  $service_enable                                                = $::redis::params::service_enable,
+  $service_ensure                                                = $::redis::params::service_ensure,
+  $service_group                                                 = $::redis::params::service_group,
+  $service_hasrestart                                            = $::redis::params::service_hasrestart,
+  $service_hasstatus                                             = $::redis::params::service_hasstatus,
+  Boolean $service_manage                                        = $::redis::params::service_manage,
+  $service_name                                                  = $::redis::params::service_name,
+  $service_provider                                              = $::redis::params::service_provider,
+  $service_user                                                  = $::redis::params::service_user,
+  $set_max_intset_entries                                        = $::redis::params::set_max_intset_entries,
+  $slave_priority                                                = $::redis::params::slave_priority,
+  $slave_read_only                                               = $::redis::params::slave_read_only,
+  $slave_serve_stale_data                                        = $::redis::params::slave_serve_stale_data,
+  $slaveof                                                       = $::redis::params::slaveof,
+  $slowlog_log_slower_than                                       = $::redis::params::slowlog_log_slower_than,
+  $slowlog_max_len                                               = $::redis::params::slowlog_max_len,
+  $stop_writes_on_bgsave_error                                   = $::redis::params::stop_writes_on_bgsave_error,
+  $syslog_enabled                                                = $::redis::params::syslog_enabled,
+  $syslog_facility                                               = $::redis::params::syslog_facility,
+  $tcp_backlog                                                   = $::redis::params::tcp_backlog,
+  $tcp_keepalive                                                 = $::redis::params::tcp_keepalive,
+  $timeout                                                       = $::redis::params::timeout,
+  $unixsocket                                                    = $::redis::params::unixsocket,
+  $unixsocketperm                                                = $::redis::params::unixsocketperm,
+  $ulimit                                                        = $::redis::params::ulimit,
+  Stdlib::Absolutepath $workdir                                  = $::redis::params::workdir,
+  Stdlib::Filemode $workdir_mode                                 = $::redis::params::workdir_mode,
+  $zset_max_ziplist_entries                                      = $::redis::params::zset_max_ziplist_entries,
+  $zset_max_ziplist_value                                        = $::redis::params::zset_max_ziplist_value,
+  Boolean $cluster_enabled                                       = $::redis::params::cluster_enabled,
+  $cluster_config_file                                           = $::redis::params::cluster_config_file,
+  $cluster_node_timeout                                          = $::redis::params::cluster_node_timeout,
+  Integer[0] $cluster_slave_validity_factor                      = $::redis::params::cluster_slave_validity_factor,
+  Boolean $cluster_require_full_coverage                         = $::redis::params::cluster_require_full_coverage,
+  Integer[0] $cluster_migration_barrier                          = $::redis::params::cluster_migration_barrier
 ) inherits redis::params {
 
-  contain ::redis::preinstall
-  contain ::redis::install
-  contain ::redis::config
-  contain ::redis::service
+  contain redis::preinstall
+  contain redis::install
+  contain redis::config
+  contain redis::service
 
   Class['redis::preinstall']
   -> Class['redis::install']

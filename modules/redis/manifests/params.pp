@@ -17,7 +17,7 @@ class redis::params {
   $appendonly                      = false
   $auto_aof_rewrite_min_size       = '64mb'
   $auto_aof_rewrite_percentage     = 100
-  $bind                            = '127.0.0.1'
+  $bind                            = ['127.0.0.1']
   $output_buffer_limit_slave       = '256mb 64mb 60'
   $output_buffer_limit_pubsub      = '32mb 8mb 60'
   $conf_template                   = 'redis/redis.conf.erb'
@@ -61,6 +61,7 @@ class redis::params {
   $sentinel_parallel_sync          = 1
   $sentinel_port                   = 26379
   $sentinel_quorum                 = 2
+  $sentinel_redis_host             = '127.0.0.1'
   $sentinel_service_name           = 'redis-sentinel'
   $sentinel_working_dir            = '/tmp'
   $sentinel_init_template          = 'redis/redis-sentinel.init.erb'
@@ -101,6 +102,9 @@ class redis::params {
   $cluster_enabled        = false
   $cluster_config_file    = 'nodes.conf'
   $cluster_node_timeout   = 5000
+  $cluster_slave_validity_factor = 0
+  $cluster_require_full_coverage = true
+  $cluster_migration_barrier = 1
 
   case $::osfamily {
     'Debian': {
@@ -203,6 +207,11 @@ class redis::params {
         }
         '7': {
           # CentOS 7 EPEL package is 3.2.3
+          $minimum_version           = '3.2.3'
+
+          $service_group             = 'redis'
+        }
+        '8': {
           $minimum_version           = '3.2.3'
 
           $service_group             = 'redis'
