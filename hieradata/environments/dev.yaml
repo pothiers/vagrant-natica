@@ -24,8 +24,8 @@ tada_logging_conf: 'puppet:///modules/dmo_hiera/tada-logging.yaml'
 watch_logging_conf: 'puppet:///modules/dmo_hiera/watch-logging.yaml'
 dqcli_logging_conf: 'puppet:///modules/dmo_hiera/dqcli-logging.yaml'
 
-localdjango: 'puppet:///modules/dmo_hiera/django_settings_local_pat.py'
-#localdjango: 'puppet:///modules/dmo_hiera/django_settings_local_dev.py'
+#localdjango: 'puppet:///modules/dmo_hiera/django_settings_local_pat.py'
+localdjango: 'puppet:///modules/dmo_hiera/django_settings_local_dev_natica.py
 irodstgz: 'puppet:///modules/tada/irods-3.3.1.tgz'
 rsyncdconf: 'puppet:///modules/dmo_hiera/rsyncd.conf'
 rsyncdscr: 'puppet:///modules/dmo_hiera/rsyncd.scr'
