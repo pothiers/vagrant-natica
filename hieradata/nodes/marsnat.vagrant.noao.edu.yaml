@@ -1,5 +1,5 @@
 ---
 dummy: nothing-here
-#localdjango:  'puppet:///modules/dmo-hiera/django_settings_local_dev.py'
+localnatica:  'puppet:///modules/dmo_hiera/django_settings_local_dev_natica.py'
 #nginx_conf: 'puppet:///modules/dmo-hiera/nginx.conf'
 

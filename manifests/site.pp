@@ -11,6 +11,7 @@ node dbnat {
   notice("Loading site.pp::dbnat")
   include naticadb
 } 
+
 node marsnat {
   notice("Loading site.pp::marsnat")
   include marsnat::config
