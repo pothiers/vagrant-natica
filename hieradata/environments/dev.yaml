@@ -90,3 +90,4 @@ marsnat_pubkey: 'puppet:///modules/dmo_hiera/spdev1.id_dsa.pub'
 marsnat_privkey: 'puppet:///modules/dmo_hiera/spdev1.id_dsa'
 test_val_host: valnat.vagrant.noao.edu
 test_mtn_host: mtnnat.vagrant.noao.edu
+guconf: 'puppet:///modules/dmo_hiera/gunicorn-conf.py'
