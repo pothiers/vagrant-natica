@@ -3,3 +3,6 @@ dummy: nothing-here
 #localnatica:  'puppet:///modules/dmo_hiera/django_settings_local_dev_natica.py'
 #nginx_conf: 'puppet:///modules/dmo-hiera/nginx.conf'
 
+ssl_domain_crt: 'puppet:///modules/dmo_hiera/ssl_domain.pat.crt'
+ssl_domain_key: 'puppet:///modules/dmo_hiera/ssl_domain.pat.key'
+
