@@ -82,7 +82,7 @@ marsnatversion: master
 dqnatversion: master
 personalityversion: master
 
-archive_topdir: '/sandbox/natica-archive'
+#archive_topdir: '/sandbox/natica-archive'
 patch_dbnat: 'puppet:///modules/dmo_hiera/patch-dbnat.sh'
 patch_marsnat: 'puppet:///modules/dmo_hiera/patch-marsnat.sh'
 #! patch_tadanat: 'puppet:///modules/dmo_hiera/patch-tadanat.sh'
