@@ -14,6 +14,7 @@ node dbnat {
 
 node marsnat {
   notice("Loading site.pp::marsnat")
+  
   include marsnat::config
   include marsnat::install
   include marsnat::service
