@@ -5,61 +5,6 @@
 ###    dmo_hiera/hieradata/pat/common.yaml
 ###
 
-# original defaults
-#!!inotify_instances: 128
-#!!inotify_watches: 8192
-#!!
-#!!arch_host: NA
-#!!arch_port: NA
-#!!arch_timeout: NA
-#!!arch_irods_host: NA
-#!!arch_irods_port: NA
-#!!arch_irods_resource: NA
-#!!archive_irods331: NA
-#!!irodsdata: NA
-#!!irodsenv: NA
-#!!
-#!!tada_conf: 'puppet:///modules/dmo_hiera/tada-config.yaml'
-#!!tada_logging_conf: 'puppet:///modules/dmo_hiera/tada-logging.yaml'
-#!!watch_logging_conf: 'puppet:///modules/dmo_hiera/watch-logging.yaml'
-#!!dqcli_logging_conf: 'puppet:///modules/dmo_hiera/dqcli-logging.yaml'
-#!!
-#!!#localdjango: 'puppet:///modules/dmo_hiera/django_settings_local_pat.py'
-#!!# for TADA
-#!!localdjango: 'puppet:///modules/dmo_hiera/django_settings_local_dev.py
-#!!
-#!!irodstgz: 'puppet:///modules/tada/irods-3.3.1.tgz'
-#!!rsyncdconf: 'puppet:///modules/dmo_hiera/rsyncd.conf'
-#!!rsyncdscr: 'puppet:///modules/dmo_hiera/rsyncd.scr'
-#!!rsyncpwd: 'puppet:///modules/dmo_hiera/rsync.pwd'
-#!!udp_recv_channel:
-#!!  - port : 8649
-#!!    bind : localhost
-#!!  - port : 8649
-#!!    bind : 0.0.0.0
-#!!udp_send_channel:
-#!!  - port : 8649
-#!!    host : sdmvc.tuc.noao.edu
-#!!    ttl  : 2
-#!!  - port : 8649
-#!!    host : sdmvm1.tuc.noao.edu
-#!!    ttl  : 2
-#!!tcp_accept_channel:
-#!!  - port : 8649
-#!!
-#!!nginx_conf: 'puppet:///modules/dmo_hiera/nginx.conf'
-#!!smoke_conf: 'puppet:///modules/dmo_hiera/smoke-config.dev.sh'
-#!!
-#!!mars_host: mars.vagrant.noao.edu
-#!!#mars_host: mars1.sdm.noao.edu
-#!!mars_port: 8000
-#!!
-#!!
-#!!dataqversion: master
-#!!tadaversion: master
-#!!marsversion: ingest2
-#!!#djangoserver: /sandbox/mars/start-mars-development.sh
-#!!
 
 ####################
 ## NATICA
@@ -82,7 +27,7 @@ marsnatversion: master
 dqnatversion: master
 personalityversion: master
 
-#archive_topdir: '/sandbox/natica-archive'
+archive_topdir: '/sandbox/natica-archive'
 patch_dbnat: 'puppet:///modules/dmo_hiera/patch-dbnat.sh'
 patch_marsnat: 'puppet:///modules/dmo_hiera/patch-marsnat.sh'
 #! patch_tadanat: 'puppet:///modules/dmo_hiera/patch-tadanat.sh'

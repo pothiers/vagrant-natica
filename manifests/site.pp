@@ -15,15 +15,19 @@ node dbnat {
 node marsnat {
   notice("Loading site.pp::marsnat")
   
+  # sudo usermod -aG devops,tester,tada vagrant
+  group { ['devops', 'tester', 'cache'] :
+    ensure => present,
+  }         
+  user { 'vagrant':
+    ensure => present,
+    groups => ['devops', 'tester', 'tada', 'cache'],
+  }
+
   include marsnat::config
   include marsnat::install
   include marsnat::service
 
-  # sudo usermod -aG devops,tester,tada vagrant
-  user { 'vagrant':
-    ensure => present,
-    groups => ['devops', 'tester', 'tada'],
-  }
 } 
 #!node mtnnat {
 #!  include tadanat
