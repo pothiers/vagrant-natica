@@ -12,6 +12,7 @@
 
 localnatica: 'puppet:///modules/dmo_hiera/django_settings_local_dev_natica.py'
 djangoserver: /sandbox/marsnat/start-mars-development.sh
+elasticsearch_host: 'http://docker1.dm.noao.edu'
 
 natica_timeout: 2 # arch_timeout: 11
 
