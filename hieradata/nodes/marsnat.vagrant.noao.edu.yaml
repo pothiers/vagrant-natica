@@ -6,3 +6,7 @@ dummy: nothing-here
 ssl_domain_crt: 'puppet:///modules/dmo_hiera/ssl_domain.pat.crt'
 ssl_domain_key: 'puppet:///modules/dmo_hiera/ssl_domain.pat.key'
 
+ssl_noao_crt: 'puppet:///modules/dmo_hiera/ssl_domain.pat.crt'
+ssl_noao_key: 'puppet:///modules/dmo_hiera/ssl_domain.pat.key'
+
+noirlab_edu_nginx_conf: 'puppet:///modules/marsnat/nginx/sites-enabled/internal.noirlab'

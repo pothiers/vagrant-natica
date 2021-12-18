@@ -8,11 +8,11 @@ PUPPETENV = "dev"
 ##How to set vagrant virtualbox video memory
 ##
 ## You'll need to use the following config:
-## 
+##
 ## config.vm.provider "virtualbox" do |v|
 ##    v.customize ["modifyvm", :id, "--vram", "<vramsize in MB>"]
 ## end
-## 
+##
 ## How I found this? I looked at VirtualBox docs but haven't found
 ## anything about 'Video' or 'Memory' that seem related to video
 ## memory. So I ran VBoxManage showvminfo <vm name> command and looked
@@ -42,7 +42,6 @@ Vagrant.configure("2") do |config|
   #!config.vm.synced_folder "../tada-tools/dev-scripts", "/dbin"
   #!config.vm.synced_folder "../../logs", "/logs"
 
-
   # DMO demo machines: Puppet-3.7.5, OS=SL-7.4
   # DMO dev.dm machines: Puppet-5.5.1, OS=SL-7.5
   #!config.vm.box = "vStone/centos-7.x-puppet.3.x" # atlas is GONE
@@ -52,9 +51,14 @@ Vagrant.configure("2") do |config|
   #!config.vm.box = "gutocarvalho/scientific7x64puppet5"
   #!config.vm.box = "adrianovieira/centos7x64_minimal-puppet5"
   #!config.vm.box_version = "5.3.2"
+
   config.vm.box = "aeciopires/centos-7"
   config.vm.box_version = "1.0.0"
-  
+  # 10/21/2021 Foreman marsnat1: Scientific Linux 7.6
+  #!config.vm.box = "genebean/centos-7-puppet5"
+  #!config.vm.box_version = "2.4.20201113"
+
+
   # Attempt to speed up connection to remote hosts
   # (e.g. connection to MARS services)
   config.vm.provider :virtualbox do |vb|
@@ -63,7 +67,7 @@ Vagrant.configure("2") do |config|
     vb.customize ["modifyvm", :id, "--natdnsproxy1", "off", "--vram", "12"]
     #vb.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
     #!vb.gui = true
-  end    
+  end
 
   ##############################################################################
   ### NATICA System
@@ -73,9 +77,9 @@ Vagrant.configure("2") do |config|
     marsnat.vm.network :forwarded_port, guest: 8000, host: 8020
     marsnat.vm.network :forwarded_port, guest: 80, host: 8021
     marsnat.vm.network :forwarded_port, guest: 443, host: 443
-    marsnat.vm.hostname = "marsnat.vagrant.noao.edu" 
+    marsnat.vm.hostname = "marsnat.vagrant.noao.edu"
     marsnat.hostmanager.aliases =  %w(marsnat)
-    
+
     marsnat.vm.provision :puppet do |puppet|
       puppet.manifests_path = "manifests"
       puppet.manifest_file = "site.pp"
@@ -96,9 +100,9 @@ Vagrant.configure("2") do |config|
   config.vm.define "dbnat" do |dbnat| #natica
     dbnat.vm.network :private_network, ip: "172.16.1.24"
     dbnat.vm.network :forwarded_port, guest: 8010, host: 8010
-    dbnat.vm.hostname = "dbnat.vagrant.noao.edu" 
+    dbnat.vm.hostname = "dbnat.vagrant.noao.edu"
     dbnat.hostmanager.aliases =  %w(dbnat)
-    
+
     dbnat.vm.provision :puppet do |puppet|
       puppet.manifests_path = "manifests"
       puppet.manifest_file = "site.pp"
@@ -115,17 +119,16 @@ Vagrant.configure("2") do |config|
       ]
     end
   end
-  
+
   ###
   ### END NATICA system
   ##############################################################################
 
-##  config.vm.define "mtnnat" do |mtnnat| 
+##  config.vm.define "mtnnat" do |mtnnat|
 ##    mtnnat.vm.network :private_network, ip: "172.16.1.25"
-##  end  
-##  config.vm.define "valnat" do |valnat| 
+##  end
+##  config.vm.define "valnat" do |valnat|
 ##    valnat.vm.network :private_network, ip: "172.16.1.25"
-##  end  
+##  end
 
 end
-
